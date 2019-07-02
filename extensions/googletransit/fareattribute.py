@@ -18,15 +18,15 @@ import transitfeed
 
 class FareAttribute(transitfeed.FareAttribute):
   """Extension of transitfeed.FareAttribute:
-  - Adding field 'agency_id' and ValidateAgencyId() function.
-  - Overriding ValidateAfterAdd() in order to call ValidateAgencyId().
+  - Adding field 'agency_id' and validate_agency_id() function.
+  - Overriding validate_after_add() in order to call validate_agency_id().
   - See open proposal "add agency_id column to fare_attributes.txt" at
   http://groups.google.com/group/gtfs-changes/browse_frm/thread/4e74c23bb1f80480
   """
 
   _FIELD_NAMES = transitfeed.FareAttribute._FIELD_NAMES + [ 'agency_id' ]
 
-  def ValidateAgencyId(self, problems):
+  def validate_agency_id(self, problems):
     agencies = self._schedule.GetAgencyList()
     for agency in agencies:
       if agency.agency_id == self.agency_id:
@@ -37,6 +37,6 @@ class FareAttribute(transitfeed.FareAttribute):
       problems.InvalidAgencyID('agency_id', self.agency_id,
                                  'fare', self.fare_id)
 
-  def ValidateAfterAdd(self, problems):
-    super(FareAttribute, self).ValidateAfterAdd(problems)
-    self.ValidateAgencyId(problems)
+  def validate_after_add(self, problems):
+    super(FareAttribute, self).validate_after_add(problems)
+    self.validate_agency_id(problems)

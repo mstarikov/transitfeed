@@ -15,18 +15,20 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+
 from .loader import Loader
 
+
 class ShapeLoader(Loader):
-  """A subclass of Loader that only loads the shapes from a GTFS file."""
+    """A subclass of loader that only loads the shapes from a GTFS file."""
 
-  def __init__(self, *args, **kwargs):
-    """Initialize a new ShapeLoader object.
+    def __init__(self, *args, **kwargs):
+        """Initialize a new Shapeloader object.
 
-    See Loader.__init__ for argument documentation.
-    """
-    Loader.__init__(self, *args, **kwargs)
+        See loader.__init__ for argument documentation.
+        """
+        Loader.__init__(self, *args, **kwargs)
 
-  def Load(self):
-    self._LoadShapes()
-    return self._schedule
+    def load(self):
+        self._loadShapes()
+        return self._schedule

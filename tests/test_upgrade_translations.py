@@ -13,10 +13,10 @@ def get_file_contents(filename):
 
 
 class TestTranslationsConverter(unittest.TestCase):
-    def setUp(self):
+    def set_up(self):
         self.test_dir = tempfile.mkdtemp()
 
-    def tearDown(self):
+    def tear_down(self):
         shutil.rmtree(self.test_dir)
 
     def test_convert_translations(self):

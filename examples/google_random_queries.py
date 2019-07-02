@@ -34,101 +34,104 @@ import random
 import sys
 import transitfeed
 import urllib
-import urlparse
+try:
+    from urllib import parse as urlparse  # Python 3
+except ImportError:
+    import urlparse  # Python 2.7
 
 
-def Distance(lat0, lng0, lat1, lng1):
-  """
-  Compute the geodesic distance in meters between two points on the
-  surface of the Earth.  The latitude and longitude angles are in
-  degrees.
+def distance(lat0, lng0, lat1, lng1):
+    """
+    Compute the geodesic distance in meters between two points on the
+    surface of the Earth.  The latitude and longitude angles are in
+    degrees.
 
-  Approximate geodesic distance function (Haversine Formula) assuming
-  a perfect sphere of radius 6367 km (see "What are some algorithms
-  for calculating the distance between 2 points?" in the GIS Faq at
-  http://www.census.gov/geo/www/faq-index.html).  The approximate
-  radius is adequate for our needs here, but a more sophisticated
-  geodesic function should be used if greater accuracy is required
-  (see "When is it NOT okay to assume the Earth is a sphere?" in the
-  same faq).
-  """
-  deg2rad = math.pi / 180.0
-  lat0 = lat0 * deg2rad
-  lng0 = lng0 * deg2rad
-  lat1 = lat1 * deg2rad
-  lng1 = lng1 * deg2rad
-  dlng = lng1 - lng0
-  dlat = lat1 - lat0
-  a = math.sin(dlat*0.5)
-  b = math.sin(dlng*0.5)
-  a = a * a + math.cos(lat0) * math.cos(lat1) * b * b
-  c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
-  return 6367000.0 * c
-
-
-def AddNoiseToLatLng(lat, lng):
-  """Add up to 500m of error to each coordinate of lat, lng."""
-  m_per_tenth_lat = Distance(lat, lng, lat + 0.1, lng)
-  m_per_tenth_lng = Distance(lat, lng, lat, lng + 0.1)
-  lat_per_100m = 1 / m_per_tenth_lat * 10
-  lng_per_100m = 1 / m_per_tenth_lng * 10
-  return (lat + (lat_per_100m * 5 * (random.random() * 2 - 1)),
-          lng + (lng_per_100m * 5 * (random.random() * 2 - 1)))
+    Approximate geodesic distance function (Haversine Formula) assuming
+    a perfect sphere of radius 6367 km (see "What are some algorithms
+    for calculating the distance between 2 points?" in the GIS Faq at
+    http://www.census.gov/geo/www/faq-index.html).  The approximate
+    radius is adequate for our needs here, but a more sophisticated
+    geodesic function should be used if greater accuracy is required
+    (see "When is it NOT okay to assume the Earth is a sphere?" in the
+    same faq).
+    """
+    deg2rad = math.pi / 180.0
+    lat0 = lat0 * deg2rad
+    lng0 = lng0 * deg2rad
+    lat1 = lat1 * deg2rad
+    lng1 = lng1 * deg2rad
+    dlng = lng1 - lng0
+    dlat = lat1 - lat0
+    a = math.sin(dlat * 0.5)
+    b = math.sin(dlng * 0.5)
+    a = a * a + math.cos(lat0) * math.cos(lat1) * b * b
+    c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
+    return 6367000.0 * c
 
 
-def GetRandomLocationsNearStops(schedule):
-  """Return a list of (lat, lng) tuples."""
-  locations = []
-  for s in schedule.GetStopList():
-    locations.append(AddNoiseToLatLng(s.stop_lat, s.stop_lon))
-  return locations
+def add_noise_to_lat_lng(lat, lng):
+    """Add up to 500m of error to each coordinate of lat, lng."""
+    m_per_tenth_lat = distance(lat, lng, lat + 0.1, lng)
+    m_per_tenth_lng = distance(lat, lng, lat, lng + 0.1)
+    lat_per_100m = 1 / m_per_tenth_lat * 10
+    lng_per_100m = 1 / m_per_tenth_lng * 10
+    return (lat + (lat_per_100m * 5 * (random.random() * 2 - 1)),
+            lng + (lng_per_100m * 5 * (random.random() * 2 - 1)))
 
 
-def GetRandomDatetime():
-  """Return a datetime in the next week."""
-  seconds_offset = random.randint(0, 60 * 60 * 24 * 7)
-  dt = datetime.today() + timedelta(seconds=seconds_offset)
-  return dt.replace(second=0, microsecond=0)
+def get_random_locations_near_stops(schedule):
+    """Return a list of (lat, lng) tuples."""
+    locations = []
+    for s in schedule.GetStopList():
+        locations.append(add_noise_to_lat_lng(s.stop_lat, s.stop_lon))
+    return locations
 
 
-def FormatLatLng(lat_lng):
-  """Format a (lat, lng) tuple into a string for maps.google.com."""
-  return "%0.6f,%0.6f" % lat_lng
+def get_random_datetime():
+    """Return a datetime in the next week."""
+    seconds_offset = random.randint(0, 60 * 60 * 24 * 7)
+    dt = datetime.today() + timedelta(seconds=seconds_offset)
+    return dt.replace(second=0, microsecond=0)
 
 
-def LatLngsToGoogleUrl(source, destination, dt):
-  """Return a URL for routing between two (lat, lng) at a datetime."""
-  params = {"saddr": FormatLatLng(source),
-            "daddr": FormatLatLng(destination),
-            "time": dt.strftime("%I:%M%p"),
-            "date": dt.strftime("%Y-%m-%d"),
-            "dirflg": "r",
-            "ie": "UTF8",
-            "oe": "UTF8"}
-  url = urlparse.urlunsplit(("http", "maps.google.com", "/maps",
-                             urllib.urlencode(params), ""))
-  return url
+def format_lat_lng(lat_lng):
+    """Format a (lat, lng) tuple into a string for maps.google.com."""
+    return "%0.6f,%0.6f" % lat_lng
 
 
-def LatLngsToGoogleLink(source, destination):
-  """Return a string "<a ..." for a trip at a random time."""
-  dt = GetRandomDatetime()
-  return "<a href='%s'>from:%s to:%s on %s</a>" % (
-      LatLngsToGoogleUrl(source, destination, dt),
-      FormatLatLng(source), FormatLatLng(destination),
-      dt.ctime())
+def lat_lngs_to_google_url(source, destination, dt):
+    """Return a URL for routing between two (lat, lng) at a datetime."""
+    params = {"saddr": format_lat_lng(source),
+              "daddr": format_lat_lng(destination),
+              "time": dt.strftime("%I:%M%p"),
+              "date": dt.strftime("%Y-%m-%d"),
+              "dirflg": "r",
+              "ie": "UTF8",
+              "oe": "UTF8"}
+    url = urlparse.urlunsplit(("http", "maps.google.com", "/maps",
+                               urllib.urlencode(params), ""))
+    return url
 
 
-def WriteOutput(title, locations, limit, f):
-  """Write html to f for up to limit trips between locations.
+def lat_lngs_to_google_link(source, destination):
+    """Return a string "<a ..." for a trip at a random time."""
+    dt = get_random_datetime()
+    return "<a href='%s'>from:%s to:%s on %s</a>" % (
+        lat_lngs_to_google_url(source, destination, dt),
+        format_lat_lng(source), format_lat_lng(destination),
+        dt.ctime())
 
-  Args:
-    title: String used in html title
-    locations: list of (lat, lng) tuples
-    limit: maximum number of queries in the html
-    f: a file object
-  """
-  output_prefix = """
+
+def write_output(title, locations, limit, f):
+    """Write html to f for up to limit trips between locations.
+
+    Args:
+      title: String used in html title
+      locations: list of (lat, lng) tuples
+      limit: maximum number of queries in the html
+      f: a file object
+    """
+    output_prefix = """
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -165,72 +168,72 @@ If you find a problem be sure to save the URL. This file is generated randomly.
 <ol>
 """ % locals()
 
-  output_suffix = """
+    output_suffix = """
 </ol>
 </body>
 </html>
 """ % locals()
 
-  f.write(transitfeed.EncodeUnicode(output_prefix))
-  for source, destination in zip(locations[0:limit], locations[1:limit + 1]):
-    f.write(transitfeed.EncodeUnicode("<li>%s\n" %
-                                      LatLngsToGoogleLink(source, destination)))
-  f.write(transitfeed.EncodeUnicode(output_suffix))
+    f.write(transitfeed.EncodeUnicode(output_prefix))
+    for source, destination in zip(locations[0:limit], locations[1:limit + 1]):
+        f.write(transitfeed.EncodeUnicode("<li>%s\n" %
+                                          lat_lngs_to_google_link(source, destination)))
+    f.write(transitfeed.EncodeUnicode(output_suffix))
 
 
-def ParentAndBaseName(path):
-  """Given a path return only the parent name and file name as a string."""
-  dirname, basename = os.path.split(path)
-  dirname = dirname.rstrip(os.path.sep)
-  if os.path.altsep:
-    dirname = dirname.rstrip(os.path.altsep)
-  _, parentname = os.path.split(dirname)
-  return os.path.join(parentname, basename)
+def parent_and_base_name(path):
+    """Given a path return only the parent name and file name as a string."""
+    dirname, basename = os.path.split(path)
+    dirname = dirname.rstrip(os.path.sep)
+    if os.path.altsep:
+        dirname = dirname.rstrip(os.path.altsep)
+    _, parent_name = os.path.split(dirname)
+    return os.path.join(parent_name, basename)
 
 
 def main():
-  usage = \
-"""%prog [options] <input GTFS.zip>
+    usage = \
+        """%prog [options] <input GTFS.zip>
+        
+        Create an HTML page of random URLs for the Google Maps transit trip
+        planner. The queries go between places near stops listed in a <input GTFS.zip>.
+        By default 50 random URLs are saved to google_random_queries.html.
+        
+        For more information see
+        https://github.com/google/transitfeed/wiki/GoogleRandomQueries
+        """
 
-Create an HTML page of random URLs for the Google Maps transit trip
-planner. The queries go between places near stops listed in a <input GTFS.zip>.
-By default 50 random URLs are saved to google_random_queries.html.
+    parser = optparse.OptionParser(
+        usage=usage,
+        version="%prog " + transitfeed.__version__)
+    parser.add_option("-l", "--limit", dest="limit", type="int",
+                      help="Maximum number of URLs to generate")
+    parser.add_option("-o", "--output", dest="output", metavar="HTML_OUTPUT_PATH",
+                      help="write HTML output to HTML_OUTPUT_PATH")
+    parser.set_defaults(output="google_random_queries.html", limit=50)
+    (options, args) = parser.parse_args()
+    if len(args) != 1:
+        print(parser.format_help(), file=sys.stderr)
+        print("\n\nYou must provide the path of a single feed\n\n", file=sys.stderr)
+        sys.exit(2)
+    feed_path = args[0]
 
-For more information see
-https://github.com/google/transitfeed/wiki/GoogleRandomQueries
-"""
+    # ProblemReporter prints problems on console.
+    loader = transitfeed.Loader(feed_path, problems=transitfeed.ProblemReporter(),
+                                load_stop_times=False)
+    schedule = loader.Load()
+    locations = get_random_locations_near_stops(schedule)
+    random.shuffle(locations)
+    agencies = ", ".join([a.agency_name for a in schedule.GetAgencyList()])
+    title = "%s (%s)" % (agencies, parent_and_base_name(feed_path))
 
-  parser = optparse.OptionParser(
-      usage=usage,
-      version="%prog "+transitfeed.__version__)
-  parser.add_option("-l", "--limit", dest="limit", type="int",
-                    help="Maximum number of URLs to generate")
-  parser.add_option("-o", "--output", dest="output", metavar="HTML_OUTPUT_PATH",
-                    help="write HTML output to HTML_OUTPUT_PATH")
-  parser.set_defaults(output="google_random_queries.html", limit=50)
-  (options, args) = parser.parse_args()
-  if len(args) != 1:
-    print(parser.format_help(), file=sys.stderr)
-    print("\n\nYou must provide the path of a single feed\n\n", file=sys.stderr)
-    sys.exit(2)
-  feed_path = args[0]
-
-  # ProblemReporter prints problems on console.
-  loader = transitfeed.Loader(feed_path, problems=transitfeed.ProblemReporter(),
-                              load_stop_times=False)
-  schedule = loader.Load()
-  locations = GetRandomLocationsNearStops(schedule)
-  random.shuffle(locations)
-  agencies = ", ".join([a.agency_name for a in schedule.GetAgencyList()])
-  title = "%s (%s)" % (agencies, ParentAndBaseName(feed_path))
-
-  WriteOutput(title,
-              locations,
-              options.limit,
-              open(options.output, "w"))
-  print ("Load %s in your web browser. It contains more instructions." %
-         options.output)
+    write_output(title,
+                 locations,
+                 options.limit,
+                 open(options.output, "w"))
+    print("Load %s in your web browser. It contains more instructions." %
+          options.output)
 
 
 if __name__ == "__main__":
-  main()
+    main()

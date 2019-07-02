@@ -21,12 +21,12 @@ import transitfeed
 
 class Agency(transitfeed.Agency):
   """Extension of transitfeed.Agency:
-  - Overriding ValidateAgencyLang() for supporting BCP-47 agency_lang codes.
+  - Overriding validate_agency_lang() for supporting BCP-47 agency_lang codes.
   """
 
-  # Overrides transitfeed.Agency.ValidateAgencyLang() and validates agency_lang
+  # Overrides transitfeed.Agency.validate_agency_lang() and validates agency_lang
   # using the new pybcp47 module via extension_util.py
-  def ValidateAgencyLang(self, problems):
+  def validate_agency_lang(self, problems):
     if not self.agency_lang:
       return False
     return not extension_util.ValidateLanguageCode(

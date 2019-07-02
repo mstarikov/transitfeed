@@ -125,6 +125,7 @@ class RecordIdHelper(object):
     """Helper object to find record_id and record_sub_id based on GTFS table
     name and its fields.
     """
+
     def __init__(self, table_name, field_names):
         id_and_sub_id = RECORD_ID_MAP.get(table_name)
         if id_and_sub_id is None:
@@ -187,6 +188,7 @@ def any_translatable_field(fields):
 class OldTranslations(object):
     """Reads all old translations and keeps them for further usage.
     """
+
     def __init__(self, src_dir):
         self.src_dir = src_dir
         self._find_feed_language()
@@ -197,10 +199,10 @@ class OldTranslations(object):
         """Find feed language based specified feed_info.txt or agency.txt.
         """
         self.feed_language = (
-            read_first_available_value(
-                os.path.join(self.src_dir, 'feed_info.txt'), 'feed_lang') or
-            read_first_available_value(
-                os.path.join(self.src_dir, 'agency.txt'), 'agency_lang'))
+                read_first_available_value(
+                    os.path.join(self.src_dir, 'feed_info.txt'), 'feed_lang') or
+                read_first_available_value(
+                    os.path.join(self.src_dir, 'agency.txt'), 'agency_lang'))
         if not self.feed_language:
             raise Exception(
                 'Cannot find feed language in feed_info.txt and agency.txt')
@@ -243,8 +245,8 @@ class OldTranslations(object):
                     'No translation in feed language for %s, available: %s' %
                     (trans_id, translations))
             n_occurences_of_original[original_name] = (
-                n_occurences_of_original.get(original_name, 0) +
-                1)
+                    n_occurences_of_original.get(original_name, 0) +
+                    1)
 
         self.context_dependent_names = set(
             name
@@ -257,6 +259,7 @@ class OldTranslations(object):
 class TranslationsConverter(object):
     """Converts translations from the old to the new format.
     """
+
     def __init__(self, src_dir):
         self.src_dir = src_dir
         self.old_translations = OldTranslations(src_dir)
@@ -319,6 +322,7 @@ class TranslationsConverter(object):
 class TableTranslator(object):
     """Translates a given GTFS table.
     """
+
     def __init__(self, table_name, field_names, old_translations,
                  translations_writer):
         self.table_name = table_name
@@ -357,8 +361,8 @@ class TableTranslator(object):
             out_row[field_name] = value_in_feed_lang
             # If translation depends on the context, then always use record_id.
             use_record_id = (
-                self.table_uses_record_id or
-                value_in_feed_lang in context_dependent_names)
+                    self.table_uses_record_id or
+                    value_in_feed_lang in context_dependent_names)
             record_id = self.record_id_helper.get_record_id(row)
             record_sub_id = self.record_id_helper.get_record_sub_id(row)
             for language, translation in field_translations.items():

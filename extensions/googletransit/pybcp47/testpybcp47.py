@@ -26,7 +26,7 @@ from .bcp47languageparser import Bcp47LanguageParser
 class PyBcp47TestCase(unittest.TestCase):
   bcp47parser = Bcp47LanguageParser()
 
-  def testRegistryFileRecordsBeingWellformed(self):
+  def test_registry_file_records_being_wellformed(self):
     # Test whether the parsed entries from the registry file in this package are
     # valid. The registry file in this package is originally downloaded from
     # http://www.iana.org/assignments/language-subtag-registry. Formatting
@@ -64,17 +64,17 @@ class PyBcp47TestCase(unittest.TestCase):
                       "Variant subtag '%s' in language-subtag-registry.txt "
                       "seems to be invalid!" % (tag))
 
-  def testValidationWithSamples(self):
+  def test_validation_with_samples(self):
     # Test whether samples are all well-formed but not valid.
-    self._CheckTagsInFile("well-formed-not-valid-tags.txt", True, False)
+    self._check_tags_in_file("well-formed-not-valid-tags.txt", True, False)
 
     # Test whether samples are all not well-formed.
-    self._CheckTagsInFile("not-well-formed-tags.txt", False, False)
+    self._check_tags_in_file("not-well-formed-tags.txt", False, False)
 
     # Test whether samples are all valid.
-    self._CheckTagsInFile("valid-tags.txt", True, True)
+    self._check_tags_in_file("valid-tags.txt", True, True)
 
-  def _CheckTagsInFile(self, filename, should_be_wellformed, should_be_valid):
+  def _check_tags_in_file(self, filename, should_be_wellformed, should_be_valid):
     full_filename = os.path.join(os.path.dirname(__file__), "testdata",
                                  filename)
     fileObj = codecs.open(full_filename, "r", "utf-8" )

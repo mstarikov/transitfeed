@@ -22,9 +22,9 @@ from . import fareattribute
 from . import route
 from . import stop
 
-def GetGtfsFactory(factory = None):
+def get_gtfs_factory(factory = None):
   if not factory:
-    factory = transitfeed.GetGtfsFactory()
+    factory = transitfeed.get_gtfs_factory()
 
   # Agency class extension
   factory.UpdateClass('Agency', agency.Agency)

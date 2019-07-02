@@ -44,9 +44,9 @@ class Bcp47LanguageParser(object):
     self.variants = {}        # variant subtags, e.g. '1901'
     self.grandfathereds = {}  # grandfathered tags, e.g. 'sgn-CH-DE'
     self.redundants = {}      # redundant subtags, e.g. 'zh-Hant-CN'
-    self._ReadLanguageSubtagRegistryFile()
+    self._read_language_subtag_registry_file()
 
-  def _GetLinesFromLanguageSubtagRegistryFile(self):
+  def _get_lines_from_language_subtag_registry_file(self):
     # Read and yield the registry file from this package. This should be a most
     # recent copy of http://www.iana.org/assignments/language-subtag-registry
     # Formatting rules of this file can be found at page 20 of
@@ -71,9 +71,9 @@ class Bcp47LanguageParser(object):
     if accumulated_line_parts:
       yield (' '.join(accumulated_line_parts), line_number)
 
-  def _ReadLanguageSubtagRegistryFile(self):
+  def _read_language_subtag_registry_file(self):
     # Load the entries from the registry file in this package.
-    line_iterator = self._GetLinesFromLanguageSubtagRegistryFile()
+    line_iterator = self._get_lines_from_language_subtag_registry_file()
     # Read the header lines with the File-Date record.
     first_line, line_number = next(line_iterator)
     if not first_line[:11] == 'File-Date: ':
@@ -90,7 +90,7 @@ class Bcp47LanguageParser(object):
     current_prefixes = []
     for line, line_number in line_iterator:
       if line == '%%':
-        self._AddSubtagFromRegistryFile(current_type, current_tag,
+        self._add_subtag_from_registry_file(current_type, current_tag,
                                         current_descriptions, current_prefixes,
                                         line_number)
         current_type = None
@@ -131,20 +131,20 @@ class Bcp47LanguageParser(object):
 
     # The last record does not get terminated by the '%%' preceding the next
     # record. So we have to add it after the 'for' loop.
-    self._AddSubtagFromRegistryFile(current_type, current_tag,
+    self._add_subtag_from_registry_file(current_type, current_tag,
                                     current_descriptions, current_prefixes,
                                     line_number)
 
-  def IntStr26ToInt(self, int_str):
+  def int_str26_to_int(self, int_str):
     return reduce(lambda x, y: 26 * x + y, map(string.lowercase.index, int_str))
 
-  def IntToIntStr26(self, int_value, int_str=''):
+  def int_to_int_str26(self, int_value, int_str=''):
     if int_value == 0:
       return int_str
-    return self.IntToIntStr26(
+    return self.int_to_int_str26(
         int_value/26, string.lowercase[int_value%26] + int_str)
 
-  def _AddSubtagFromRegistryFile(self, current_type, current_tag,
+  def _add_subtag_from_registry_file(self, current_type, current_tag,
                                  current_descriptions, current_prefixes,
                                  line_number):
     if not current_descriptions:
@@ -171,9 +171,9 @@ class Bcp47LanguageParser(object):
           "The start and end tags in ranges must have the same length! "
           "The tags '%s' and '%s' are different!" % (start_str, end_str))
       for i in range(
-          self.IntStr26ToInt(start_str), self.IntStr26ToInt(end_str) + 1):
-        range_tag = self.IntToIntStr26(i)
-        self._AddSubtagFromRegistryFile(current_type, range_tag,
+          self.int_str26_to_int(start_str), self.int_str26_to_int(end_str) + 1):
+        range_tag = self.int_to_int_str26(i)
+        self._add_subtag_from_registry_file(current_type, range_tag,
                                         current_descriptions, current_prefixes,
                                         line_number)
       # Range tags are added as recursion so we have to return afterwards.
@@ -246,13 +246,13 @@ class Bcp47LanguageParser(object):
       "((^|-)%(private)s)?$"      # 0..1 private subtags (can be standalone)
       % _wellformed_dict)
 
-  def IsWellformedSubtag(self, subtag, subtag_type):
+  def is_wellformed_subtag(self, subtag, subtag_type):
     if subtag_type in self._wellformed_dict:
       subtag_regexp = "^%s$" % (self._wellformed_dict[subtag_type])
       return re.search(subtag_regexp, subtag) is not None
     return False
 
-  def IsWellformed(self, lang_code):
+  def is_wellformed(self, lang_code):
     if lang_code.lower() in self.grandfathereds:
       return True
     match_obj = self._wellformed_bcp47.match(lang_code)
@@ -263,96 +263,96 @@ class Bcp47LanguageParser(object):
     else:
       return True
 
-  def ParseLanguage(self, lang_code):
+  def parse_language(self, lang_code):
     lang_obj = Bcp47LanguageObject(lang_code)
 
-    if not self.IsWellformed(lang_code):
+    if not self.is_wellformed(lang_code):
       return lang_obj
     lang_obj.wellformed = True
 
     lang_code = lang_code.lower()
     if lang_code in self.grandfathereds:
-      return lang_obj.Update(self.grandfathereds[lang_code], True, True)
+      return lang_obj.update(self.grandfathereds[lang_code], True, True)
     if lang_code in self.redundants:
-      return lang_obj.Update(self.redundants[lang_code], True, True)
+      return lang_obj.update(self.redundants[lang_code], True, True)
 
     lang_code_parts = lang_code.split('-')
     lang_code_part_len = len(lang_code_parts)
     lang_code_part_idx = 0
     lang_tag = lang_code_parts[lang_code_part_idx]
-    if not self.IsWellformedSubtag(lang_tag, "lang"):
-      return lang_obj.Update(None, False, False)
+    if not self.is_wellformed_subtag(lang_tag, "lang"):
+      return lang_obj.update(None, False, False)
     elif lang_tag != 'x':
       if lang_tag in self.languages:
         lang_obj.descriptions.append(self.languages[lang_tag])
       else:
-        return lang_obj.Update("unknown language \'" + lang_tag + "\'",
+        return lang_obj.update("unknown language \'" + lang_tag + "\'",
                               True, False)
       lang_code_part_idx = lang_code_part_idx + 1
 
     if lang_code_part_idx == lang_code_part_len:
-      return lang_obj.Update(None, True, True)
+      return lang_obj.update(None, True, True)
 
     extlang_tag = lang_code_parts[lang_code_part_idx]
-    if self.IsWellformedSubtag(extlang_tag, "extlang"):
+    if self.is_wellformed_subtag(extlang_tag, "extlang"):
       if extlang_tag in self.extlangs:
         lang_obj.descriptions.append(self.extlangs[extlang_tag])
       else:
-        return lang_obj.Update("unknown extlang \'" + extlang_tag + "\'",
+        return lang_obj.update("unknown extlang \'" + extlang_tag + "\'",
                               True, False)
       lang_code_part_idx = lang_code_part_idx + 1
 
     if lang_code_part_idx == lang_code_part_len:
-      return lang_obj.Update(None, True, True)
+      return lang_obj.update(None, True, True)
 
     script_tag = lang_code_parts[lang_code_part_idx]
-    if self.IsWellformedSubtag(script_tag, "script"):
+    if self.is_wellformed_subtag(script_tag, "script"):
       if script_tag in self.scripts:
         lang_obj.descriptions.append(self.scripts[script_tag]+" script")
       else:
-        return lang_obj.Update("unknown script \'" + script_tag + "\'",
+        return lang_obj.update("unknown script \'" + script_tag + "\'",
                               True, False)
       lang_code_part_idx = lang_code_part_idx + 1
 
     if lang_code_part_idx == lang_code_part_len:
-      return lang_obj.Update(None, True, True)
+      return lang_obj.update(None, True, True)
 
     region_tag = lang_code_parts[lang_code_part_idx]
-    if self.IsWellformedSubtag(region_tag, "region"):
+    if self.is_wellformed_subtag(region_tag, "region"):
       if region_tag in self.regions:
         lang_obj.descriptions.append(self.regions[region_tag])
       else:
-        return lang_obj.Update("unknown region \'" + region_tag + "\'",
+        return lang_obj.update("unknown region \'" + region_tag + "\'",
                               True, False)
       lang_code_part_idx = lang_code_part_idx + 1
 
     if lang_code_part_idx == lang_code_part_len:
-      return lang_obj.Update(None, True, True)
+      return lang_obj.update(None, True, True)
 
     variant_tag = lang_code_parts[lang_code_part_idx]
-    if self.IsWellformedSubtag(variant_tag, "variant"):
+    if self.is_wellformed_subtag(variant_tag, "variant"):
       if variant_tag in self.variants:
         lang_obj.descriptions.append(self.variants[variant_tag])
       else:
-        return lang_obj.Update("unknown variant \'" + variant_tag + "\'",
+        return lang_obj.update("unknown variant \'" + variant_tag + "\'",
                               True, False)
       lang_code_part_idx = lang_code_part_idx + 1
 
     if lang_code_part_len > lang_code_part_idx:
       remainder = "-".join(lang_code_parts[lang_code_part_idx:])
       if len(remainder) > 0:
-        return lang_obj.Update("subtag \'"+remainder+"\' was ignored", True,
+        return lang_obj.update("subtag \'"+remainder+"\' was ignored", True,
                                True)
 
-    return lang_obj.Update(None, True, True)
+    return lang_obj.update(None, True, True)
 
-  def Parse_ISO639_1_Language(self, lang_code):
+  def parse__i_s_o639_1__language(self, lang_code):
     lang_obj = Bcp47LanguageObject(lang_code)
 
     lang_code = lang_code.lower()
     if len(lang_code) == 2:
       if lang_code in self.languages:
-        lang_obj.Update(self.languages[lang_code], True, True)
+        lang_obj.update(self.languages[lang_code], True, True)
       else:
         match_obj = re.match("^([a-z]{2})", lang_code)
         if match_obj:
@@ -368,7 +368,7 @@ class Bcp47LanguageObject(object):
     self.wellformed = False
     self.valid = False
 
-  def Update(self, description, wellformed, valid):
+  def update(self, description, wellformed, valid):
     if description:
       self.descriptions.append(description)
     self.wellformed = wellformed

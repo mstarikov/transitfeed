@@ -6,7 +6,6 @@
 import transitfeed
 from optparse import OptionParser
 
-
 parser = OptionParser()
 parser.add_option('--output', dest='output',
                   help='Path of output file. Should end in .zip')

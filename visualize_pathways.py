@@ -40,13 +40,12 @@ Usage:
 
 from __future__ import print_function
 
-from enum import Enum
 import argparse
 import csv
-import re
 import os
+import re
 import subprocess
-import sys
+from enum import Enum
 
 
 class LocationType(Enum):
@@ -75,6 +74,7 @@ class PathwayMode(Enum):
 class GtfsLocation(object):
     """GTFS location of any type: station, entrance etc defined in stops.txt.
     """
+
     def __init__(self, row, gtfs_reader):
         self._row = row
         self._reader = gtfs_reader
@@ -131,6 +131,7 @@ class GtfsLocation(object):
 class GtfsPathway(object):
     """GTFS pathway defined in pathways.txt.
     """
+
     def __init__(self, row, gtfs_reader):
         self._row = row
         self._reader = gtfs_reader
@@ -161,6 +162,7 @@ class GtfsReader(object):
     pathways.txt.
 
     """
+
     def __init__(self, gtfs_dir):
         self.gtfs_dir = gtfs_dir
         self._read_locations()
@@ -222,6 +224,7 @@ class Attributes(object):
       label="Platform 2" color=springgreen shape=oval
 
     """
+
     def __init__(self, **kwargs):
         self.attributes = kwargs
 
@@ -236,6 +239,7 @@ class GraphViz(object):
     """Keeps all data for a GraphViz DOT file: nodes, clustes and edges.
 
     """
+
     def __init__(self):
         self.nodes = []
         self.clusters = {}
@@ -263,6 +267,7 @@ class GraphViz(object):
 class GraphCluster(object):
     """A GraphViz cluster that groups several nodes.
     """
+
     def __init__(self, id, label, color):
         self.id = id
         self.label = label
@@ -304,6 +309,7 @@ class GraphNode(object):
     """A GraphViz node.
 
     """
+
     def __init__(self, id, label, color, shape):
         self.id = id
         self.label = label
@@ -322,6 +328,7 @@ class GraphEdge(object):
     """A GraphViz edge.
 
     """
+
     def __init__(self, source, destination, direction, label):
         self.source = source
         self.destination = destination
@@ -480,7 +487,7 @@ def main():
                         help='Additionally generate a SVG file with GraphViz')
     parser.add_argument('--stop_ids', '-s',
                         help='If set, then the graph will contain only those '
-                        'stations that include locations with these stop_ids')
+                             'stations that include locations with these stop_ids')
 
     args = parser.parse_args()
 

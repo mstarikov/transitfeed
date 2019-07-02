@@ -19,7 +19,7 @@ import transitfeed.util as util
 
 class Route(transitfeed.Route):
   """Extension of transitfeed.Route:
-  - Adding field 'co2_per_km' and ValidateCo2PerKm() function. See proposal at
+  - Adding field 'co2_per_km' and validate_co2_per_km() function. See proposal at
     https://sites.google.com/site/gtfschanges/open-proposals
   - Adding HVT (Hierarchical Vehicle Type) route types, also used in
     extension of transitfeed.Stop for validating the vehicle_type field.
@@ -71,13 +71,13 @@ class Route(transitfeed.Route):
   # _ROUTE_TYPE_NAMES is not getting updated as we should not continue to allow
   # reverse lookup by name. The new non GTFS route types are only valid as int.
 
-  def ValidateCo2PerKm(self, problems):
+  def validate_co2_per_km(self, problems):
     if not util.IsEmpty(self.co2_per_km):
       try:
         self.co2_per_km = float(self.co2_per_km)
       except ValueError:
         problems.InvalidValue('co2_per_km', self.co2_per_km)
 
-  def ValidateBeforeAdd(self, problems):
-    self.ValidateCo2PerKm(problems)
-    return super(Route, self).ValidateBeforeAdd(problems)
+  def validate_before_add(self, problems):
+    self.validate_co2_per_km(problems)
+    return super(Route, self).validate_before_add(problems)
