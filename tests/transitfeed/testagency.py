@@ -156,12 +156,12 @@ class AgencyAttributesTestCase(util.ValidationTestCase):
 class DeprecatedAgencyFieldsTestCase(util.MemoryZipTestCase):
 
     def test_deprectated_field_names(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "agency.txt",
             "agency_id,agency_name,agency_timezone,agency_url,agency_ticket_url\n"
             "DTA,Demo Agency,America/Los_Angeles,http://google.com,"
             "http://google.com/tickets\n")
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         e = self.accumulator.PopException("DeprecatedColumn")
         self.assertEquals("agency_ticket_url", e.column_name)
         self.accumulator.AssertNoMoreExceptions()
@@ -170,18 +170,18 @@ class DeprecatedAgencyFieldsTestCase(util.MemoryZipTestCase):
 class MultiAgencyTimeZoneTestCase(util.MemoryZipTestCase):
 
     def test_no_errors_with_agencies_having_same_time_zone(self):
-        self.SetArchiveContents("agency.txt",
+        self.set_archive_contents("agency.txt",
                                 "agency_id,agency_name,agency_url,agency_timezone,agency_lang\n"
                                 "DTA,Demo Agency,http://google.com,America/Los_Angeles,en\n"
                                 "DTA2,Demo Agency 2,http://google.com,America/Los_Angeles,en\n")
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_agencies_with_different_time_zone(self):
-        self.SetArchiveContents("agency.txt",
+        self.set_archive_contents("agency.txt",
                                 "agency_id,agency_name,agency_url,agency_timezone,agency_lang\n"
                                 "DTA,Demo Agency,http://google.com,America/Los_Angeles,en\n"
                                 "DTA2,Demo Agency 2,http://google.com,America/New_York,en\n")
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.PopInvalidValue("agency_timezone")
         self.accumulator.AssertNoMoreExceptions()

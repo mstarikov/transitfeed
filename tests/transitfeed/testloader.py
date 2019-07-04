@@ -199,13 +199,13 @@ class LoadAndRewriteFromZipTestCase(util.TestCase):
 
 class BasicMemoryZipTestCase(util.MemoryZipTestCase):
     def run_test(self):
-        self.MakeLoaderAndLoad()
+        self.make_loader_and_load()
         self.accumulator.AssertNoMoreExceptions()
 
 
 class ZipCompressionTestCase(util.MemoryZipTestCase):
     def run_test(self):
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         self.zip.close()
         write_output = StringIO()
         schedule.WriteGoogleTransitFeed(write_output)
@@ -222,14 +222,14 @@ class ZipCompressionTestCase(util.MemoryZipTestCase):
 
 class LoadUnknownFileInZipTestCase(util.MemoryZipTestCase):
     def run_test(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "stpos.txt",
             "stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station\n"
             "BEATTY_AIRPORT,Airport,36.868446,-116.784582,,STATION\n"
             "STATION,Airport,36.868446,-116.784582,1,\n"
             "BULLFROG,Bullfrog,36.88108,-116.81797,,\n"
             "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,,\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopException('UnknownFile')
         self.assertEquals('stpos.txt', e.file_name)
         self.accumulator.AssertNoMoreExceptions()
@@ -241,8 +241,8 @@ class TabDelimitedTestCase(util.MemoryZipTestCase):
         # ignoring csv quoting.
         for arcname in self.GetArchiveNames():
             contents = self.GetArchiveContents(arcname)
-            self.SetArchiveContents(arcname, contents.replace(",", "\t"))
-        schedule = self.MakeLoaderAndLoad()
+            self.set_archive_contents(arcname, contents.replace(",", "\t"))
+        schedule = self.make_loader_and_load()
         # Don't call self.accumulator.AssertNoMoreExceptions() because there are
         # lots of problems but I only care that the validator doesn't crash. In the
         # magical future the validator will stop when the csv is obviously hosed.

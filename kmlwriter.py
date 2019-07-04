@@ -811,4 +811,4 @@ def main():
 
 
 if __name__ == '__main__':
-    util.RunWithCrashHandler(main)
+    util.run_with_crash_handler(main)

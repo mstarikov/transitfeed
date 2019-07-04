@@ -18,14 +18,16 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-import dircache
+
 import os
 import os.path
 import re
 try:
-    from io import StringIO
+    import io as StringIO
+    import os as dircache
 except ImportError:
     import cStringIO as StringIO
+    import dircache
 import shutil
 import subprocess
 import sys
@@ -70,7 +72,7 @@ def check_call(cmd, expected_retcode=0, stdin_str="", **kwargs):
         raise Exception(
             "Child '%s' returned %d. Output:\n%s\n%s\n" %
             (cmd, retcode, out, err))
-    return (out, err)
+    return out, err
 
 
 def data_path(path):
@@ -111,11 +113,11 @@ class RedirectStdOutTestCaseBase(TestCase):
         self.this_stdout.close()
 
 
-class get_pathTestCase(TestCase):
+class GetPathTestCase(TestCase):
     """TestCase with method to get paths to files in the distribution."""
 
     def set_up(self):
-        super(get_pathTestCase, self).set_up()
+        super(GetPathTestCase, self).set_up()
         self._origcwd = os.getcwd()
 
     def get_example_path(self, name):
@@ -132,22 +134,23 @@ class get_pathTestCase(TestCase):
         return os.path.join(self._origcwd, here, '..', *path)
 
 
-class TempDirTestCaseBase(get_pathTestCase):
+class TempDirTestCaseBase(GetPathTestCase):
     """Make a temporary directory the current directory before running the test
     and remove it after the test.
     """
 
     def set_up(self):
-        get_pathTestCase.set_up(self)
+        GetPathTestCase.set_up(self)
         self.tempdirpath = tempfile.mkdtemp()
         os.chdir(self.tempdirpath)
 
     def tear_down(self):
         os.chdir(self._origcwd)
         shutil.rmtree(self.tempdirpath)
-        get_pathTestCase.tear_down(self)
+        GetPathTestCase.tear_down(self)
 
-    def check_call_with_path(self, cmd, expected_retcode=0, stdin_str=""):
+    @staticmethod
+    def check_call_with_path(cmd, expected_retcode=0, stdin_str=""):
         """Run python script cmd[0] with args cmd[1:], making sure 'import
         transitfeed' will use the module in this source tree. Raises an Exception
         if the return code is not expected_retcode. Returns a tuple of strings,
@@ -183,7 +186,8 @@ class TempDirTestCaseBase(get_pathTestCase):
         return check_call(cmd, expected_retcode=expected_retcode, shell=False,
                           env=env, stdin_str=stdin_str)
 
-    def convert_zip_to_dict(self, zip):
+    @staticmethod
+    def convert_zip_to_dict(zip):
         """Converts a zip file into a dictionary.
 
         Arguments:
@@ -198,7 +202,8 @@ class TempDirTestCaseBase(get_pathTestCase):
         zip.close()
         return zip_dict
 
-    def convert_dict_to_zip(self, dict):
+    @staticmethod
+    def convert_dict_to_zip(dict):
         """Converts a dictionary to an in-memory zipfile.
 
         Arguments:
@@ -286,7 +291,7 @@ class MemoryZipTestCase(TestCase):
         """Returns a Schedule loaded with the contents of the file dict."""
 
         if gtfs_factory is None:
-            gtfs_factory = transitfeed.GetGtfsFactory()
+            gtfs_factory = transitfeed.get_gtfs_factory()
         if problems is None:
             problems = self.problems
         self.create_zip()
@@ -332,7 +337,10 @@ class MemoryZipTestCase(TestCase):
         self.zipfile = StringIO.StringIO()
         self.zip = zipfile.ZipFile(self.zipfile, 'a')
         for (arcname, contents) in self.zip_contents.items():
-            self.zip.writestr(arcname, contents)
+            try:
+                self.zip.writestr(arcname, contents)
+            except TypeError:
+                self.zip.write(arcname, contents)
 
     def dump_zip_file(self, zf):
         """Print the contents of something zipfile can open, such as a StringIO."""
@@ -342,7 +350,7 @@ class MemoryZipTestCase(TestCase):
             print("--\n%s\n%s" % (n, z.read(n)))
 
 
-class loadTestCase(TestCase):
+class LoadTestCase(TestCase):
     def set_up(self):
         self.accumulator = RecordingProblemAccumulator(self, ("expiration_date",))
         self.problems = transitfeed.ProblemReporter(self.accumulator)
@@ -479,7 +487,8 @@ class RecordingProblemAccumulator(transitfeed.ProblemAccumulatorInterface):
     Args:
       test_case: a unittest.TestCase object on which to report problems
       ignore_types: sequence of string type names that will be ignored by the
-      ProblemAccumulator"""
+      ProblemAccumulator
+    """
 
     def __init__(self, test_case, ignore_types=None):
         self.exceptions = []
@@ -511,7 +520,8 @@ class RecordingProblemAccumulator(transitfeed.ProblemAccumulatorInterface):
                                     (e_name, type_name, self.format_exception(*e)))
         return e[0]
 
-    def format_exception(self, exce, tb):
+    @staticmethod
+    def format_exception(exce, tb):
         return ("%s\nwith gtfs file context %s\nand traceback\n%s" %
                 (exce.FormatProblem(), exce.FormatContext(), tb))
 

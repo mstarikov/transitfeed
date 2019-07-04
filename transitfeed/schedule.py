@@ -64,7 +64,7 @@ class Schedule(object):
         if gtfs_factory is None:
             # This hackery is due to the cyclic dependency mess we currently have.
             # See gtfsfactoryuser for more.
-            gtfs_factory = gtfsfactoryuser.GtfsFactoryUser().GetGtfsFactory()
+            gtfs_factory = gtfsfactoryuser.GtfsFactoryUser().get_gtfs_factory()
         self._gtfs_factory = gtfs_factory
 
         # Map from table name to list of columns present in this schedule

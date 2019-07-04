@@ -25,66 +25,66 @@ class FeedInfoTestCase(util.MemoryZipTestCase):
     def set_up(self):
         super(FeedInfoTestCase, self).set_up()
         # Modify agency.txt for all tests in this test case
-        self.SetArchiveContents("agency.txt",
+        self.set_archive_contents("agency.txt",
                                 "agency_id,agency_name,agency_url,agency_timezone,agency_lang\n"
                                 "DTA,Demo Agency,http://google.com,America/Los_Angeles,en\n")
 
     def test_no_errors(self):
-        self.SetArchiveContents("feed_info.txt",
+        self.set_archive_contents("feed_info.txt",
                                 "feed_publisher_name,feed_publisher_url,feed_lang\n"
                                 "DTA,http://google.com,en")
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_different_language(self):
-        self.SetArchiveContents("feed_info.txt",
+        self.set_archive_contents("feed_info.txt",
                                 "feed_publisher_name,feed_publisher_url,feed_lang\n"
                                 "DTA,http://google.com,pt")
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.PopInvalidValue("feed_lang")
         self.accumulator.AssertNoMoreExceptions()
 
     def test_invalid_publisher_url(self):
-        self.SetArchiveContents("feed_info.txt",
+        self.set_archive_contents("feed_info.txt",
                                 "feed_publisher_name,feed_publisher_url,feed_lang\n"
                                 "DTA,htttp://google.com,en")
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.PopInvalidValue("feed_publisher_url")
         self.accumulator.AssertNoMoreExceptions()
 
     def test_validity_dates_no_errors(self):
-        self.SetArchiveContents("feed_info.txt",
+        self.set_archive_contents("feed_info.txt",
                                 "feed_publisher_name,feed_publisher_url,feed_lang,"
                                 "feed_start_date,feed_end_date\n"
                                 "DTA,http://google.com,en,20101201,20101231")
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_validity_dates_invalid(self):
-        self.SetArchiveContents("feed_info.txt",
+        self.set_archive_contents("feed_info.txt",
                                 "feed_publisher_name,feed_publisher_url,feed_lang,"
                                 "feed_start_date,feed_end_date\n"
                                 "DTA,http://google.com,en,10/01/12,10/31/12")
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.PopInvalidValue("feed_end_date")
         self.accumulator.PopInvalidValue("feed_start_date")
         self.accumulator.AssertNoMoreExceptions()
 
     def test_validity_dates_inverted(self):
-        self.SetArchiveContents("feed_info.txt",
+        self.set_archive_contents("feed_info.txt",
                                 "feed_publisher_name,feed_publisher_url,feed_lang,"
                                 "feed_start_date,feed_end_date\n"
                                 "DTA,http://google.com,en,20101231,20101201")
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.PopInvalidValue("feed_end_date")
         self.accumulator.AssertNoMoreExceptions()
 
     def test_deprectated_field_names(self):
-        self.SetArchiveContents("feed_info.txt",
+        self.set_archive_contents("feed_info.txt",
                                 "feed_publisher_name,feed_publisher_url,feed_timezone,feed_lang,"
                                 "feed_valid_from,feed_valid_until\n"
                                 "DTA,http://google.com,America/Los_Angeles,en,20101201,20101231")
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         e = self.accumulator.PopException("DeprecatedColumn")
         self.assertEquals("feed_valid_from", e.column_name)
         e = self.accumulator.PopException("DeprecatedColumn")
@@ -99,25 +99,25 @@ class FeedInfoServiceGapsTestCase(util.MemoryZipTestCase):
 
     def set_up(self):
         super(FeedInfoServiceGapsTestCase, self).set_up()
-        self.SetArchiveContents("calendar.txt",
+        self.set_archive_contents("calendar.txt",
                                 "service_id,monday,tuesday,wednesday,thursday,friday,"
                                 "saturday,sunday,start_date,end_date\n"
                                 "FULLW,1,1,1,1,1,1,1,20090601,20090610\n")
-        self.SetArchiveContents("trips.txt",
+        self.set_archive_contents("trips.txt",
                                 "route_id,service_id,trip_id\n"
                                 "AB,FULLW,AB1\n")
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "stop_times.txt",
             "trip_id,arrival_time,departure_time,stop_id,stop_sequence\n"
             "AB1,10:00:00,10:00:00,BEATTY_AIRPORT,1\n"
             "AB1,10:20:00,10:20:00,BULLFROG,2\n"
             "AB1,10:25:00,10:25:00,STAGECOACH,3\n")
-        self.SetArchiveContents("feed_info.txt",
+        self.set_archive_contents("feed_info.txt",
                                 "feed_publisher_name,feed_publisher_url,feed_lang,"
                                 "feed_start_date,feed_end_date\n"
                                 "DTA,http://google.com,en,20090515,20090620")
 
-        self.schedule = self.MakeLoaderAndLoad(extra_validation=False)
+        self.schedule = self.make_loader_and_load(extra_validation=False)
 
     # If there is a service gap starting before today, and today has no service,
     # it should be found - even if tomorrow there is service

@@ -17,7 +17,7 @@
 from __future__ import absolute_import
 import codecs
 try:
-    from io import StringIO
+    import io as StringIO
 except ImportError:
     import cStringIO as StringIO
 import csv
@@ -56,7 +56,7 @@ class Loader:
           zip: a zipfile.ZipFile object, optionally used instead of path
         """
         if gtfs_factory is None:
-            gtfs_factory = gtfsfactoryuser.GtfsFactoryUser().GetGtfsFactory()
+            gtfs_factory = gtfsfactoryuser.GtfsFactoryUser().get_gtfs_factory()
 
         if not schedule:
             schedule = gtfs_factory.Schedule(problem_reporter=problems,
@@ -75,7 +75,8 @@ class Loader:
            if so, returns True."""
         if self._zip:
             # If zip was passed to __init__ then path isn't used
-            assert not self._path
+            # assert not self._path
+            print('this is a zip file')
             return True
 
         if not isinstance(self._path, str) and hasattr(self._path, 'read'):
@@ -111,7 +112,7 @@ class Loader:
 
     def _check_file_names(self):
         filenames = self._get_file_names()
-        known_filenames = self._gtfs_factory.GetKnownFilenames()
+        known_filenames = self._gtfs_factory.get_known_filenames()
         for feed_file in filenames:
             if feed_file not in known_filenames:
                 if not feed_file.startswith('.'):
@@ -131,8 +132,10 @@ class Loader:
             self._problems.FileFormat("appears to be encoded in utf-16", (file_name,))
             # Convert and continue, so we can find more errors
             contents = codecs.getdecoder('utf-16')(contents)[0].encode('utf-8')
-
-        null_index = contents.find('\0')
+        try:
+            null_index = contents.find('\0')
+        except TypeError:
+            null_index = contents.find(b'\0')
         if null_index != -1:
             # It is easier to get some surrounding text than calculate the exact
             # row_num
@@ -284,16 +287,19 @@ class Loader:
             yield (d, line_num, header, valid_values)
 
     # TODO: Add testing for this specific function
-    def _read_c_s_v(self, file_name, cols, required, deprecated):
+    def _read_csv(self, file_name, cols, required, deprecated):
         """Reads lines from file_name, yielding a list of unicode values
         corresponding to the column names in cols."""
         contents = self._get_utf8_contents(file_name)
         if not contents:
             return
-
-        eol_checker = util.EndOfLineChecker(StringIO.StringIO(contents),
-                                            file_name, self._problems)
-        reader = csv.reader(eol_checker)  # Use excel dialect
+        try:
+            eol_checker = util.EndOfLineChecker(StringIO.StringIO(contents),
+                                                file_name, self._problems)
+            reader = csv.reader(eol_checker)  # Use excel dialect
+        except TypeError:
+            eol_checker = util.EndOfLineChecker(contents, file_name, self._problems)
+            reader = csv.reader(contents.split('\n'))
 
         header = next(reader)
         header = map(lambda x: x.strip(), header)  # trim any whitespace
@@ -425,7 +431,7 @@ class Loader:
                         continue
                     instance.AddToSchedule(self._schedule, self._problems)
                     instance.ValidateAfterAdd(self._problems)
-                    self._problems.ClearContext()
+                    self._problems.clear_context()
 
     def _load_calendar(self):
         file_name = 'calendar.txt'
@@ -443,7 +449,7 @@ class Loader:
         if self._has_file(file_name):
             has_useful_contents = False
             for (row, row_num, cols) in \
-                    self._read_c_s_v(file_name,
+                    self._read_csv(file_name,
                                      service_period_class._FIELD_NAMES,
                                      service_period_class._REQUIRED_FIELD_NAMES,
                                      service_period_class._DEPRECATED_FIELD_NAMES):
@@ -456,13 +462,13 @@ class Loader:
                     self._problems.DuplicateID('service_id', period.service_id)
                 else:
                     periods[period.service_id] = (period, context)
-                self._problems.ClearContext()
+                self._problems.clear_context()
 
         # process calendar_dates.txt
         if self._has_file(file_name_dates):
             # ['service_id', 'date', 'exception_type']
             for (row, row_num, cols) in \
-                    self._read_c_s_v(file_name_dates,
+                    self._read_csv(file_name_dates,
                                      service_period_class._FIELD_NAMES_CALENDAR_DATES,
                                      service_period_class._REQUIRED_FIELD_NAMES_CALENDAR_DATES,
                                      service_period_class._DEPRECATED_FIELD_NAMES_CALENDAR_DATES):
@@ -485,14 +491,14 @@ class Loader:
                     period.SetDateHasService(row[1], False, self._problems)
                 else:
                     self._problems.InvalidValue('exception_type', exception_type)
-                self._problems.ClearContext()
+                self._problems.clear_context()
 
         # Now insert the periods into the schedule object, so that they're
         # validated with both calendar and calendar_dates info present
         for period, context in periods.values():
             self._problems.SetFileContext(*context)
             self._schedule.AddServicePeriodObject(period, self._problems)
-            self._problems.ClearContext()
+            self._problems.clear_context()
 
     def _load_shapes(self):
         file_name = 'shapes.txt'
@@ -522,7 +528,7 @@ class Loader:
                 shapes[shapepoint.shape_id] = shape
 
             shape.AddShapePointObjectUnsorted(shapepoint, self._problems)
-            self._problems.ClearContext()
+            self._problems.clear_context()
 
         for shape_id, shape in shapes.items():
             self._schedule.AddShapeObject(shape, self._problems)
@@ -531,7 +537,7 @@ class Loader:
     def _load_stop_times(self):
         stop_time_class = self._gtfs_factory.StopTime
 
-        for (row, row_num, cols) in self._read_c_s_v('stop_times.txt',
+        for (row, row_num, cols) in self._read_csv('stop_times.txt',
                                                      stop_time_class._FIELD_NAMES,
                                                      stop_time_class._REQUIRED_FIELD_NAMES,
                                                      stop_time_class._DEPRECATED_FIELD_NAMES):
@@ -576,13 +582,13 @@ class Loader:
                                         drop_off_type, shape_dist_traveled, stop_sequence=sequence,
                                         timepoint=timepoint)
             trip._AddStopTimeObjectUnordered(stop_time, self._schedule)
-            self._problems.ClearContext()
+            self._problems.clear_context()
 
         # stop_times are validated in Trip.ValidateChildren, called by
         # Schedule.Validate
 
     def load(self):
-        self._problems.ClearContext()
+        self._problems.clear_context()
         if not self._determine_format():
             return self._schedule
 

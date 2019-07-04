@@ -10,7 +10,7 @@ class AdhereToPEP8:
         self.file_data = ''
         self.alternative_import_strings = {
             'import cStringIO as StringIO\n':
-                'try:\n\tfrom io import StringIO\nexcept ImportError:\n\timport cStringIO as StringIO',
+                'try:\n\timport io as StringIO\nexcept ImportError:\n\timport cStringIO as StringIO',
             'import dircache\n':
                 'try:\n\timport os as dircache\nexcept ImportError:\n\timport dircache',
             'import urlparse\n':

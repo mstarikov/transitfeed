@@ -31,7 +31,7 @@ try:
 except ImportError:
     import urllib2
 
-
+from distutils.version import LooseVersion
 from . import errors
 from .version import __version__
 
@@ -209,7 +209,7 @@ def check_version(problems, latest_version=None):
         try:
             response = urllib2.urlopen(request)
             content = response.read()
-            m = re.search(r'version=(\d+\.\d+\.\d+)', content)
+            m = re.search(r'version=(\d+\.\d+\.\d+)', str(content))
             if m:
                 latest_version = m.group(1)
 
@@ -240,9 +240,14 @@ def check_version(problems, latest_version=None):
 
 
 def _max_version(versions):
-    versions = filter(None, versions)
-    versions.sort(lambda x, y: -cmp([int(item) for item in x.split('.')],
-                                    [int(item) for item in y.split('.')]))
+    print(versions)
+    try:
+        ver_list = filter(None, versions)
+        ver_list.sort(lambda x, y: -cmp([int(item) for item in x.split('.')],
+                                        [int(item) for item in y.split('.')]))
+    except AttributeError:
+        versions.sort(key=lambda x: LooseVersion(x), reverse=True)
+    print(versions)
     if len(versions) > 0:
         return versions[0]
 
@@ -508,7 +513,7 @@ def format_seconds_since_midnight(s):
 def date_string_to_date_object(date_string):
     """Return a date object for a string "YYYYMMDD"."""
     # If this becomes a bottleneck date objects could be cached
-    if re.match('^\d{8}$', date_string) == None:
+    if re.match('^\d{8}$', date_string):
         return None
     try:
         return datetime.date(int(date_string[0:4]), int(date_string[4:6]),
@@ -594,7 +599,7 @@ class CsvUnicodeWriter:
         utf-8."""
         encoded_row = []
         for s in row:
-            if isinstance(s, unicode):
+            if isinstance(s, str):
                 encoded_row.append(s.encode("utf-8"))
             else:
                 encoded_row.append(s)

@@ -68,7 +68,7 @@ class TripMemoryZipTestCase(util.MemoryZipTestCase):
 
     def test_extra_object_attribute(self):
         """Extra columns added to an object are preserved when writing."""
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         # Add an attribute to an existing trip
         trip1 = schedule.GetTrip("AB1")
         trip1.t_foo = "foo"
@@ -90,7 +90,7 @@ class TripMemoryZipTestCase(util.MemoryZipTestCase):
         """Extra columns loaded from a file are preserved when writing."""
         # Uncomment the code in assert_load_and_check_extra_values to generate this
         # string.
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "trips.txt",
             "route_id,service_id,trip_id,t_foo,n_foo\n"
             "AB,FULLW,AB1,foo,\n"
@@ -101,7 +101,7 @@ class TripMemoryZipTestCase(util.MemoryZipTestCase):
             "AB2,09:30:00,09:30:00,STAGECOACH,2\n")
         load1_problems = util.GetTestFailureProblemReporter(
             self, ("ExpirationDate", "UnrecognizedColumn"))
-        schedule = self.MakeLoaderAndLoad(problems=load1_problems)
+        schedule = self.make_loader_and_load(problems=load1_problems)
         saved_schedule_file = StringIO()
         schedule.WriteGoogleTransitFeed(saved_schedule_file)
 

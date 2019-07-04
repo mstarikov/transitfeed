@@ -27,15 +27,15 @@ def get_gtfs_factory(factory = None):
     factory = transitfeed.get_gtfs_factory()
 
   # Agency class extension
-  factory.UpdateClass('Agency', agency.Agency)
+  factory.update_class('Agency', agency.Agency)
 
   # FareAttribute class extension
-  factory.UpdateClass('FareAttribute', fareattribute.FareAttribute)
+  factory.update_class('FareAttribute', fareattribute.FareAttribute)
 
   # Route class extension
-  factory.UpdateClass('Route', route.Route)
+  factory.update_class('Route', route.Route)
 
   # Stop class extension
-  factory.UpdateClass('Stop', stop.Stop)
+  factory.update_class('Stop', stop.Stop)
 
   return factory

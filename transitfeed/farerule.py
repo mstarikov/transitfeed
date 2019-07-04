@@ -37,7 +37,7 @@ class FareRule(GtfsObjectBase):
          self.contains_id) = \
             (fare_id, route_id, origin_id, destination_id, contains_id)
         if field_dict:
-            if isinstance(field_dict, self.GetGtfsFactory().FareRule):
+            if isinstance(field_dict, self.get_gtfs_factory().FareRule):
                 # Special case so that we don't need to re-parse the attributes to
                 # native types iteritems returns all attributes that don't start with _
                 for k, v in field_dict.iteritems():

@@ -103,7 +103,6 @@ class GtfsFactory(object):
     def __getattr__(self, name):
         if name in self._class_mapping:
             return self._class_mapping[name]
-
         raise AttributeError(name)
 
     def get_gtfs_class_by_file_name(self, filename):

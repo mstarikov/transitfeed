@@ -305,12 +305,12 @@ class DuplicateServiceIdDateWarningTestCase(util.MemoryZipTestCase):
     def run_test(self):
         # Two lines with the same value of service_id and date.
         # Test for the warning.
-        self.SetArchiveContents(
+        self.set_archive_contents(
             'calendar_dates.txt',
             'service_id,date,exception_type\n'
             'FULLW,20100604,1\n'
             'FULLW,20100604,2\n')
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopException('DuplicateID')
         self.assertEquals('(service_id, date)', e.column_name)
         self.assertEquals('(FULLW, 20100604)', e.value)
@@ -385,24 +385,24 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
     def test_bad_end_date_format(self):
         # A badly formatted end_date used to generate an InvalidValue report from
         # Schedule.Validate and ServicePeriod.Validate. Test for the bug.
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar.txt",
             "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,"
             "start_date,end_date\n"
             "FULLW,1,1,1,1,1,1,1,20070101,20101232\n"
             "WE,0,0,0,0,0,1,1,20070101,20101231\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopInvalidValue('end_date')
         self.accumulator.AssertNoMoreExceptions()
 
     def test_bad_start_date_format(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar.txt",
             "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,"
             "start_date,end_date\n"
             "FULLW,1,1,1,1,1,1,1,200701xx,20101231\n"
             "WE,0,0,0,0,0,1,1,20070101,20101231\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopInvalidValue('start_date')
         self.accumulator.AssertNoMoreExceptions()
 
@@ -411,13 +411,13 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
 
         See https://github.com/google/transitfeed/issues/41
         """
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar.txt",
             "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,"
             "start_date,end_date\n"
             "FULLW,1,1,1,1,1,1,1,    ,\t\n"
             "WE,0,0,0,0,0,1,1,20070101,20101231\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopException("MissingValue")
         self.assertEquals(2, e.row_num)
         self.assertEquals("start_date", e.column_name)
@@ -427,13 +427,13 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
         self.accumulator.AssertNoMoreExceptions()
 
     def test_no_start_date_and_bad_end_date(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar.txt",
             "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,"
             "start_date,end_date\n"
             "FULLW,1,1,1,1,1,1,1,,abc\n"
             "WE,0,0,0,0,0,1,1,20070101,20101231\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopException("MissingValue")
         self.assertEquals(2, e.row_num)
         self.assertEquals("start_date", e.column_name)
@@ -442,26 +442,26 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
         self.accumulator.AssertNoMoreExceptions()
 
     def test_missing_end_date_column(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar.txt",
             "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,"
             "start_date\n"
             "FULLW,1,1,1,1,1,1,1,20070101\n"
             "WE,0,0,0,0,0,1,1,20070101\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopException("MissingColumn")
         self.assertEquals("end_date", e.column_name)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_date_outside_valid_range(self):
         """ start_date and end_date values must be in [1900,2100] """
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar.txt",
             "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,"
             "start_date,end_date\n"
             "FULLW,1,1,1,1,1,1,1,20070101,21101231\n"
             "WE,0,0,0,0,0,1,1,18990101,20101231\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopDateOutsideValidRange('end_date', 'calendar.txt')
         self.assertEquals('21101231', e.value)
         e = self.accumulator.PopDateOutsideValidRange('start_date', 'calendar.txt')
@@ -472,10 +472,10 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
 class CalendarDatesTxtIntegrationTestCase(util.MemoryZipTestCase):
     def test_date_outside_valid_range(self):
         """ exception date values in must be in [1900,2100] """
-        self.SetArchiveContents("calendar_dates.txt",
+        self.set_archive_contents("calendar_dates.txt",
                                 "service_id,date,exception_type\n"
                                 "WE,18990815,2\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopDateOutsideValidRange('date', 'calendar_dates.txt')
         self.assertEquals('18990815', e.value)
         self.accumulator.AssertNoMoreExceptions()

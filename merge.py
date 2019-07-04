@@ -1835,7 +1835,7 @@ def main():
     accumulator = HTMLProblemAccumulator()
     problem_reporter = MergeProblemReporter(accumulator)
 
-    util.CheckVersion(problem_reporter, options.latest_version)
+    util.check_version(problem_reporter, options.latest_version)
 
     feed_merger = FeedMerger(a_schedule, b_schedule, merged_schedule,
                              problem_reporter)
@@ -1865,4 +1865,4 @@ def main():
 
 
 if __name__ == '__main__':
-    util.RunWithCrashHandler(main)
+    util.run_with_crash_handler(main)

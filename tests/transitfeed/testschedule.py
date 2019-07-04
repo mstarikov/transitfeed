@@ -209,42 +209,42 @@ class OverlappingBlockTripsTestCase(util.TestCase):
 
 class StopsNearEachOther(util.MemoryZipTestCase):
     def test_too_near(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "stops.txt",
             "stop_id,stop_name,stop_lat,stop_lon\n"
             "BEATTY_AIRPORT,Airport,48.20000,140\n"
             "BULLFROG,Bullfrog,48.20001,140\n"
             "STAGECOACH,Stagecoach Hotel,48.20016,140\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopException('StopsTooClose')
         self.assertTrue(e.FormatProblem().find("1.11m apart") != -1)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_just_far_enough(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "stops.txt",
             "stop_id,stop_name,stop_lat,stop_lon\n"
             "BEATTY_AIRPORT,Airport,48.20000,140\n"
             "BULLFROG,Bullfrog,48.20002,140\n"
             "STAGECOACH,Stagecoach Hotel,48.20016,140\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         # Stops are 2.2m apart
         self.accumulator.AssertNoMoreExceptions()
 
     def test_same_location(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "stops.txt",
             "stop_id,stop_name,stop_lat,stop_lon\n"
             "BEATTY_AIRPORT,Airport,48.2,140\n"
             "BULLFROG,Bullfrog,48.2,140\n"
             "STAGECOACH,Stagecoach Hotel,48.20016,140\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopException('StopsTooClose')
         self.assertTrue(e.FormatProblem().find("0.00m apart") != -1)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_stations_too_near(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "stops.txt",
             "stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station\n"
             "BEATTY_AIRPORT,Airport,48.20000,140,,BEATTY_AIRPORT_STATION\n"
@@ -252,21 +252,21 @@ class StopsNearEachOther(util.MemoryZipTestCase):
             "BEATTY_AIRPORT_STATION,Airport,48.20001,140,1,\n"
             "BULLFROG_STATION,Bullfrog,48.20002,140,1,\n"
             "STAGECOACH,Stagecoach Hotel,48.20016,140,,\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopException('StationsTooClose')
         self.assertTrue(e.FormatProblem().find("1.11m apart") != -1)
         self.assertTrue(e.FormatProblem().find("BEATTY_AIRPORT_STATION") != -1)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_stop_near_non_parent_station(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "stops.txt",
             "stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station\n"
             "BEATTY_AIRPORT,Airport,48.20000,140,,\n"
             "BULLFROG,Bullfrog,48.20005,140,,\n"
             "BULLFROG_STATION,Bullfrog,48.20006,140,1,\n"
             "STAGECOACH,Stagecoach Hotel,48.20016,140,,\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopException('DifferentStationTooClose')
         fmt = e.FormatProblem()
         self.assertTrue(re.search(
@@ -279,52 +279,52 @@ class NoServiceExceptionsTestCase(util.MemoryZipTestCase):
 
     def test_no_calendar_dates(self):
         self.RemoveArchive("calendar_dates.txt")
-        self.MakeLoaderAndLoad()
+        self.make_loader_and_load()
         e = self.accumulator.PopException("NoServiceExceptions")
         self.accumulator.AssertNoMoreExceptions()
 
     def test_no_exceptions_when_feed_active_for_short_period_of_time(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar.txt",
             "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,"
             "start_date,end_date\n"
             "FULLW,1,1,1,1,1,1,1,20070101,20070630\n"
             "WE,0,0,0,0,0,1,1,20070101,20070331\n")
         self.RemoveArchive("calendar_dates.txt")
-        self.MakeLoaderAndLoad()
+        self.make_loader_and_load()
         self.accumulator.AssertNoMoreExceptions()
 
     def test_empty_calendar_dates(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar_dates.txt",
             "")
-        self.MakeLoaderAndLoad()
+        self.make_loader_and_load()
         e = self.accumulator.PopException("EmptyFile")
         e = self.accumulator.PopException("NoServiceExceptions")
         self.accumulator.AssertNoMoreExceptions()
 
     def test_calendar_dates_with_header_only(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar_dates.txt",
             "service_id,date,exception_type\n")
-        self.MakeLoaderAndLoad()
+        self.make_loader_and_load()
         e = self.accumulator.PopException("NoServiceExceptions")
         self.accumulator.AssertNoMoreExceptions()
 
     def test_calendar_dates_with_added_service_exception(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar_dates.txt",
             "service_id,date,exception_type\n"
             "FULLW,20070101,1\n")
-        self.MakeLoaderAndLoad()
+        self.make_loader_and_load()
         self.accumulator.AssertNoMoreExceptions()
 
     def test_calendar_dates_with_removed_service_exception(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar_dates.txt",
             "service_id,date,exception_type\n"
             "FULLW,20070101,2\n")
-        self.MakeLoaderAndLoad()
+        self.make_loader_and_load()
         self.accumulator.AssertNoMoreExceptions()
 
 
@@ -516,14 +516,14 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
 
     def prepare_archive_contents(self, calendar_start, calendar_end,
                                  exception_date, feed_info_start, feed_info_end):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar.txt",
             "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,"
             "start_date,end_date\n"
             "FULLW,1,1,1,1,1,1,1,%s,%s\n"
             "WE,0,0,0,0,0,1,1,%s,%s\n" % (calendar_start, calendar_end,
                                           calendar_start, calendar_end))
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "calendar_dates.txt",
             "service_id,date,exception_type\n"
             "FULLW,%s,1\n" % (exception_date))
@@ -535,7 +535,7 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
         if feed_info_end:
             until_column = ",feed_end_date"
             feed_info_end = "," + feed_info_end
-        self.SetArchiveContents("feed_info.txt",
+        self.set_archive_contents("feed_info.txt",
                                 "feed_publisher_name,feed_publisher_url,feed_lang%s%s\n"
                                 "DTA,http://google.com,en%s%s" % (
                                     from_column, until_column, feed_info_start, feed_info_end))
@@ -545,7 +545,7 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
             self.two_weeks_ago, self.two_months,  # calendar
             self.two_weeks,  # calendar_dates
             "", "")  # feed_info
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_expiration_date_caused_by_service_period(self):
@@ -554,7 +554,7 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
             self.two_weeks_ago, self.two_weeks,  # calendar
             self.one_week,  # calendar_dates
             "", "")  # feed_info
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         e = self.accumulator.PopException("ExpirationDate")
         self.assertTrue("calendar.txt" in e.expiration_origin_file)
         self.accumulator.AssertNoMoreExceptions()
@@ -563,7 +563,7 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
             self.two_weeks_ago, self.two_weeks,  # calendar
             self.one_week,  # calendar_dates
             self.two_weeks_ago, self.two_months)  # feed_info
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_future_service_caused_by_service_period(self):
@@ -572,7 +572,7 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
             self.one_week, self.two_months,  # calendar
             self.two_weeks,  # calendar_dates
             "", "")  # feed_info
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         e = self.accumulator.PopException("FutureService")
         self.assertTrue("calendar.txt" in e.start_date_origin_file)
         self.accumulator.AssertNoMoreExceptions()
@@ -581,7 +581,7 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
             self.one_week, self.two_months,  # calendar
             self.two_weeks,  # calendar_dates
             self.two_weeks_ago, self.two_months)  # feed_info
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_expiration_date_caused_by_service_periodDateException(self):
@@ -590,7 +590,7 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
             self.two_weeks_ago, self.one_week,  # calendar
             self.two_weeks,  # calendar_dates
             "", "")  # feed_info
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         e = self.accumulator.PopException("ExpirationDate")
         self.assertTrue("calendar_dates.txt" in e.expiration_origin_file)
         self.accumulator.AssertNoMoreExceptions()
@@ -599,7 +599,7 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
             self.two_weeks_ago, self.one_week,  # calendar
             self.two_weeks,  # calendar_dates
             self.two_weeks_ago, self.two_months)  # feed_info
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_future_service_caused_by_service_periodDateException(self):
@@ -608,7 +608,7 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
             self.two_weeks, self.two_months,  # calendar
             self.one_week,  # calendar_dates
             "", "")  # feed_info
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         e = self.accumulator.PopException("FutureService")
         self.assertTrue("calendar_dates.txt" in e.start_date_origin_file)
         self.accumulator.AssertNoMoreExceptions()
@@ -617,7 +617,7 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
             self.two_weeks, self.two_months,  # calendar
             self.one_week,  # calendar_dates
             self.two_weeks_ago, self.two_months)  # feed_info
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_expiration_date_caused_by_feed_info(self):
@@ -625,7 +625,7 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
             self.two_weeks_ago, self.two_months,  # calendar
             self.one_week,  # calendar_dates
             "", self.two_weeks)  # feed_info
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         e = self.accumulator.PopException("ExpirationDate")
         self.assertTrue("feed_info.txt" in e.expiration_origin_file)
         self.accumulator.AssertNoMoreExceptions()
@@ -635,7 +635,7 @@ class ScheduleStartAndExpirationDatesTestCase(util.MemoryZipTestCase):
             self.two_weeks_ago, self.two_months,  # calendar
             self.one_week_ago,  # calendar_dates
             self.one_week, self.two_months)  # feed_info
-        self.MakeLoaderAndLoad(self.problems)
+        self.make_loader_and_load(self.problems)
         e = self.accumulator.PopException("FutureService")
         self.assertTrue("feed_info.txt" in e.start_date_origin_file)
         self.accumulator.AssertNoMoreExceptions()
@@ -858,12 +858,12 @@ class ServiceGapsTestCase(util.MemoryZipTestCase):
 
     def set_up(self):
         super(ServiceGapsTestCase, self).set_up()
-        self.SetArchiveContents("calendar.txt",
+        self.set_archive_contents("calendar.txt",
                                 "service_id,monday,tuesday,wednesday,thursday,friday,"
                                 "saturday,sunday,start_date,end_date\n"
                                 "FULLW,1,1,1,1,1,1,1,20090601,20090610\n"
                                 "WE,0,0,0,0,0,1,1,20090718,20101231\n")
-        self.SetArchiveContents("calendar_dates.txt",
+        self.set_archive_contents("calendar_dates.txt",
                                 "service_id,date,exception_type\n"
                                 "WE,20090815,2\n"
                                 "WE,20090816,2\n"
@@ -880,18 +880,18 @@ class ServiceGapsTestCase(util.MemoryZipTestCase):
                                 "WE,20100613,2\n"
                                 "WE,20100619,2\n"
                                 "WE,20100620,2\n")
-        self.SetArchiveContents("trips.txt",
+        self.set_archive_contents("trips.txt",
                                 "route_id,service_id,trip_id\n"
                                 "AB,WE,AB1\n"
                                 "AB,FULLW,AB2\n")
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "stop_times.txt",
             "trip_id,arrival_time,departure_time,stop_id,stop_sequence\n"
             "AB1,10:00:00,10:00:00,BEATTY_AIRPORT,1\n"
             "AB1,10:20:00,10:20:00,BULLFROG,2\n"
             "AB2,10:25:00,10:25:00,STAGECOACH,1\n"
             "AB2,10:55:00,10:55:00,BULLFROG,2\n")
-        self.schedule = self.MakeLoaderAndLoad(extra_validation=False)
+        self.schedule = self.make_loader_and_load(extra_validation=False)
 
     # If there is a service gap starting before today, and today has no service,
     # it should be found - even if tomorrow there is service

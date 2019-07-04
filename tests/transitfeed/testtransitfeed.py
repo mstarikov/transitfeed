@@ -96,16 +96,17 @@ class DeprecatedFieldNamesTestCase(util.MemoryZipTestCase):
     def set_up(self):
         super(DeprecatedFieldNamesTestCase, self).set_up()
         # init a new gtfs_factory instance and update its class mappings
-        self.gtfs_factory = transitfeed.GetGtfsFactory()
-        self.gtfs_factory.UpdateClass('Agency', self.Agency)
-        self.gtfs_factory.UpdateClass('Stop', self.Stop)
+        self.gtfs_factory = transitfeed.get_gtfs_factory()
+        self.gtfs_factory.update_class('Agency', self.Agency)
+        self.gtfs_factory.update_class('Stop', self.Stop)
 
     def test_deprectated_field_names(self):
-        self.SetArchiveContents(
+        self.set_up()
+        self.set_archive_contents(
             "agency.txt",
             "agency_id,agency_name,agency_timezone,agency_url\n"
             "DTA,Demo Agency,America/Los_Angeles,http://google.com\n")
-        schedule = self.MakeLoaderAndLoad(self.problems,
+        schedule = self.make_loader_and_load(self.problems,
                                           gtfs_factory=self.gtfs_factory)
         e = self.accumulator.PopException("DeprecatedColumn")
         self.assertEquals("agency_url", e.column_name)
@@ -114,19 +115,20 @@ class DeprecatedFieldNamesTestCase(util.MemoryZipTestCase):
     def test_deprecated_field_defaults_to_none_if_not_provided(self):
         # load agency.txt with no 'agency_url', accessing the variable agency_url
         # should default to None instead of raising an AttributeError
-        self.SetArchiveContents(
+        self.set_up()
+        self.set_archive_contents(
             "agency.txt",
             "agency_id,agency_name,agency_timezone\n"
             "DTA,Demo Agency,America/Los_Angeles\n")
-        schedule = self.MakeLoaderAndLoad(self.problems,
+        schedule = self.make_loader_and_load(self.problems,
                                           gtfs_factory=self.gtfs_factory)
         agency = schedule._agencies.values()[0]
-        self.assertTrue(agency.agency_url == None)
+        self.assertTrue(not agency.agency_url)
         # stop.txt from util.MemoryZipTestCase does not have 'stop_desc', accessing
         # the variable stop_desc should default to None instead of raising an
         # AttributeError
         stop = schedule.stops.values()[0]
-        self.assertTrue(stop.stop_desc == None)
+        self.assertTrue(not stop.stop_desc)
         self.accumulator.AssertNoMoreExceptions()
 
 

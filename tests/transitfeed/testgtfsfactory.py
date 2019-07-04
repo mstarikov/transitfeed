@@ -23,7 +23,7 @@ import types
 class TestGtfsFactory(util.TestCase):
 
     def set_up(self):
-        self._factory = transitfeed.GetGtfsFactory()
+        self._factory = transitfeed.get_gtfs_factory()
 
     def test_can_update_mapping(self):
         self._factory.UpdateMapping("agency.txt",
@@ -42,7 +42,7 @@ class TestGtfsFactory(util.TestCase):
         self.assertEqual(self._factory.GetGtfsClassByFileName("agency.txt"),
                          transitfeed.Stop)
         self.assertFalse(self._factory.IsFileRequired("agency.txt"))
-        known_filenames = self._factory.GetKnownFilenames()
+        known_filenames = self._factory.get_known_filenames()
         self.assertTrue("agency.txt" in known_filenames)
         self.assertTrue("calendar.txt" in known_filenames)
 
@@ -59,7 +59,7 @@ class TestGtfsFactory(util.TestCase):
         self.assertEqual(self._factory.NewRequiredClass, transitfeed.Stop)
         self.assertTrue(self._factory.IsFileRequired("newrequiredfile.txt"))
         self.assertFalse(self._factory.IsFileRequired("newfile.txt"))
-        known_filenames = self._factory.GetKnownFilenames()
+        known_filenames = self._factory.get_known_filenames()
         self.assertTrue("newfile.txt" in known_filenames)
         self.assertTrue("newrequiredfile.txt" in known_filenames)
         loading_order = self._factory.GetLoadingOrder()
@@ -93,7 +93,7 @@ class TestGtfsFactory(util.TestCase):
 
     def test_can_remove_mapping(self):
         self._factory.RemoveMapping("agency.txt")
-        self.assertFalse("agency.txt" in self._factory.GetKnownFilenames())
+        self.assertFalse("agency.txt" in self._factory.get_known_filenames())
         self.assertFalse("agency.txt" in self._factory.GetLoadingOrder())
         self.assertEqual(self._factory.GetGtfsClassByFileName("agency.txt"),
                          None)
@@ -179,24 +179,24 @@ class TestGtfsFactory(util.TestCase):
                           self._factory.GetGtfsClassByFileName,
                           'shapes.txt')
         self.assertRaises(transitfeed.NonexistentMapping,
-                          self._factory.UpdateClass,
+                          self._factory.update_class,
                           "Agenci", transitfeed.Agency)
 
 
 class TestGtfsFactoryUser(util.TestCase):
     def assert_default_factory_is_returned_if_none_is_set(self, instance):
-        self.assertTrue(isinstance(instance.GetGtfsFactory(),
+        self.assertTrue(isinstance(instance.get_gtfs_factory(),
                                    transitfeed.GtfsFactory))
 
     def assert_factory_is_saved_and_returned(self, instance, factory):
         instance.SetGtfsFactory(factory)
-        self.assertEquals(factory, instance.GetGtfsFactory())
+        self.assertEquals(factory, instance.get_gtfs_factory())
 
     def test_classes(self):
         class FakeGtfsFactory(object):
             pass
 
-        factory = transitfeed.GetGtfsFactory()
+        factory = transitfeed.get_gtfs_factory()
         gtfs_class_instances = [
             factory.Shape("id"),
             factory.ShapePoint(),

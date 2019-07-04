@@ -74,7 +74,7 @@ SPECIAL_CITIES = {
 }
 
 
-def read_c_s_v(s, cols):
+def read_csv(s, cols):
     csv_dialect = csv.Sniffer().sniff(s[0])
     reader = csv.reader(s, csv_dialect)
     header = next(reader)
@@ -110,7 +110,7 @@ def convert_c_h1903(x, y):
     return phi * 100.0 / 36.0, lam * 100.0 / 36.0
 
 
-def encode_for_c_s_v(x):
+def encode_for_csv(x):
     "Encodes one value for CSV."
     k = x.encode('utf-8')
     if ',' in k or '"' in k:
@@ -121,7 +121,7 @@ def encode_for_c_s_v(x):
 
 def write_row(stream, values):
     "writes one row of comma-separated values to stream."
-    stream.write(','.join([encode_for_c_s_v(val) for val in values]))
+    stream.write(','.join([encode_for_csv(val) for val in values]))
     stream.write('\n')
 
 
@@ -207,7 +207,7 @@ class Divaimporter:
     def import_stations(self, station_file, adv_file):
         "imports the rec_ort.mdv file."
         for id, name, x, y, uic_code in \
-                read_c_s_v(station_file, ['ORT_NR', 'ORT_NAME',
+                read_csv(station_file, ['ORT_NR', 'ORT_NAME',
                                           'ORT_POS_X', 'ORT_POS_Y', 'ORT_NR_NATIONAL']):
             station = Station()
             station.id = id
@@ -221,7 +221,7 @@ class Divaimporter:
                           urllib.quote(name.encode('iso-8859-1'))
             station.advertised_lines = set()
             self.stations[id] = station
-        for station_id, line_id in read_c_s_v(adv_file, ['ORT_NR', 'LI_NR']):
+        for station_id, line_id in read_csv(adv_file, ['ORT_NR', 'LI_NR']):
             if station_id in self.stations:
                 # Line ids in this file have leading zeroes, remove.
                 self.stations[station_id].advertised_lines.add(line_id.lstrip("0"))
@@ -235,7 +235,7 @@ class Divaimporter:
         # table of advertised lines does not include area. Fortunately, it seems
         # that line ids are unique across all areas, so we can just throw it away.
         for line_id, name in \
-                read_c_s_v(s, ['LI_NR', 'LINIEN_BEZ_DRUCK']):
+                read_csv(s, ['LI_NR', 'LINIEN_BEZ_DRUCK']):
             route = Route()
             route.id = line_id
             route.name = name
@@ -255,7 +255,7 @@ class Divaimporter:
     def import_patterns(self, s):
         "imports the lid_verlauf.mdv file."
         for line, strli, direction, seq, station_id in \
-                read_c_s_v(s, ['LI_NR', 'STR_LI_VAR', 'LI_RI_NR', 'LI_LFD_NR', 'ORT_NR']):
+                read_csv(s, ['LI_NR', 'STR_LI_VAR', 'LI_RI_NR', 'LI_LFD_NR', 'ORT_NR']):
             pattern_id = u'Pat.%s.%s.%s' % (line, strli, direction)
             pattern = self.patterns.get(pattern_id, None)
             if not pattern:
@@ -272,7 +272,7 @@ class Divaimporter:
     def import_boarding(self, drop_off_file):
         "Reads the bedverb.mdv file."
         for trip_id, seq, code in \
-                read_c_s_v(drop_off_file, ['FRT_FID', 'LI_LFD_NR', 'BEDVERB_CODE']):
+                read_csv(drop_off_file, ['FRT_FID', 'LI_LFD_NR', 'BEDVERB_CODE']):
             key = (trip_id, int(seq) - 1)
             if code == 'A':
                 self.pickup_type[key] = '1'  # '1' = no pick-up
@@ -290,7 +290,7 @@ class Divaimporter:
         daytypes = {}  # 'j06' --> {20060713:1, 20060714:1, ...}
         schedules = {}  # {'j06':1, 'p27':1}
         for schedule, daytype, date in \
-                read_c_s_v(days_file, ['FPL_KUERZEL', 'TAGESART_NR', 'BETRIEBSTAG']):
+                read_csv(days_file, ['FPL_KUERZEL', 'TAGESART_NR', 'BETRIEBSTAG']):
             schedule = schedule.strip()
             daytypes.setdefault('%s.%s' % (schedule, daytype), {})[int(date)] = 1
             schedules[schedule] = 1
@@ -298,7 +298,7 @@ class Divaimporter:
 
         service_days = {}  # 'Cj06.H9' --> {20060713:1, 20060714:1, ...}
         for daytype, service_id in \
-                read_c_s_v(daytype_file, ['TAGESART_NR', 'TAGESMERKMAL_NR']):
+                read_csv(daytype_file, ['TAGESART_NR', 'TAGESMERKMAL_NR']):
             for schedule in schedules:
                 service = 'C%s.%s' % (schedule, service_id)
                 for date in daytypes['%s.%s' % (schedule, daytype)].iterkeys():
@@ -312,7 +312,7 @@ class Divaimporter:
         ParseDate = lambda x: datetime.date(int(x[:4]), int(x[4:6]), int(x[6:8]))
         MonthNr = lambda x: int(x[:4]) * 12 + int(x[4:6])
         for schedule, id, bitmask, start_date, end_date in \
-                read_c_s_v(restrictions_file,
+                read_csv(restrictions_file,
                            ['FPL_KUERZEL', 'VB', 'VB_DATUM', 'DATUM_VON', 'DATUM_BIS']):
             id = u"VB%s.%s" % (schedule, id)
             bitmask = bitmask.strip()
@@ -340,7 +340,7 @@ class Divaimporter:
     def import_stop_times(self, stoptimes_file):
         "imports the lid_fahrzeitart.mdv file."
         for line, strli, direction, seq, stoptime_id, drive_secs, wait_secs in \
-                read_c_s_v(stoptimes_file,
+                read_csv(stoptimes_file,
                            ['LI_NR', 'STR_LI_VAR', 'LI_RI_NR', 'LI_LFD_NR',
                             'FGR_NR', 'FZT_REL', 'HZEIT']):
             pattern = self.patterns[u'Pat.%s.%s.%s' % (line, strli, direction)]
@@ -356,7 +356,7 @@ class Divaimporter:
         for trip_id, trip_starttime, line, strli, direction, \
             stoptime_id, schedule_id, daytype_id, restriction_id, \
             dest_station_id, dest_stop_id, trip_type in \
-                read_c_s_v(trips_file,
+                read_csv(trips_file,
                            ['FRT_FID', 'FRT_START', 'LI_NR', 'STR_LI_VAR', 'LI_RI_NR',
                             'FGR_NR', 'FPL_KUERZEL', 'TAGESMERKMAL_NR', 'VB',
                             'FRT_HP_AUS', 'HALTEPUNKT_NR_ZIEL', 'FAHRTART_NR']):
@@ -410,7 +410,7 @@ class Divaimporter:
         k = [(r.id, r) for r in self.routes.itervalues()]
         k.sort()
         for id, route in k:
-            name = encode_for_c_s_v(route.name)
+            name = encode_for_csv(route.name)
             out.write('%s,%s,%s,%s,%s,%s\n' % (
                 id, name, name, route.type, route.color, route.color_text))
 
@@ -429,12 +429,12 @@ class Divaimporter:
                   'friday,saturday,sunday,start_date,end_date\n')
         for service_id, service in self.services.iteritems():
             out.write('%s,0,0,0,0,0,0,0,%d,%d\n' %
-                      (encode_for_c_s_v(service_id), service[0], service[-1]))
+                      (encode_for_csv(service_id), service[0], service[-1]))
 
     def write_calendarDates(self, out):
         out.write('service_id,date,exception_type\n')
         for service_id, service in self.services.iteritems():
-            encoded_service_id = encode_for_c_s_v(service_id)
+            encoded_service_id = encode_for_csv(service_id)
             for date in service:
                 out.write('%s,%d,1\n' % (encoded_service_id, date))
 

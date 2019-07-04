@@ -52,7 +52,7 @@ class RouteMemoryZipTestCase(util.MemoryZipTestCase):
 
     def test_extra_object_attribute(self):
         """Extra columns added to an object are preserved when writing."""
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         # Add an attribute after AddRouteObject
         route_t = transitfeed.Route(short_name="T", route_type="Bus", route_id="t")
         schedule.AddRouteObject(route_t)
@@ -71,7 +71,7 @@ class RouteMemoryZipTestCase(util.MemoryZipTestCase):
         """Extra columns loaded from a file are preserved when writing."""
         # Uncomment the code in assert_load_and_check_extra_values to generate this
         # string.
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "routes.txt",
             "route_id,agency_id,route_short_name,route_long_name,route_type,"
             "t_foo,n_foo\n"
@@ -80,7 +80,7 @@ class RouteMemoryZipTestCase(util.MemoryZipTestCase):
             "n,DTA,N,,3,,bar\n")
         load1_problems = util.GetTestFailureProblemReporter(
             self, ("ExpirationDate", "UnrecognizedColumn"))
-        schedule = self.MakeLoaderAndLoad(problems=load1_problems)
+        schedule = self.make_loader_and_load(problems=load1_problems)
         saved_schedule_file = StringIO()
         schedule.WriteGoogleTransitFeed(saved_schedule_file)
 

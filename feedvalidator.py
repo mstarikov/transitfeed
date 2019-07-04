@@ -61,7 +61,7 @@ def problem_count_text(error_count, warning_count):
     return ' and '.join(results)
 
 
-def calendar_summary(schedule):
+def Calendar_summary(schedule):
     today = datetime.date.today()
     summary_end_date = today + datetime.timedelta(days=60)
     start_date, end_date = schedule.GetDateRange()
@@ -563,7 +563,7 @@ def run_validation(feed, options, problems):
       problems are found and 0 if the Schedule is problem free.
       plain text string is '' if no other problems are found.
     """
-    util.CheckVersion(problems, options.latest_version)
+    util.check_version(problems, options.latest_version)
 
     # TODO: add tests for this flag in testfeedvalidator.py
     if options.extension:
@@ -578,7 +578,7 @@ def run_validation(feed, options, problems):
     else:
         extension_module = transitfeed
 
-    gtfs_factory = extension_module.GetGtfsFactory()
+    gtfs_factory = extension_module.get_gtfs_factory()
 
     print('validating %s' % feed)
     print('FeedValidator extension used: %s' % options.extension)
@@ -763,4 +763,4 @@ def profilerun_validation_output_from_options(feed, options):
 
 
 if __name__ == '__main__':
-    util.RunWithCrashHandler(main)
+    util.run_with_crash_handler(main)

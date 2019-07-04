@@ -267,45 +267,45 @@ class CheckVersionTestCase(test_util.TempDirTestCaseBase):
         urllib2.urlopen = self.orig_urlopen
 
     def test_assigned_different_version(self):
-        util.CheckVersion(self.problems, '100.100.100')
+        util.check_version(self.problems, '100.100.100')
         e = self.accumulator.PopException('NewVersionAvailable')
         self.assertEqual(e.version, '100.100.100')
         self.assertEqual(e.url, 'https://github.com/google/transitfeed')
         self.accumulator.AssertNoMoreExceptions()
 
     def test_assigned_same_version(self):
-        util.CheckVersion(self.problems, version.__version__)
+        util.check_version(self.problems, version.__version__)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_get_correct_returns(self):
         urllib2.urlopen = self.mock.mocked_connect_success
-        util.CheckVersion(self.problems)
+        util.check_version(self.problems)
         self.accumulator.PopException('NewVersionAvailable')
 
     def test_page_not_found(self):
         urllib2.urlopen = self.mock.mocked_page_not_found
-        util.CheckVersion(self.problems)
+        util.check_version(self.problems)
         e = self.accumulator.PopException('OtherProblem')
         self.assertTrue(re.search(r'we failed to reach', e.description))
         self.assertTrue(re.search(r'Reason: Not Found \[404\]', e.description))
 
     def test_connection_time_out(self):
         urllib2.urlopen = self.mock.mocked_connection_time_out
-        util.CheckVersion(self.problems)
+        util.check_version(self.problems)
         e = self.accumulator.PopException('OtherProblem')
         self.assertTrue(re.search(r'we failed to reach', e.description))
         self.assertTrue(re.search(r'Reason: Connection timed', e.description))
 
     def test_get_addr_info_failed(self):
         urllib2.urlopen = self.mock.mocked_get_addr_info_failed
-        util.CheckVersion(self.problems)
+        util.check_version(self.problems)
         e = self.accumulator.PopException('OtherProblem')
         self.assertTrue(re.search(r'we failed to reach', e.description))
         self.assertTrue(re.search(r'Reason: Getaddrinfo failed', e.description))
 
     def test_empty_is_returned(self):
         urllib2.urlopen = self.mock.mocked_empty_is_returned
-        util.CheckVersion(self.problems)
+        util.check_version(self.problems)
         e = self.accumulator.PopException('OtherProblem')
         self.assertTrue(re.search(r'we had trouble parsing', e.description))
 

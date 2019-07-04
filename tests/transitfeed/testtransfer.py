@@ -364,7 +364,7 @@ class TransferValidationTestCase(util.MemoryZipTestCase):
     """Integration test for transfers."""
 
     def test_invalid_stop_ids(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "transfers.txt",
             "from_stop_id,to_stop_id,transfer_type\n"
             "DOESNOTEXIST,BULLFROG,2\n"
@@ -373,7 +373,7 @@ class TransferValidationTestCase(util.MemoryZipTestCase):
             "BULLFROG,DOESNOTEXISTEITHER,2\n"
             "DOESNOTEXIT,DOESNOTEXISTEITHER,2\n"
             ",,2\n")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         # First row
         e = self.accumulator.PopInvalidValue('from_stop_id')
         # Second row
@@ -403,12 +403,12 @@ class TransferValidationTestCase(util.MemoryZipTestCase):
             "AIR1,7:00:00,7:00:00,BEATTY_AIRPORT_HANGER,1\n"
             "AIR1,7:05:00,7:05:00,BEATTY_AIRPORT_34,2\n"
             "AIR1,7:10:00,7:10:00,BEATTY_AIRPORT_HANGER,3\n")
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "transfers.txt",
             "from_stop_id,to_stop_id,transfer_type\n"
             "BEATTY_AIRPORT,BEATTY_AIRPORT_HANGER,0\n"
             "BEATTY_AIRPORT,BEATTY_AIRPORT_HANGER,3")
-        schedule = self.MakeLoaderAndLoad()
+        schedule = self.make_loader_and_load()
         e = self.accumulator.PopException('DuplicateID')
         self.assertEquals('(from_stop_id, to_stop_id)', e.column_name)
         self.assertEquals('(BEATTY_AIRPORT, BEATTY_AIRPORT_HANGER)', e.value)

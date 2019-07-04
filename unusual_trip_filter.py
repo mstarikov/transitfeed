@@ -25,7 +25,10 @@ from __future__ import print_function
 __author__ = 'Jiri Semecky <jiri.semecky@gmail.com>'
 
 import transitfeed
-from transitfeed import util
+try:
+    from transitfeed import util
+except ImportError:
+    print(__file__)
 
 
 class UnusualTripFilter(object):
@@ -59,7 +62,7 @@ class UnusualTripFilter(object):
         for pattern_id, pattern in route.GetPatternIdTripDict().items():
             ratio = float(1.0 * len(pattern) / trip_count)
             if not self._force:
-                if (ratio < self._threshold):
+                if ratio < self._threshold:
                     self.info("\t%d trips on route %s with headsign '%s' recognized "
                               "as unusual (ratio %f)" %
                               (len(pattern),
@@ -152,4 +155,4 @@ def main():
 
 
 if __name__ == '__main__':
-    util.RunWithCrashHandler(main)
+    util.run_with_crash_handler(main)

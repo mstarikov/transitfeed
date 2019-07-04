@@ -64,109 +64,109 @@ class ExtensionMemoryZipTestCase(MemoryZipTestCase):
 
 
 class FareAttributeAgencyIdTestCase(ExtensionMemoryZipTestCase):
-    gtfs_factory = extensions.googletransit.GetGtfsFactory()
+    gtfs_factory = extensions.googletransit.get_gtfs_factory()
 
     def test_no_errors_with_one_agency_and_no_id_and_agency_id_column_not_present(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "fare_attributes.txt",
             "fare_id,price,currency_type,payment_method,transfers\n"
             "fare1,1,EUR,1,0\n")
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "agency.txt",
             "agency_id,agency_name,agency_url,agency_timezone,agency_lang\n"
             ",Demo Agency,http://google.com,America/Los_Angeles,en\n")
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "routes.txt",
             "route_id,agency_id,route_short_name,route_long_name,route_type\n"
             "AB,,,Airport Bullfrog,3\n")
-        self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
+        self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_no_errors_with_one_agency_and_no_id_and_agency_id_column_present(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "fare_attributes.txt",
             "fare_id,price,currency_type,payment_method,transfers,agency_id\n"
             "fare1,1,EUR,1,0,\n")
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "agency.txt",
             "agency_id,agency_name,agency_url,agency_timezone,agency_lang\n"
             ",Demo Agency,http://google.com,America/Los_Angeles,en\n")
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "routes.txt",
             "route_id,agency_id,route_short_name,route_long_name,route_type\n"
             "AB,,,Airport Bullfrog,3\n")
-        self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
+        self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_no_errors_with_several_agencies(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "fare_attributes.txt",
             "fare_id,price,currency_type,payment_method,transfers,agency_id\n"
             "fare1,1,EUR,1,0,DTA\n"
             "fare2,2,EUR,0,0,ATD\n")
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "agency.txt",
             "agency_id,agency_name,agency_url,agency_timezone,agency_lang\n"
             "DTA,Demo Agency,http://google.com,America/Los_Angeles,en\n"
             "ATD,Another Demo Agency,http://example.com,America/Los_Angeles,en\n")
-        self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
+        self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_wrong_id_with_one_agency_with_no_id(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "fare_attributes.txt",
             "fare_id,price,currency_type,payment_method,transfers,agency_id\n"
             "fare1,1,EUR,1,0,DOESNOTEXIST\n")
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "routes.txt",
             "route_id,agency_id,route_short_name,route_long_name,route_type\n"
             "AB,,,Airport Bullfrog,3\n")
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "agency.txt",
             "agency_id,agency_name,agency_url,agency_timezone,agency_lang\n"
             ",Demo Agency,http://google.com,America/Los_Angeles,en\n")
-        self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
+        self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
         e = self.accumulator.PopException("InvalidAgencyID")
         self.assertEquals('agency_id', e.column_name)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_wrong_id_with_one_agency_with_id(self):
-        self.SetArchiveContents("fare_attributes.txt",
+        self.set_archive_contents("fare_attributes.txt",
                                 "fare_id,price,currency_type,payment_method,transfers,agency_id\n"
                                 "fare1,1,EUR,1,0,DOESNOTEXIST\n")
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "agency.txt",
             "agency_id,agency_name,agency_url,agency_timezone,agency_lang\n"
             "DTA,Demo Agency,http://google.com,America/Los_Angeles,en\n")
-        self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
+        self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
         e = self.accumulator.PopException("InvalidAgencyID")
         self.assertEquals('agency_id', e.column_name)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_wrong_id_with_several_agencies(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "fare_attributes.txt",
             "fare_id,price,currency_type,payment_method,transfers,"
             "agency_id\n"
             "fare1,1,EUR,1,0,DTA\n"
             "fare2,2,EUR,0,1,ATD\n"
             "fare3,2,EUR,0,2,DOESNOTEXIST\n")
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "agency.txt",
             "agency_id,agency_name,agency_url,agency_timezone,agency_lang\n"
             "DTA,Demo Agency,http://google.com,America/Los_Angeles,en\n"
             "ATD,Another Demo Agency,http://example.com,America/Los_Angeles,en\n")
-        self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
+        self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
         e = self.accumulator.PopException("InvalidAgencyID")
         self.assertEquals('agency_id', e.column_name)
         self.accumulator.AssertNoMoreExceptions()
 
 
 class StopExtensionIntegrationTestCase(ExtensionMemoryZipTestCase):
-    gtfs_factory = extensions.googletransit.GetGtfsFactory()
+    gtfs_factory = extensions.googletransit.get_gtfs_factory()
 
     def test_no_errors(self):
-        self.SetArchiveContents("stops.txt",
+        self.set_archive_contents("stops.txt",
                                 "stop_id,stop_name,stop_lat,stop_lon,stop_timezone,location_type,"
                                 "parent_station,vehicle_type\n"
                                 "BEATTY,Beatty,36.868446,-116.784582,,1,,1100\n"
@@ -174,11 +174,11 @@ class StopExtensionIntegrationTestCase(ExtensionMemoryZipTestCase):
                                 "BULLFROG,Bullfrog,36.88108,-116.81797,,,,3\n"
                                 "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,America/Los_Angeles,"
                                 ",,204\n")
-        self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
+        self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_invalid_vehicle_type(self):
-        self.SetArchiveContents("stops.txt",
+        self.set_archive_contents("stops.txt",
                                 "stop_id,stop_name,stop_lat,stop_lon,stop_timezone,location_type,"
                                 "parent_station,vehicle_type\n"
                                 "BEATTY,Beatty,36.868446,-116.784582,,1,,2557\n"  # bad vehicle type
@@ -186,13 +186,13 @@ class StopExtensionIntegrationTestCase(ExtensionMemoryZipTestCase):
                                 "BULLFROG,Bullfrog,36.88108,-116.81797,,,,3\n"
                                 "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,America/Los_Angeles,"
                                 ",,204\n")
-        self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
+        self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
         self.accumulator.PopInvalidValue("vehicle_type")
         self.accumulator.AssertNoMoreExceptions()
 
 
 class StopExtensionTestCase(ValidationTestCase):
-    gtfs_factory = extensions.googletransit.GetGtfsFactory()
+    gtfs_factory = extensions.googletransit.get_gtfs_factory()
 
     def set_up(self):
         super(StopExtensionTestCase, self).set_up()
@@ -298,45 +298,45 @@ class StopExtensionTestCase(ValidationTestCase):
 
 
 class RouteExtensionIntegrationTestCase(ExtensionMemoryZipTestCase):
-    gtfs_factory = extensions.googletransit.GetGtfsFactory()
+    gtfs_factory = extensions.googletransit.get_gtfs_factory()
 
     def test_no_errors(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "routes.txt",
             "route_id,agency_id,route_short_name,route_long_name,route_type,"
             "co2_per_km\n"
             "AB,DTA,,Airport Bullfrog,201,15.5\n")
-        self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
+        self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
         self.accumulator.AssertNoMoreExceptions()
 
     def test_invalid_co2_per_km(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "routes.txt",
             "route_id,route_short_name,route_long_name,route_type,co2_per_km\n"
             "AB,,Airport Bullfrog,201,15.5mg\n")
-        self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
+        self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
         self.accumulator.PopInvalidValue("co2_per_km")
         self.accumulator.AssertNoMoreExceptions()
 
     def test_invalid_route_type(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "routes.txt",
             "route_id,route_short_name,route_long_name,route_type,co2_per_km\n"
             "AB,,Airport Bullfrog,2557,15.5\n")
-        self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
+        self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
         self.accumulator.PopInvalidValue("route_type")
         self.accumulator.AssertNoMoreExceptions()
 
 
 class AgencyLangTestCase(ExtensionMemoryZipTestCase):
-    gtfs_factory = extensions.googletransit.GetGtfsFactory()
+    gtfs_factory = extensions.googletransit.get_gtfs_factory()
 
     def test_not_well_formed_agency_lang(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "agency.txt",
             "agency_id,agency_name,agency_url,agency_timezone,agency_lang\n"
             "DTA,Demo Agency,http://google.com,America/Los_Angeles,lang123456789\n")
-        self.MakeLoaderAndLoad(self.problems,
+        self.make_loader_and_load(self.problems,
                                gtfs_factory=self.gtfs_factory)
         e = self.accumulator.PopInvalidValue("agency_lang")
         e_msg = e.FormatProblem()
@@ -345,12 +345,12 @@ class AgencyLangTestCase(ExtensionMemoryZipTestCase):
         self.accumulator.AssertNoMoreExceptions()
 
     def test_not_valid_agency_lang(self):
-        self.SetArchiveContents(
+        self.set_archive_contents(
             "agency.txt",
             "agency_id,agency_name,agency_url,agency_timezone,agency_lang\n"
             "DTA,Demo Agency,http://google.com,America/Los_Angeles,fra-XY\n")
 
-        self.MakeLoaderAndLoad(self.problems,
+        self.make_loader_and_load(self.problems,
                                gtfs_factory=self.gtfs_factory)
         e = self.accumulator.PopInvalidValue("agency_lang")
         e_msg = e.FormatProblem()

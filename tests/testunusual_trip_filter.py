@@ -46,7 +46,7 @@ class UnusualTripFilterTestCase(util.TempDirTestCaseBase):
             except ValueError:
                 self.assertEquals(actual_trip_type, '')
 
-    def test_filterNoForceFilter(self):
+    def test_filter_no_force_filter(self):
         """Test that force==False doesn't set default values"""
         filter = unusual_trip_filter.UnusualTripFilter(0.1, force=False, quiet=True)
         input = self.GetPath('tests', 'data', 'filter_unusual_trips')
@@ -72,7 +72,7 @@ class UnusualTripFilterTestCase(util.TempDirTestCaseBase):
         trip2 = schedule.trips['CITY2']
         self.assertEquals(trip2['trip_type'], '0')
 
-    def test_filterAppliedForSpecifiedRouteType(self):
+    def test_filter_applied_for_specified_route_type(self):
         """Setting integer route_type filters trips of this route type."""
         filter = unusual_trip_filter.UnusualTripFilter(0.1, quiet=True,
                                                        route_type=3)
@@ -83,7 +83,7 @@ class UnusualTripFilterTestCase(util.TempDirTestCaseBase):
         actual_trip_type = schedule.trips['CITY11']['trip_type']
         self.assertEquals(actual_trip_type, '1')
 
-    def test_filterNotAppliedForUnspecifiedRouteType(self):
+    def test_filter_not_applied_for_unspecified_route_type(self):
         """Setting integer route_type filters trips of this route type."""
         filter = unusual_trip_filter.UnusualTripFilter(0.1, quiet=True,
                                                        route_type=2)
@@ -105,7 +105,7 @@ class UnusualTripFilterTestCase(util.TempDirTestCaseBase):
         actual_trip_type = schedule.trips['CITY11']['trip_type']
         self.assertEquals(actual_trip_type, '1')
 
-    def test_filterNotAppliedForDifferentRouteTypeSpecifiedByName(self):
+    def test_filter_applied_for_different_route_type_specified_by_name(self):
         """Setting integer route_type filters trips of this route type."""
         filter = unusual_trip_filter.UnusualTripFilter(0.1, quiet=True,
                                                        route_type='Ferry')
