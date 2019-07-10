@@ -27,8 +27,8 @@ class DuplicateStopTestCase(util.TestCase):
             problem_reporter=util.ExceptionProblemReporterNoExpiration())
         try:
             schedule.Load(util.DataPath('duplicate_stop'), extra_validation=True)
-            self.fail('OtherProblem exception expected')
-        except transitfeed.OtherProblem:
+            self.fail('other_problem exception expected')
+        except transitfeed.other_problem:
             pass
 
 
@@ -39,8 +39,8 @@ class DuplicateScheduleIDTestCase(util.TestCase):
         try:
             schedule.Load(util.DataPath('duplicate_schedule_id'),
                           extra_validation=True)
-            self.fail('DuplicateID exception expected')
-        except transitfeed.DuplicateID:
+            self.fail('duplicate_id exception expected')
+        except transitfeed.duplicate_id:
             pass
 
 
@@ -75,7 +75,7 @@ class OverlappingBlockTripsTestCase(util.TestCase):
         sp1.SetWeekdayService(True)
         sp1.SetStartDate("20070605")
         sp1.SetEndDate("20080605")
-        schedule.AddServicePeriodObject(sp1)
+        schedule.add_service_period_object(sp1)
 
         sp2 = transitfeed.ServicePeriod("SID2")
         sp2.SetDayOfWeekHasService(0)
@@ -83,13 +83,13 @@ class OverlappingBlockTripsTestCase(util.TestCase):
         sp2.SetDayOfWeekHasService(4)
         sp2.SetStartDate("20070605")
         sp2.SetEndDate("20080605")
-        schedule.AddServicePeriodObject(sp2)
+        schedule.add_service_period_object(sp2)
 
         sp3 = transitfeed.ServicePeriod("SID3")
         sp3.SetWeekendService(True)
         sp3.SetStartDate("20070605")
         sp3.SetEndDate("20080605")
-        schedule.AddServicePeriodObject(sp3)
+        schedule.add_service_period_object(sp3)
 
         self.stop1 = schedule.AddStop(lng=-116.75167,
                                       lat=36.915682,
@@ -344,9 +344,9 @@ class get_service_periodsActiveEachDateTestCase(util.TestCase):
         schedule = transitfeed.Schedule()
         sp1 = transitfeed.ServicePeriod()
         sp1.service_id = "sp1"
-        sp1.SetDateHasService("20090101")
-        sp1.SetDateHasService("20090102")
-        schedule.AddServicePeriodObject(sp1)
+        sp1.set_date_has_service("20090101")
+        sp1.set_date_has_service("20090102")
+        schedule.add_service_period_object(sp1)
         self.assertEquals(
             [],
             schedule.get_service_periodsActiveEachDate(date(2009, 1, 1),
@@ -360,17 +360,17 @@ class get_service_periodsActiveEachDateTestCase(util.TestCase):
         schedule = transitfeed.Schedule()
         sp1 = transitfeed.ServicePeriod()
         sp1.service_id = "sp1"
-        sp1.SetDateHasService("20081231")
-        sp1.SetDateHasService("20090101")
+        sp1.set_date_has_service("20081231")
+        sp1.set_date_has_service("20090101")
 
-        schedule.AddServicePeriodObject(sp1)
+        schedule.add_service_period_object(sp1)
         sp2 = transitfeed.ServicePeriod()
         sp2.service_id = "sp2"
         sp2.SetStartDate("20081201")
         sp2.SetEndDate("20081231")
         sp2.SetWeekendService()
         sp2.SetWeekdayService()
-        schedule.AddServicePeriodObject(sp2)
+        schedule.add_service_period_object(sp2)
         self.assertEquals(
             [],
             schedule.get_service_periodsActiveEachDate(date(2009, 1, 1),
@@ -393,7 +393,7 @@ class DuplicateTripTestCase(util.ValidationTestCase):
         schedule.AddAgencyObject(agency)
 
         service = schedule.GetDefaultServicePeriod()
-        service.SetDateHasService('20070101')
+        service.set_date_has_service('20070101')
 
         route1 = transitfeed.Route('Route1', 'route 1', 3, 'route_1', 'agency1')
         schedule.AddRouteObject(route1)
@@ -461,7 +461,7 @@ class StopBelongsToBothSubwayAndBusTestCase(util.ValidationTestCase):
                                    route_type=1)
 
         service = schedule.GetDefaultServicePeriod()
-        service.SetDateHasService("20070101")
+        service.set_date_has_service("20070101")
 
         trip1 = route1.AddTrip(schedule, "trip1", service, "t1")
         trip2 = route2.AddTrip(schedule, "trip2", service, "t2")
@@ -656,7 +656,7 @@ class DuplicateStopValidationTestCase(util.ValidationTestCase):
         service_period.SetStartDate("20070101")
         service_period.SetEndDate("20071231")
         service_period.SetWeekdayService(True)
-        schedule.AddServicePeriodObject(service_period)
+        schedule.add_service_period_object(service_period)
 
         trip = transitfeed.Trip()
         trip.route_id = "SAMPLE_ID"
@@ -719,7 +719,7 @@ class DuplicateTripIDValidationTestCase(util.TestCase):
         service_period.SetStartDate("20070101")
         service_period.SetEndDate("20071231")
         service_period.SetWeekdayService(True)
-        schedule.AddServicePeriodObject(service_period)
+        schedule.add_service_period_object(service_period)
 
         trip1 = transitfeed.Trip()
         trip1.route_id = "SAMPLE_ID"
@@ -734,7 +734,7 @@ class DuplicateTripIDValidationTestCase(util.TestCase):
         try:
             schedule.AddTripObject(trip2)
             self.fail("Expected Duplicate ID validation failure")
-        except transitfeed.DuplicateID as e:
+        except transitfeed.duplicate_id as e:
             self.assertEqual("trip_id", e.column_name)
             self.assertEqual("SAMPLE_TRIP", e.value)
 
@@ -751,7 +751,7 @@ class AgencyIDValidationTestCase(util.TestCase):
         try:
             schedule.AddRouteObject(route)
             self.fail("Expected validation error")
-        except transitfeed.InvalidValue as e:
+        except transitfeed.invalid_value as e:
             self.assertEqual('agency_id', e.column_name)
             self.assertEqual(None, e.value)
 
@@ -770,7 +770,7 @@ class AgencyIDValidationTestCase(util.TestCase):
         try:
             schedule.AddRouteObject(route)
             self.fail("Expected validation error")
-        except transitfeed.InvalidValue as e:
+        except transitfeed.invalid_value as e:
             self.assertEqual('agency_id', e.column_name)
             self.assertEqual(None, e.value)
 

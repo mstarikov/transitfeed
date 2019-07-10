@@ -796,7 +796,7 @@ def main():
                 "While loading %s the following error was found:\n%s\n%s\n" %
                 (input_path,
                  e.FormatContext(),
-                 transitfeed.EncodeUnicode(e.FormatProblem()))), file=sys.stderr)
+                 transitfeed.encode_str(e.FormatProblem()))), file=sys.stderr)
         sys.exit(1)
 
     print("Writing %s" % output_path)

@@ -189,7 +189,7 @@ class TestGtfsFactoryUser(util.TestCase):
                                    transitfeed.GtfsFactory))
 
     def assert_factory_is_saved_and_returned(self, instance, factory):
-        instance.SetGtfsFactory(factory)
+        instance.set_gtfs_factory(factory)
         self.assertEquals(factory, instance.get_gtfs_factory())
 
     def test_classes(self):

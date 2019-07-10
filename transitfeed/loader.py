@@ -67,7 +67,7 @@ class Loader:
         self._problems = problems
         self._path = feed_path
         self._zip = zip
-        self._load_stop_times = load_stop_times
+        self._load_stop_times_flag = load_stop_times
         self._gtfs_factory = gtfs_factory
 
     def _determine_format(self):
@@ -158,9 +158,10 @@ class Loader:
         contents = self._get_utf8_contents(file_name)
         if not contents:
             return
-
-        eol_checker = util.EndOfLineChecker(StringIO.StringIO(contents),
-                                            file_name, self._problems)
+        try:
+            eol_checker = [line for line in contents.decode('utf-8').split('\n')]
+        except TypeError:
+            eol_checker = util.EndOfLineChecker(StringIO.StringIO(contents), file_name, self._problems)
         # The csv module doesn't provide a way to skip trailing space, but when I
         # checked 15/675 feeds had trailing space in a header row and 120 had spaces
         # after fields. Space after header fields can cause a serious parsing
@@ -223,7 +224,7 @@ class Loader:
         for col in missing_cols:
             # this is provided in order to create a nice colored list of
             # columns in the validator output
-            self._problems.MissingColumn(file_name, col, header_context)
+            self._problems.missing_column(file_name, col, header_context)
 
         # check for deprecated columns
         for (deprecated_name, new_name) in deprecated:
@@ -238,7 +239,7 @@ class Loader:
                 continue
 
             if len(raw_row) > len(raw_header):
-                self._problems.OtherProblem('Found too many cells (commas) in line '
+                self._problems.other_problem('Found too many cells (commas) in line '
                                             '%d of file "%s".  Every row in the file '
                                             'should have the same number of cells as '
                                             'the header (first line) does.' %
@@ -247,7 +248,7 @@ class Loader:
                                             type=problems.TYPE_WARNING)
 
             if len(raw_row) < len(raw_header):
-                self._problems.OtherProblem('Found missing cells (commas) in line '
+                self._problems.other_problem('Found missing cells (commas) in line '
                                             '%d of file "%s".  Every row in the file '
                                             'should have the same number of cells as '
                                             'the header (first line) does.' %
@@ -262,6 +263,8 @@ class Loader:
             for i in valid_columns:
                 try:
                     valid_values.append(raw_row[i].decode('utf-8'))
+                except AttributeError:
+                    valid_values.append(raw_row[i])
                 except UnicodeDecodeError:
                     # Replace all invalid characters with REPLACEMENT CHARACTER (U+FFFD)
                     valid_values.append(codecs.getdecoder("utf8")
@@ -274,7 +277,7 @@ class Loader:
             # problems can not be reported until after converting all of raw_row to
             # Unicode.
             for i in unicode_error_columns:
-                self._problems.InvalidValue(header[i], valid_values[i],
+                self._problems.invalid_value(header[i], valid_values[i],
                                             'Unicode error',
                                             (file_name, line_num,
                                              valid_values, header))
@@ -294,15 +297,16 @@ class Loader:
         if not contents:
             return
         try:
+            # eol_checker = util.EndOfLineChecker(StringIO.BytesIO(contents), file_name, self._problems)
+            eol_checker = [line for line in contents.decode('utf-8').split('\n')]
+        except TypeError:
             eol_checker = util.EndOfLineChecker(StringIO.StringIO(contents),
                                                 file_name, self._problems)
-            reader = csv.reader(eol_checker)  # Use excel dialect
-        except TypeError:
-            eol_checker = util.EndOfLineChecker(contents, file_name, self._problems)
-            reader = csv.reader(contents.split('\n'))
+        reader = csv.reader(eol_checker, delimiter=',')  # Use excel dialect
 
         header = next(reader)
-        header = map(lambda x: x.strip(), header)  # trim any whitespace
+        # header = map(lambda x: x.strip(), header)  # trim any whitespace
+        header = [re.sub(r'[\s+]', '', x) for x in header]
         header_occurrences = util.defaultdict(lambda: 0)
         for column_header in header:
             header_occurrences[column_header] += 1
@@ -315,7 +319,7 @@ class Loader:
                     count=count)
 
         # check for unrecognized columns, which are often misspellings
-        header_context = (file_name, 1, [''] * len(header), header)
+        header_context = (file_name, 1, [''] * header_occurrences.__len__(), header)
         valid_cols = cols + [deprecated_name for (deprecated_name, _) in deprecated]
         unknown_cols = set(header).difference(set(valid_cols))
         for col in unknown_cols:
@@ -329,7 +333,7 @@ class Loader:
             if cols[i] in header:
                 col_index[i] = header.index(cols[i])
             elif cols[i] in required:
-                self._problems.MissingColumn(file_name, cols[i], header_context)
+                self._problems.missing_column(file_name, cols[i], header_context)
 
         # check for deprecated columns
         for (deprecated_name, new_name) in deprecated:
@@ -344,7 +348,7 @@ class Loader:
                 continue
 
             if len(row) > len(header):
-                self._problems.OtherProblem('Found too many cells (commas) in line '
+                self._problems.other_problem('Found too many cells (commas) in line '
                                             '%d of file "%s".  Every row in the file '
                                             'should have the same number of cells as '
                                             'the header (first line) does.' %
@@ -352,7 +356,7 @@ class Loader:
                                             type=problems.TYPE_WARNING)
 
             if len(row) < len(header):
-                self._problems.OtherProblem('Found missing cells (commas) in line '
+                self._problems.other_problem('Found missing cells (commas) in line '
                                             '%d of file "%s".  Every row in the file '
                                             'should have the same number of cells as '
                                             'the header (first line) does.' %
@@ -368,7 +372,8 @@ class Loader:
                         result[i] = u''
                     else:
                         try:
-                            result[i] = row[ci].decode('utf-8').strip()
+                            # result[i] = row[ci].decode('utf-8').strip()
+                            result[i] = re.sub(r'[\s+]', '', row[ci])
                         except UnicodeDecodeError:
                             # Replace all invalid characters with
                             # REPLACEMENT CHARACTER (U+FFFD)
@@ -377,7 +382,7 @@ class Loader:
                             unicode_error_columns.append(i)
 
             for i in unicode_error_columns:
-                self._problems.InvalidValue(cols[i], result[i],
+                self._problems.invalid_value(cols[i], result[i],
                                             'Unicode error',
                                             (file_name, row_num, result, cols))
             yield (result, row_num, cols)
@@ -412,7 +417,7 @@ class Loader:
         return results
 
     def _load_feed(self):
-        loading_order = self._gtfs_factory.GetloadingOrder()
+        loading_order = self._gtfs_factory.get_loading_order()
         for filename in loading_order:
             if not self._gtfs_factory.IsFileRequired(filename) and \
                     not self._has_file(filename):
@@ -424,9 +429,9 @@ class Loader:
                         object_class._FIELD_NAMES,
                         object_class._REQUIRED_FIELD_NAMES,
                         object_class._DEPRECATED_FIELD_NAMES):
-                    self._problems.SetFileContext(filename, row_num, row, header)
+                    self._problems.set_file_context(filename, row_num, row, header)
                     instance = object_class(field_dict=d)
-                    instance.SetGtfsFactory(self._gtfs_factory)
+                    instance.set_gtfs_factory(self._gtfs_factory)
                     if not instance.ValidateBeforeAdd(self._problems):
                         continue
                     instance.AddToSchedule(self._schedule, self._problems)
@@ -454,14 +459,14 @@ class Loader:
                                      service_period_class._REQUIRED_FIELD_NAMES,
                                      service_period_class._DEPRECATED_FIELD_NAMES):
                 context = (file_name, row_num, row, cols)
-                self._problems.SetFileContext(*context)
+                self._problems.set_file_context(*context)
 
                 period = service_period_class(field_list=row)
 
-                if period.service_id in periods:
-                    self._problems.DuplicateID('service_id', period.service_id)
+                if ''.join(period.service_id) in periods:
+                    self._problems.duplicate_id('service_id', period.service_id)
                 else:
-                    periods[period.service_id] = (period, context)
+                    periods[period.service_id[0]] = (period, context)
                 self._problems.clear_context()
 
         # process calendar_dates.txt
@@ -473,31 +478,31 @@ class Loader:
                                      service_period_class._REQUIRED_FIELD_NAMES_CALENDAR_DATES,
                                      service_period_class._DEPRECATED_FIELD_NAMES_CALENDAR_DATES):
                 context = (file_name_dates, row_num, row, cols)
-                self._problems.SetFileContext(*context)
+                self._problems.set_file_context(*context)
 
                 service_id = row[0]
 
                 period = None
-                if service_id in periods:
-                    period = periods[service_id][0]
+                if ''.join(service_id)in periods:
+                    period = periods[''.join(service_id)][0]
                 else:
                     period = service_period_class(service_id)
-                    periods[period.service_id] = (period, context)
+                    periods[''.join(period.service_id)] = (period, context)
 
-                exception_type = row[2]
+                exception_type = ''.join(row[2])
                 if exception_type == u'1':
-                    period.SetDateHasService(row[1], True, self._problems)
+                    period.set_date_has_service(row[1], True, self._problems)
                 elif exception_type == u'2':
-                    period.SetDateHasService(row[1], False, self._problems)
+                    period.set_date_has_service(row[1], False, self._problems)
                 else:
-                    self._problems.InvalidValue('exception_type', exception_type)
+                    self._problems.invalid_value('exception_type', exception_type)
                 self._problems.clear_context()
 
         # Now insert the periods into the schedule object, so that they're
         # validated with both calendar and calendar_dates info present
         for period, context in periods.values():
-            self._problems.SetFileContext(*context)
-            self._schedule.AddServicePeriodObject(period, self._problems)
+            self._problems.set_file_context(*context)
+            self._schedule.add_service_period_object(period, self._problems)
             self._problems.clear_context()
 
     def _load_shapes(self):
@@ -514,24 +519,24 @@ class Loader:
                 shape_class._REQUIRED_FIELD_NAMES,
                 shape_class._DEPRECATED_FIELD_NAMES):
             file_context = (file_name, row_num, row, header)
-            self._problems.SetFileContext(*file_context)
+            self._problems.set_file_context(*file_context)
 
             shapepoint = self._gtfs_factory.ShapePoint(field_dict=d)
-            if not shapepoint.ParseAttributes(self._problems):
+            if not shapepoint.parse_attributes(self._problems):
                 continue
 
             if shapepoint.shape_id in shapes:
                 shape = shapes[shapepoint.shape_id]
             else:
                 shape = shape_class(shapepoint.shape_id)
-                shape.SetGtfsFactory(self._gtfs_factory)
+                shape.set_gtfs_factory(self._gtfs_factory)
                 shapes[shapepoint.shape_id] = shape
 
-            shape.AddShapePointObjectUnsorted(shapepoint, self._problems)
+            shape.add_shape_point_object_unsorted(shapepoint, self._problems)
             self._problems.clear_context()
 
-        for shape_id, shape in shapes.items():
-            self._schedule.AddShapeObject(shape, self._problems)
+        for shape_id, shape in list(shapes.items()):
+            self._schedule.add_shape_object(shape, self._problems)
             del shapes[shape_id]
 
     def _load_stop_times(self):
@@ -542,7 +547,7 @@ class Loader:
                                                      stop_time_class._REQUIRED_FIELD_NAMES,
                                                      stop_time_class._DEPRECATED_FIELD_NAMES):
             file_context = ('stop_times.txt', row_num, row, cols)
-            self._problems.SetFileContext(*file_context)
+            self._problems.set_file_context(*file_context)
 
             (trip_id, arrival_time, departure_time, stop_id, stop_sequence,
              stop_headsign, pickup_type, drop_off_type, shape_dist_traveled,
@@ -551,20 +556,20 @@ class Loader:
             try:
                 sequence = int(stop_sequence)
             except (TypeError, ValueError):
-                self._problems.InvalidValue('stop_sequence', stop_sequence,
+                self._problems.invalid_value('stop_sequence', stop_sequence,
                                             'This should be a number.')
                 continue
             if sequence < 0:
-                self._problems.InvalidValue('stop_sequence', sequence,
+                self._problems.invalid_value('stop_sequence', sequence,
                                             'Sequence numbers should be 0 or higher.')
 
             if stop_id not in self._schedule.stops:
-                self._problems.InvalidValue('stop_id', stop_id,
+                self._problems.invalid_value('stop_id', stop_id,
                                             'This value wasn\'t defined in stops.txt')
                 continue
             stop = self._schedule.stops[stop_id]
             if trip_id not in self._schedule.trips:
-                self._problems.InvalidValue('trip_id', trip_id,
+                self._problems.invalid_value('trip_id', trip_id,
                                             'This value wasn\'t defined in trips.txt')
                 continue
             trip = self._schedule.trips[trip_id]
@@ -597,7 +602,7 @@ class Loader:
         self._load_shapes()
         self._load_feed()
 
-        if self._load_stop_times:
+        if self._load_stop_times_flag:
             self._load_stop_times()
 
         if self._zip:

@@ -54,15 +54,15 @@ def save_feed(input, output):
     service_period.SetStartDate('20070314')
     service_period.SetEndDate('20071231')
     # Holidays for 2007
-    service_period.SetDateHasService('20070528', has_service=False)
-    service_period.SetDateHasService('20070704', has_service=False)
-    service_period.SetDateHasService('20070903', has_service=False)
-    service_period.SetDateHasService('20071122', has_service=False)
-    service_period.SetDateHasService('20071123', has_service=False)
-    service_period.SetDateHasService('20071224', has_service=False)
-    service_period.SetDateHasService('20071225', has_service=False)
-    service_period.SetDateHasService('20071226', has_service=False)
-    service_period.SetDateHasService('20071231', has_service=False)
+    service_period.set_date_has_service('20070528', has_service=False)
+    service_period.set_date_has_service('20070704', has_service=False)
+    service_period.set_date_has_service('20070903', has_service=False)
+    service_period.set_date_has_service('20071122', has_service=False)
+    service_period.set_date_has_service('20071123', has_service=False)
+    service_period.set_date_has_service('20071224', has_service=False)
+    service_period.set_date_has_service('20071225', has_service=False)
+    service_period.set_date_has_service('20071226', has_service=False)
+    service_period.set_date_has_service('20071231', has_service=False)
 
     stops = {}  # Map from xml stop id to python Stop object
     agency = schedule.NewDefaultAgency(name='GBus', url='http://shuttle/',

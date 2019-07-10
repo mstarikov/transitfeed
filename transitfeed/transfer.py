@@ -44,13 +44,13 @@ class Transfer(GtfsObjectBase):
             self.transfer_type = 0
         else:
             try:
-                self.transfer_type = util.NonNegIntStringToInt(self.transfer_type)
+                self.transfer_type = util.non_neg_int_string_to_int(self.transfer_type)
             except (TypeError, ValueError):
                 pass
 
         if hasattr(self, 'min_transfer_time'):
             try:
-                self.min_transfer_time = util.NonNegIntStringToInt(self.min_transfer_time)
+                self.min_transfer_time = util.non_neg_int_string_to_int(self.min_transfer_time)
             except (TypeError, ValueError):
                 pass
         else:
@@ -62,27 +62,27 @@ class Transfer(GtfsObjectBase):
             schedule.AddTransferObject(self)
 
     def validate_from_stop_id_is_present(self, problems):
-        if util.IsEmpty(self.from_stop_id):
-            problems.MissingValue('from_stop_id')
+        if util.is_empty(self.from_stop_id):
+            problems.missing_value('from_stop_id')
             return False
         return True
 
     def validate_to_stop_id_is_present(self, problems):
-        if util.IsEmpty(self.to_stop_id):
-            problems.MissingValue('to_stop_id')
+        if util.is_empty(self.to_stop_id):
+            problems.missing_value('to_stop_id')
             return False
         return True
 
     def validate_transfer_type(self, problems):
-        if not util.IsEmpty(self.transfer_type):
+        if not util.is_empty(self.transfer_type):
             if (not isinstance(self.transfer_type, int)) or \
                     (self.transfer_type not in range(0, 4)):
-                problems.InvalidValue('transfer_type', self.transfer_type)
+                problems.invalid_value('transfer_type', self.transfer_type)
                 return False
         return True
 
     def validate_minimum_transfer_time(self, problems):
-        if not util.IsEmpty(self.min_transfer_time):
+        if not util.is_empty(self.min_transfer_time):
             if self.transfer_type != 2:
                 problems.MinimumTransferTimeSetWithInvalidTransferType(
                     self.transfer_type)
@@ -93,23 +93,23 @@ class Transfer(GtfsObjectBase):
             # from being added to the schedule.
             if (isinstance(self.min_transfer_time, int)):
                 if self.min_transfer_time < 0:
-                    problems.InvalidValue('min_transfer_time', self.min_transfer_time,
+                    problems.invalid_value('min_transfer_time', self.min_transfer_time,
                                           reason="This field cannot contain a negative " \
                                                  "value.")
                 elif self.min_transfer_time >= 24 * 3600:
-                    problems.InvalidValue('min_transfer_time', self.min_transfer_time,
+                    problems.invalid_value('min_transfer_time', self.min_transfer_time,
                                           reason="The value is very large for a " \
                                                  "transfer time and most likely " \
                                                  "indicates an error.")
                 elif self.min_transfer_time >= 3 * 3600:
-                    problems.InvalidValue('min_transfer_time', self.min_transfer_time,
+                    problems.invalid_value('min_transfer_time', self.min_transfer_time,
                                           type=problems_module.TYPE_WARNING,
                                           reason="The value is large for a transfer " \
                                                  "time and most likely indicates " \
                                                  "an error.")
             else:
                 # It has a value, but it is not an integer
-                problems.InvalidValue('min_transfer_time', self.min_transfer_time,
+                problems.invalid_value('min_transfer_time', self.min_transfer_time,
                                       reason="If present, this field should contain " \
                                              "an integer value.")
                 return False
@@ -123,13 +123,13 @@ class Transfer(GtfsObjectBase):
 
     def validate_from_stop_id_is_valid(self, problems):
         if self.from_stop_id not in self._schedule.stops.keys():
-            problems.InvalidValue('from_stop_id', self.from_stop_id)
+            problems.invalid_value('from_stop_id', self.from_stop_id)
             return False
         return True
 
     def validate_to_stop_id_is_valid(self, problems):
         if self.to_stop_id not in self._schedule.stops.keys():
-            problems.InvalidValue('to_stop_id', self.to_stop_id)
+            problems.invalid_value('to_stop_id', self.to_stop_id)
             return False
         return True
 
@@ -147,7 +147,7 @@ class Transfer(GtfsObjectBase):
                                             type=problems_module.TYPE_WARNING)
 
     def validate_transfer_walking_time(self, problems):
-        if util.IsEmpty(self.min_transfer_time):
+        if util.is_empty(self.min_transfer_time):
             return
 
         if self.min_transfer_time < 0:

@@ -196,7 +196,7 @@ def check_version(problems, latest_version=None):
     Check if there is a newer version of transitfeed available.
 
     Args:
-      problems: if a new version is available, a NewVersionAvailable problem will
+      problems: if a new version is available, a new_version_available problem will
         be added
       latest_version: if specified, override the latest version read from the
         project page
@@ -217,26 +217,26 @@ def check_version(problems, latest_version=None):
             description = ('During the new-version check, we failed to reach '
                            'transitfeed server: Reason: %s [%s].' %
                            (e.reason, e.code))
-            problems.OtherProblem(
+            problems.other_problem(
                 description=description, type=errors.TYPE_NOTICE)
             return
         except urllib2.URLError as e:
             description = ('During the new-version check, we failed to reach '
                            'transitfeed server. Reason: %s.' % e.reason)
-            problems.OtherProblem(
+            problems.other_problem(
                 description=description, type=errors.TYPE_NOTICE)
             return
 
     if not latest_version:
         description = ('During the new-version check, we had trouble parsing the '
                        'contents of %s.' % LATEST_RELEASE_VERSION_URL)
-        problems.OtherProblem(
+        problems.other_problem(
             description=description, type=errors.TYPE_NOTICE)
         return
 
     newest_version = _max_version([latest_version, __version__])
     if __version__ != newest_version:
-        problems.NewVersionAvailable(newest_version)
+        problems.new_version_available(newest_version)
 
 
 def _max_version(versions):
@@ -255,7 +255,7 @@ def _max_version(versions):
 OUTPUT_ENCODING = 'utf-8'
 
 
-def encode_unicode(text):
+def encode_str(text):
     """
     Optionally encode text and return it. The result should be safe to print.
     """
@@ -277,14 +277,14 @@ def is_valid_u_r_l(url):
 def validate_u_r_l(url, column_name=None, problems=None):
     """
     Validates a non-required URL value using is_valid_u_r_l():
-      - if invalid adds InvalidValue error (if problems accumulator is provided)
+      - if invalid adds invalid_value error (if problems accumulator is provided)
       - an empty URL is considered valid and no error or warning is issued.
     """
     if is_empty(url) or is_valid_u_r_l(url):
         return True
     else:
         if problems:
-            problems.InvalidValue(column_name, url)
+            problems.invalid_value(column_name, url)
         return False
 
 
@@ -302,7 +302,7 @@ def validate_email(email, column_name=None, problems=None):
         return True
     else:
         if problems:
-            problems.InvalidValue(column_name, email)
+            problems.invalid_value(column_name, email)
         return False
 
 
@@ -325,7 +325,7 @@ def is_valid_language_code(lang):
 def validate_language_code(lang, column_name=None, problems=None):
     """
     Validates a non-required language code value using is_valid_language_code():
-      - if invalid adds InvalidValue error (if problems accumulator is provided)
+      - if invalid adds invalid_value error (if problems accumulator is provided)
       - an empty language code is regarded as valid! Otherwise we might end up
         with many duplicate errors because of the required field checks.
     """
@@ -333,7 +333,7 @@ def validate_language_code(lang, column_name=None, problems=None):
         return True
     else:
         if problems:
-            problems.InvalidValue(column_name, lang)
+            problems.invalid_value(column_name, lang)
         return False
 
 
@@ -355,7 +355,7 @@ def is_valid_timezone(timezone):
 def validate_timezone(timezone, column_name=None, problems=None):
     """
     Validates a non-required timezone string value using is_valid_timezone():
-      - if invalid adds InvalidValue error (if problems accumulator is provided)
+      - if invalid adds invalid_value error (if problems accumulator is provided)
       - an empty timezone string is regarded as valid! Otherwise we might end up
         with many duplicate errors because of the required field checks.
     """
@@ -366,7 +366,7 @@ def validate_timezone(timezone, column_name=None, problems=None):
             # if we get here pytz has already been imported successfully in
             # is_valid_timezone(). So a try-except block is not needed here.
             import pytz
-            problems.InvalidValue(
+            problems.invalid_value(
                 column_name, timezone,
                 '"%s" is not a common timezone name according to pytz version %s' %
                 (timezone, pytz.VERSION))
@@ -385,7 +385,7 @@ def is_valid_date(date):
 def validate_date(date, column_name=None, problems=None):
     """
     Validates a non-required date string value using is_valid_date():
-      - if invalid adds InvalidValue error (if problems accumulator is provided)
+      - if invalid adds invalid_value error (if problems accumulator is provided)
       - an empty date string is regarded as valid! Otherwise we might end up
         with many duplicate errors because of the required field checks.
     """
@@ -393,7 +393,7 @@ def validate_date(date, column_name=None, problems=None):
         return True
     else:
         if problems:
-            problems.InvalidValue(column_name, date)
+            problems.invalid_value(column_name, date)
         return False
 
 
@@ -401,14 +401,14 @@ def validate_required_fields_are_not_empty(gtfs_object, required_field_names,
                                            problems=None):
     """
     Validates whether all required fields of an object have a value:
-      - if value empty adds MissingValue errors (if problems accumulator is
+      - if value empty adds missing_value errors (if problems accumulator is
         provided)
     """
     no_missing_value = True
     for name in required_field_names:
         if is_empty(getattr(gtfs_object, name, None)):
             if problems:
-                problems.MissingValue(name)
+                problems.missing_value(name)
             no_missing_value = False
     return no_missing_value
 
@@ -418,8 +418,8 @@ def validate_and_return_int_value(value, allowed_values, default, allow_empty,
                                   column_name=None, problems=None):
     """
     Validates a value to be a valid integer in the list of allowed values:
-      - if no integer value adds InvalidValue error and returns the default value
-      - if integer but not in allowed_values addes InvalidValue warning
+      - if no integer value adds invalid_value error and returns the default value
+      - if integer but not in allowed_values addes invalid_value warning
       - returns the default value if empty and allow_empty = True
 
     Args:
@@ -440,12 +440,12 @@ def validate_and_return_int_value(value, allowed_values, default, allow_empty,
         int_value = int(value)
     except (ValueError, TypeError):
         if problems and column_name:
-            problems.InvalidValue(column_name, value)
+            problems.invalid_value(column_name, value)
         return default
     else:
         if int_value not in allowed_values:
             if problems and column_name:
-                problems.InvalidValue(column_name, value,
+                problems.invalid_value(column_name, value,
                                       type=errors.TYPE_WARNING)
         return int_value
 
@@ -475,12 +475,12 @@ def validate_yes_no_unknown(value, column_name=None, problems=None):
         return True
     else:
         if problems:
-            problems.InvalidValue(column_name, value)
+            problems.invalid_value(column_name, value)
         return False
 
 
 def is_empty(value):
-    return value is None or (isinstance(value, basestring) and not value.strip())
+    return value is None or (isinstance(value, str) and not value.strip())
 
 
 def find_unique_id(dic):
@@ -513,7 +513,7 @@ def format_seconds_since_midnight(s):
 def date_string_to_date_object(date_string):
     """Return a date object for a string "YYYYMMDD"."""
     # If this becomes a bottleneck date objects could be cached
-    if re.match('^\d{8}$', date_string):
+    if re.match(r'^\d{8}s', date_string):
         return None
     try:
         return datetime.date(int(date_string[0:4]), int(date_string[4:6]),
@@ -691,7 +691,7 @@ class EndOfLineChecker:
         next_line_contents = next_line[0:m_eol.start()]
         for seq, name in INVALID_LINE_SEPARATOR_UTF8.items():
             if next_line_contents.find(seq) != -1:
-                self._problems.OtherProblem(
+                self._problems.other_problem(
                     "Line contains %s" % name,
                     context=(self._name, self._line_number))
         return next_line_contents
@@ -707,7 +707,7 @@ class EndOfLineChecker:
             if self._lf > len(self._lf_examples):
                 lf_lines += ", ..."
 
-            self._problems.OtherProblem(
+            self._problems.other_problem(
                 "Found %d CR LF \"\\r\\n\" line end%s (line%s %s) and "
                 "%d LF \"\\n\" line end%s (line%s %s). A file must use a "
                 "consistent line end." % (self._crlf, crlf_plural, crlf_plural,

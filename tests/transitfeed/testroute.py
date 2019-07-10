@@ -26,12 +26,12 @@ import transitfeed
 
 class RepeatedRouteNameTestCase(util.LoadTestCase):
     def run_test(self):
-        self.ExpectInvalidValue('repeated_route_name', 'route_long_name')
+        self.Expectinvalid_value('repeated_route_name', 'route_long_name')
 
 
 class SameShortLongNameTestCase(util.LoadTestCase):
     def run_test(self):
-        self.ExpectInvalidValue('same_short_long_name', 'route_long_name')
+        self.Expectinvalid_value('same_short_long_name', 'route_long_name')
 
 
 class RouteMemoryZipTestCase(util.MemoryZipTestCase):
@@ -103,11 +103,11 @@ class RouteConstructorTestCase(util.TestCase):
         repr(route)
         self.assertEqual({}, dict(route))
 
-        e = self.accumulator.PopException('MissingValue')
+        e = self.accumulator.PopException('missing_value')
         self.assertEqual('route_id', e.column_name)
-        e = self.accumulator.PopException('MissingValue')
+        e = self.accumulator.PopException('missing_value')
         self.assertEqual('route_type', e.column_name)
-        e = self.accumulator.PopException('InvalidValue')
+        e = self.accumulator.PopException('invalid_value')
         self.assertEqual('route_short_name', e.column_name)
         self.accumulator.AssertNoMoreExceptions()
 
@@ -144,7 +144,7 @@ class RouteConstructorTestCase(util.TestCase):
                                   route_type='8')
         repr(route)
         route.Validate(self.problems)
-        e = self.accumulator.PopException('InvalidValue')
+        e = self.accumulator.PopException('invalid_value')
         self.assertEqual('route_type', e.column_name)
         self.assertEqual(1, e.type)
         self.accumulator.AssertNoMoreExceptions()
@@ -156,7 +156,7 @@ class RouteConstructorTestCase(util.TestCase):
                                   route_type='1foo')
         repr(route)
         route.Validate(self.problems)
-        e = self.accumulator.PopException('InvalidValue')
+        e = self.accumulator.PopException('invalid_value')
         self.assertEqual('route_type', e.column_name)
         self.accumulator.AssertNoMoreExceptions()
         self.assertEquals({'route_id': 'id1', 'route_short_name': '22',
@@ -220,86 +220,86 @@ class RouteValidationTestCase(util.ValidationTestCase):
         # blank short & long names
         route.route_short_name = ''
         route.route_long_name = '    '
-        self.ValidateAndExpectInvalidValue(route, 'route_short_name')
+        self.ValidateAndExpectinvalid_value(route, 'route_short_name')
 
         # short name too long
         route.route_short_name = 'South Side'
         route.route_long_name = ''
-        self.ValidateAndExpectInvalidValue(route, 'route_short_name')
+        self.ValidateAndExpectinvalid_value(route, 'route_short_name')
         route.route_short_name = 'M7bis'  # 5 is OK
         route.Validate(self.problems)
 
         # long name contains short name
         route.route_short_name = '54C'
         route.route_long_name = '54C South Side - North Side'
-        self.ValidateAndExpectInvalidValue(route, 'route_long_name')
+        self.ValidateAndExpectinvalid_value(route, 'route_long_name')
         route.route_long_name = '54C(South Side - North Side)'
-        self.ValidateAndExpectInvalidValue(route, 'route_long_name')
+        self.ValidateAndExpectinvalid_value(route, 'route_long_name')
         route.route_long_name = '54C-South Side - North Side'
-        self.ValidateAndExpectInvalidValue(route, 'route_long_name')
+        self.ValidateAndExpectinvalid_value(route, 'route_long_name')
 
         # long name is same as short name
         route.route_short_name = '54C'
         route.route_long_name = '54C'
-        self.ValidateAndExpectInvalidValue(route, 'route_long_name')
+        self.ValidateAndExpectinvalid_value(route, 'route_long_name')
 
         # route description is same as short name
         route.route_desc = '54C'
         route.route_short_name = '54C'
         route.route_long_name = ''
-        self.ValidateAndExpectInvalidValue(route, 'route_desc')
+        self.ValidateAndExpectinvalid_value(route, 'route_desc')
         route.route_desc = None
 
         # route description is same as long name
         route.route_desc = 'South Side - North Side'
         route.route_long_name = 'South Side - North Side'
-        self.ValidateAndExpectInvalidValue(route, 'route_desc')
+        self.ValidateAndExpectinvalid_value(route, 'route_desc')
         route.route_desc = None
 
         # invalid route types
         route.route_type = 8
-        self.ValidateAndExpectInvalidValue(route, 'route_type')
+        self.ValidateAndExpectinvalid_value(route, 'route_type')
         route.route_type = -1
-        self.ValidateAndExpectInvalidValue(route, 'route_type')
+        self.ValidateAndExpectinvalid_value(route, 'route_type')
         route.route_type = 7
 
         # invalid route URL
         route.route_url = 'www.example.com'
-        self.ValidateAndExpectInvalidValue(route, 'route_url')
+        self.ValidateAndExpectinvalid_value(route, 'route_url')
         route.route_url = None
 
         # invalid route color
         route.route_color = 'orange'
-        self.ValidateAndExpectInvalidValue(route, 'route_color')
+        self.ValidateAndExpectinvalid_value(route, 'route_color')
         route.route_color = None
 
         # invalid route text color
         route.route_text_color = 'orange'
-        self.ValidateAndExpectInvalidValue(route, 'route_text_color')
+        self.ValidateAndExpectinvalid_value(route, 'route_text_color')
         route.route_text_color = None
 
         # missing route ID
         route.route_id = None
-        self.ValidateAndExpectMissingValue(route, 'route_id')
+        self.ValidateAndExpectmissing_value(route, 'route_id')
         route.route_id = '054C'
 
         # bad color contrast
         route.route_text_color = None  # black
         route.route_color = '0000FF'  # Bad
-        self.ValidateAndExpectInvalidValue(route, 'route_color')
+        self.ValidateAndExpectinvalid_value(route, 'route_color')
         route.route_color = '00BF00'  # OK
         route.Validate(self.problems)
         route.route_color = '005F00'  # Bad
-        self.ValidateAndExpectInvalidValue(route, 'route_color')
+        self.ValidateAndExpectinvalid_value(route, 'route_color')
         route.route_color = 'FF00FF'  # OK
         route.Validate(self.problems)
         route.route_text_color = 'FFFFFF'  # OK too
         route.Validate(self.problems)
         route.route_text_color = '00FF00'  # think of color-blind people!
-        self.ValidateAndExpectInvalidValue(route, 'route_color')
+        self.ValidateAndExpectinvalid_value(route, 'route_color')
         route.route_text_color = '007F00'
         route.route_color = 'FF0000'
-        self.ValidateAndExpectInvalidValue(route, 'route_color')
+        self.ValidateAndExpectinvalid_value(route, 'route_color')
         route.route_color = '00FFFF'  # OK
         route.Validate(self.problems)
         route.route_text_color = None  # black
@@ -309,4 +309,4 @@ class RouteValidationTestCase(util.ValidationTestCase):
 
         # bad bikes_allowed
         route.bikes_allowed = '3'
-        self.ValidateAndExpectInvalidValue(route, 'bikes_allowed')
+        self.ValidateAndExpectinvalid_value(route, 'bikes_allowed')

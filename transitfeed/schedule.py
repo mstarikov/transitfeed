@@ -176,7 +176,7 @@ class Schedule(object):
             problem_reporter = self.problem_reporter
 
         if agency.agency_id in self._agencies:
-            problem_reporter.DuplicateID('agency_id', agency.agency_id)
+            problem_reporter.duplicate_id('agency_id', agency.agency_id)
             return
 
         self.add_table_columns('agency', agency._ColumnNames())
@@ -262,7 +262,7 @@ class Schedule(object):
             problem_reporter = self.problem_reporter
 
         if service_period.service_id in self.service_periods:
-            problem_reporter.DuplicateID('service_id', service_period.service_id)
+            # problem_reporter.duplicate_id('service_id', service_period.service_id)
             return
 
         if validate:
@@ -373,7 +373,7 @@ class Schedule(object):
             return
 
         if stop.stop_id in self.stops:
-            problem_reporter.DuplicateID('stop_id', stop.stop_id)
+            problem_reporter.duplicate_id('stop_id', stop.stop_id)
             return
 
         stop._schedule = weakref.proxy(self)
@@ -409,7 +409,7 @@ class Schedule(object):
             problem_reporter = self.problem_reporter
 
         if route.route_id in self.routes:
-            problem_reporter.DuplicateID('route_id', route.route_id)
+            problem_reporter.duplicate_id('route_id', route.route_id)
             return
 
         if route.agency_id not in self._agencies:
@@ -417,7 +417,7 @@ class Schedule(object):
                 # we'll just assume that the route applies to the only agency
                 pass
             else:
-                problem_reporter.InvalidValue('agency_id', route.agency_id,
+                problem_reporter.invalid_value('agency_id', route.agency_id,
                                               'Route uses an unknown agency_id.')
                 return
 
@@ -438,7 +438,7 @@ class Schedule(object):
         shape.validate(problem_reporter)
 
         if shape.shape_id in self._shapes:
-            problem_reporter.DuplicateID('shape_id', shape.shape_id)
+            problem_reporter.duplicate_id('shape_id', shape.shape_id)
             return
 
         self._shapes[shape.shape_id] = shape
@@ -454,7 +454,7 @@ class Schedule(object):
             problem_reporter = self.problem_reporter
 
         if trip.trip_id in self.trips:
-            problem_reporter.DuplicateID('trip_id', trip.trip_id)
+            problem_reporter.duplicate_id('trip_id', trip.trip_id)
             return
 
         self.add_table_columns('trips', trip._ColumnNames())
@@ -493,7 +493,7 @@ class Schedule(object):
         fare.validate(problem_reporter)
 
         if fare.fare_id in self.fares:
-            problem_reporter.DuplicateID('fare_id', fare.fare_id)
+            problem_reporter.duplicate_id('fare_id', fare.fare_id)
             return
 
         self.fares[fare.fare_id] = fare
@@ -522,23 +522,23 @@ class Schedule(object):
         if not problem_reporter:
             problem_reporter = self.problem_reporter
 
-        if util.IsEmpty(rule.fare_id):
-            problem_reporter.MissingValue('fare_id')
+        if util.is_empty(rule.fare_id):
+            problem_reporter.missing_value('fare_id')
             return
 
         if rule.route_id and rule.route_id not in self.routes:
-            problem_reporter.InvalidValue('route_id', rule.route_id)
+            problem_reporter.invalid_value('route_id', rule.route_id)
         if rule.origin_id and rule.origin_id not in self.fare_zones:
-            problem_reporter.InvalidValue('origin_id', rule.origin_id)
+            problem_reporter.invalid_value('origin_id', rule.origin_id)
         if rule.destination_id and rule.destination_id not in self.fare_zones:
-            problem_reporter.InvalidValue('destination_id', rule.destination_id)
+            problem_reporter.invalid_value('destination_id', rule.destination_id)
         if rule.contains_id and rule.contains_id not in self.fare_zones:
-            problem_reporter.InvalidValue('contains_id', rule.contains_id)
+            problem_reporter.invalid_value('contains_id', rule.contains_id)
 
         if rule.fare_id in self.fares:
             self.get_fare_attribute(rule.fare_id).rules.append(rule)
         else:
-            problem_reporter.InvalidValue('fare_id', rule.fare_id,
+            problem_reporter.invalid_value('fare_id', rule.fare_id,
                                           '(This fare_id doesn\'t correspond to any '
                                           'of the IDs defined in the '
                                           'fare attributes.)')
@@ -564,7 +564,7 @@ class Schedule(object):
         transfer_id = transfer._ID()
 
         if transfer_id in self._transfers:
-            self.problem_reporter.DuplicateID(self._gtfs_factory.Transfer._ID_COLUMNS,
+            self.problem_reporter.duplicate_id(self._gtfs_factory.Transfer._ID_COLUMNS,
                                               transfer_id,
                                               type=problems_module.TYPE_WARNING)
             # Duplicates are still added, while not prohibited by GTFS.
@@ -646,7 +646,7 @@ class Schedule(object):
             columns = self.get_table_columns('agency')
             writer.writerow(columns)
             for a in self._agencies.values():
-                writer.writerow([util.EncodeUnicode(a[c]) for c in columns])
+                writer.writerow([util.encode_str(a[c]) for c in columns])
             self._write_archive_string(archive, 'agency.txt', agency_string)
 
         if 'feed_info' in self._table_columns:
@@ -654,7 +654,7 @@ class Schedule(object):
             writer = util.CsvUnicodeWriter(feed_info_string)
             columns = self.get_table_columns('feed_info')
             writer.writerow(columns)
-            writer.writerow([util.EncodeUnicode(self.feed_info[c]) for c in columns])
+            writer.writerow([util.encode_str(self.feed_info[c]) for c in columns])
             self._write_archive_string(archive, 'feed_info.txt', feed_info_string)
 
         calendar_dates_string = StringIO.StringIO()
@@ -690,7 +690,7 @@ class Schedule(object):
             columns = self.get_table_columns('stops')
             writer.writerow(columns)
             for s in self.stops.values():
-                writer.writerow([util.EncodeUnicode(s[c]) for c in columns])
+                writer.writerow([util.encode_str(s[c]) for c in columns])
             self._write_archive_string(archive, 'stops.txt', stop_string)
 
         if 'routes' in self._table_columns:
@@ -699,7 +699,7 @@ class Schedule(object):
             columns = self.get_table_columns('routes')
             writer.writerow(columns)
             for r in self.routes.values():
-                writer.writerow([util.EncodeUnicode(r[c]) for c in columns])
+                writer.writerow([util.encode_str(r[c]) for c in columns])
             self._write_archive_string(archive, 'routes.txt', route_string)
 
         if 'trips' in self._table_columns:
@@ -708,7 +708,7 @@ class Schedule(object):
             columns = self.get_table_columns('trips')
             writer.writerow(columns)
             for t in self.trips.values():
-                writer.writerow([util.EncodeUnicode(t[c]) for c in columns])
+                writer.writerow([util.encode_str(t[c]) for c in columns])
             self._write_archive_string(archive, 'trips.txt', trips_string)
 
         # write frequencies.txt (if applicable)
@@ -769,7 +769,7 @@ class Schedule(object):
             columns = self.get_table_columns('transfers')
             writer.writerow(columns)
             for t in self.get_transfer_iter():
-                writer.writerow([util.EncodeUnicode(t[c]) for c in columns])
+                writer.writerow([util.encode_str(t[c]) for c in columns])
             self._write_archive_string(archive, 'transfers.txt', transfer_string)
 
         archive.close()
@@ -815,7 +815,7 @@ class Schedule(object):
                                 self.get_agency_list()))
         if len(timezones_set) > 1:
             timezones_str = '"%s"' % ('", "'.join(timezones_set))
-            problems.InvalidValue('agency_timezone', timezones_str,
+            problems.invalid_value('agency_timezone', timezones_str,
                                   'All agencies should have the same time zone. ' \
                                   'Please review agency.txt.')
 
@@ -826,9 +826,9 @@ class Schedule(object):
             return
         agencies = self.get_agency_list()
         for agency in agencies:
-            if not util.IsEmpty(agency.agency_lang) and (
+            if not util.is_empty(agency.agency_lang) and (
                     not self.feed_info.feed_lang == agency.agency_lang):
-                problems.InvalidValue("feed_lang",
+                problems.invalid_value("feed_lang",
                                       "The languages specified in feedinfo.txt and in "
                                       "agency.txt for agency with ID %s differ." %
                                       agency.agency_id)
@@ -940,7 +940,7 @@ class Schedule(object):
         (start_date, end_date,
          start_date_origin, end_date_origin) = self.get_date_range_with_origins()
         if not end_date or not start_date:
-            problems.OtherProblem('This feed has no effective service dates!',
+            problems.other_problem('This feed has no effective service dates!',
                                   type=problems_module.TYPE_WARNING)
         else:
             try:
@@ -1002,19 +1002,19 @@ class Schedule(object):
 
             if stop.location_type != 1 and stop.parent_station:
                 if stop.parent_station not in self.stops:
-                    problems.InvalidValue("parent_station",
-                                          util.EncodeUnicode(stop.parent_station),
+                    problems.invalid_value("parent_station",
+                                          util.encode_str(stop.parent_station),
                                           "parent_station '%s' not found for stop_id "
                                           "'%s' in stops.txt" %
-                                          (util.EncodeUnicode(stop.parent_station),
-                                           util.EncodeUnicode(stop.stop_id)))
+                                          (util.encode_str(stop.parent_station),
+                                           util.encode_str(stop.stop_id)))
                 elif self.stops[stop.parent_station].location_type != 1:
-                    problems.InvalidValue("parent_station",
-                                          util.EncodeUnicode(stop.parent_station),
+                    problems.invalid_value("parent_station",
+                                          util.encode_str(stop.parent_station),
                                           "parent_station '%s' of stop_id '%s' must "
                                           "have location_type=1 in stops.txt" %
-                                          (util.EncodeUnicode(stop.parent_station),
-                                           util.EncodeUnicode(stop.stop_id)))
+                                          (util.encode_str(stop.parent_station),
+                                           util.encode_str(stop.stop_id)))
                 else:
                     parent_station = self.stops[stop.parent_station]
                     distance = util.ApproximateDistanceBetweenStops(stop, parent_station)
@@ -1051,16 +1051,16 @@ class Schedule(object):
                     other_stop = sorted_stops[index]
                     if stop.location_type == 0 and other_stop.location_type == 0:
                         problems.StopsTooClose(
-                            util.EncodeUnicode(stop.stop_name),
-                            util.EncodeUnicode(stop.stop_id),
-                            util.EncodeUnicode(other_stop.stop_name),
-                            util.EncodeUnicode(other_stop.stop_id), distance)
+                            util.encode_str(stop.stop_name),
+                            util.encode_str(stop.stop_id),
+                            util.encode_str(other_stop.stop_name),
+                            util.encode_str(other_stop.stop_id), distance)
                     elif stop.location_type == 1 and other_stop.location_type == 1:
                         problems.StationsTooClose(
-                            util.EncodeUnicode(stop.stop_name),
-                            util.EncodeUnicode(stop.stop_id),
-                            util.EncodeUnicode(other_stop.stop_name),
-                            util.EncodeUnicode(other_stop.stop_id), distance)
+                            util.encode_str(stop.stop_name),
+                            util.encode_str(stop.stop_id),
+                            util.encode_str(other_stop.stop_name),
+                            util.encode_str(other_stop.stop_id), distance)
                     elif (stop.location_type in (0, 1) and
                           other_stop.location_type in (0, 1)):
                         if stop.location_type == 0 and other_stop.location_type == 1:
@@ -1071,10 +1071,10 @@ class Schedule(object):
                             this_station = stop
                         if this_stop.parent_station != this_station.stop_id:
                             problems.DifferentStationTooClose(
-                                util.EncodeUnicode(this_stop.stop_name),
-                                util.EncodeUnicode(this_stop.stop_id),
-                                util.EncodeUnicode(this_station.stop_name),
-                                util.EncodeUnicode(this_station.stop_id), distance)
+                                util.encode_str(this_stop.stop_name),
+                                util.encode_str(this_stop.stop_id),
+                                util.encode_str(this_station.stop_name),
+                                util.encode_str(this_station.stop_id), distance)
                 index += 1
 
     def validate_route_names(self, problems, validate_children):
@@ -1084,14 +1084,14 @@ class Schedule(object):
             if validate_children:
                 route.validate(problems)
             short_name = ''
-            if not util.IsEmpty(route.route_short_name):
+            if not util.is_empty(route.route_short_name):
                 short_name = route.route_short_name.lower().strip()
             long_name = ''
-            if not util.IsEmpty(route.route_long_name):
+            if not util.is_empty(route.route_long_name):
                 long_name = route.route_long_name.lower().strip()
             name = (short_name, long_name)
             if name in route_names:
-                problems.InvalidValue('route_long_name',
+                problems.invalid_value('route_long_name',
                                       long_name,
                                       'The same combination of '
                                       'route_short_name and route_long_name '
@@ -1140,7 +1140,7 @@ class Schedule(object):
                                                             subway_route_id, bus_route_id)
 
             # We only care about trips with a block id
-            if not util.IsEmpty(trip.block_id) and stop_times:
+            if not util.is_empty(trip.block_id) and stop_times:
 
                 first_arrival_secs = stop_times[0].arrival_secs
                 last_departure_secs = stop_times[-1].departure_secs
@@ -1288,7 +1288,7 @@ class Schedule(object):
     def validate_route_agency_id(self, problems):
         # Check that routes' agency IDs are valid, if set
         for route in self.routes.values():
-            if (not util.IsEmpty(route.agency_id) and
+            if (not util.is_empty(route.agency_id) and
                     not route.agency_id in self._agencies):
                 problems.InvalidAgencyID('agency_id', route.agency_id,
                                          'route', route.route_id)
@@ -1301,20 +1301,20 @@ class Schedule(object):
             trip.validateChildren(problems)
             count_stop_times = trip.GetCountStopTimes()
             if not count_stop_times:
-                problems.OtherProblem('The trip with the trip_id "%s" doesn\'t have '
+                problems.other_problem('The trip with the trip_id "%s" doesn\'t have '
                                       'any stop times defined.' % trip.trip_id,
                                       type=problems_module.TYPE_WARNING)
                 if len(trip._headways) > 0:  # no stoptimes, but there are headways
-                    problems.OtherProblem('Frequencies defined, but no stop times given '
+                    problems.other_problem('Frequencies defined, but no stop times given '
                                           'in trip %s' % trip.trip_id,
                                           type=problems_module.TYPE_ERROR)
             elif count_stop_times == 1:
-                problems.OtherProblem('The trip with the trip_id "%s" only has one '
+                problems.other_problem('The trip with the trip_id "%s" only has one '
                                       'stop on it; it should have at least one more '
                                       'stop so that the riders can leave!' %
                                       trip.trip_id, type=problems_module.TYPE_WARNING)
             else:
-                # These methods report InvalidValue if there's no first or last time
+                # These methods report invalid_value if there's no first or last time
                 trip.GetStartTime(problems=problems)
                 trip.GetEndTime(problems=problems)
 
@@ -1326,7 +1326,7 @@ class Schedule(object):
             used_shape_ids.add(trip.shape_id)
         unused_shape_ids = known_shape_ids - used_shape_ids
         if unused_shape_ids:
-            problems.OtherProblem('The shapes with the following shape_ids aren\'t '
+            problems.other_problem('The shapes with the following shape_ids aren\'t '
                                   'used by any trips: %s' %
                                   ', '.join(unused_shape_ids),
                                   type=problems_module.TYPE_WARNING)

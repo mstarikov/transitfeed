@@ -39,48 +39,48 @@ class ServicePeriodValidationTestCase(util.ValidationTestCase):
         # generated an error. Instead set it to an empty string, such as when the
         # csv cell is empty. See also comment in ServicePeriod.Validate.
         period.start_date = ''
-        self.ValidateAndExpectMissingValue(period, 'start_date')
+        self.ValidateAndExpectmissing_value(period, 'start_date')
         period.start_date = '20070101'
 
         # missing end_date
         period.end_date = ''
-        self.ValidateAndExpectMissingValue(period, 'end_date')
+        self.ValidateAndExpectmissing_value(period, 'end_date')
         period.end_date = '20071231'
 
         # invalid start_date
         period.start_date = '2007-01-01'
-        self.ValidateAndExpectInvalidValue(period, 'start_date')
+        self.ValidateAndExpectinvalid_value(period, 'start_date')
         period.start_date = '20070101'
 
         # impossible start_date
         period.start_date = '20070229'
-        self.ValidateAndExpectInvalidValue(period, 'start_date')
+        self.ValidateAndExpectinvalid_value(period, 'start_date')
         period.start_date = '20070101'
 
         # invalid end_date
         period.end_date = '2007/12/31'
-        self.ValidateAndExpectInvalidValue(period, 'end_date')
+        self.ValidateAndExpectinvalid_value(period, 'end_date')
         period.end_date = '20071231'
 
         # start & end dates out of order
         period.end_date = '20060101'
-        self.ValidateAndExpectInvalidValue(period, 'end_date')
+        self.ValidateAndExpectinvalid_value(period, 'end_date')
         period.end_date = '20071231'
 
         # no service in period
         period.day_of_week[0] = False
-        self.ValidateAndExpectOtherProblem(period)
+        self.ValidateAndExpectother_problem(period)
         period.day_of_week[0] = True
 
         # invalid exception date
-        period.SetDateHasService('2007', False)
-        self.ValidateAndExpectInvalidValue(period, 'date', '2007')
+        period.set_date_has_service('2007', False)
+        self.ValidateAndExpectinvalid_value(period, 'date', '2007')
         period.ResetDateToNormalService('2007')
 
         period2 = transitfeed.ServicePeriod(
             field_list=['serviceid1', '20060101', '20071231', '1', '0', 'h', '1',
                         '1', '1', '1'])
-        self.ValidateAndExpectInvalidValue(period2, 'wednesday', 'h')
+        self.ValidateAndExpectinvalid_value(period2, 'wednesday', 'h')
         repr(period)  # shouldn't crash
 
     def test_has_exceptions(self):
@@ -96,21 +96,21 @@ class ServicePeriodValidationTestCase(util.ValidationTestCase):
         self.assertFalse(period.HasExceptions())
 
         # Regular service + removed service exception
-        period.SetDateHasService('20070101', False)
+        period.set_date_has_service('20070101', False)
         self.assertTrue(period.HasExceptions())
 
         # Regular service + added service exception
-        period.SetDateHasService('20070101', True)
+        period.set_date_has_service('20070101', True)
         self.assertTrue(period.HasExceptions())
 
         # Only added service exception
         period = transitfeed.ServicePeriod()
-        period.SetDateHasService('20070101', True)
+        period.set_date_has_service('20070101', True)
         self.assertTrue(period.HasExceptions())
 
         # Only removed service exception
         period = transitfeed.ServicePeriod()
-        period.SetDateHasService('20070101', False)
+        period.set_date_has_service('20070101', False)
         self.assertTrue(period.HasExceptions())
 
     def test_service_period_date_outside_valid_range(self):
@@ -156,9 +156,9 @@ class ServicePeriodValidationTestCase(util.ValidationTestCase):
         period.start_date = '20070101'
         period.end_date = '20071231'
         period.day_of_week[0] = True
-        period.SetDateHasService('21070101', False)  # removed service exception
-        period.SetDateHasService('20070205', False)  # removed service exception
-        period.SetDateHasService('10070102', True)  # added service exception
+        period.set_date_has_service('21070101', False)  # removed service exception
+        period.set_date_has_service('20070205', False)  # removed service exception
+        period.set_date_has_service('10070102', True)  # added service exception
         period.Validate(self.problems)
 
         # check for error from first date exception
@@ -182,15 +182,15 @@ class ServicePeriodDateRangeTestCase(util.ValidationTestCase):
         period.start_date = '20070101'
         period.end_date = '20071231'
         period.SetWeekdayService(True)
-        period.SetDateHasService('20071231', False)
+        period.set_date_has_service('20071231', False)
         period.Validate(self.problems)
         self.assertEqual(('20070101', '20071231'), period.GetDateRange())
 
         period2 = transitfeed.ServicePeriod()
         period2.service_id = 'HOLIDAY'
-        period2.SetDateHasService('20071225', True)
-        period2.SetDateHasService('20080101', True)
-        period2.SetDateHasService('20080102', False)
+        period2.set_date_has_service('20071225', True)
+        period2.set_date_has_service('20080101', True)
+        period2.set_date_has_service('20080102', False)
         period2.Validate(self.problems)
         self.assertEqual(('20071225', '20080101'), period2.GetDateRange())
 
@@ -204,17 +204,17 @@ class ServicePeriodDateRangeTestCase(util.ValidationTestCase):
 
         period4 = transitfeed.ServicePeriod()
         period4.service_id = 'halloween'
-        period4.SetDateHasService('20051031', True)
+        period4.set_date_has_service('20051031', True)
         self.assertEqual(('20051031', '20051031'), period4.GetDateRange())
         period4.Validate(self.problems)
 
         schedule = transitfeed.Schedule(problem_reporter=self.problems)
         self.assertEqual((None, None), schedule.GetDateRange())
-        schedule.AddServicePeriodObject(period)
+        schedule.add_service_period_object(period)
         self.assertEqual(('20070101', '20071231'), schedule.GetDateRange())
-        schedule.AddServicePeriodObject(period2)
+        schedule.add_service_period_object(period2)
         self.assertEqual(('20070101', '20080101'), schedule.GetDateRange())
-        schedule.AddServicePeriodObject(period4)
+        schedule.add_service_period_object(period4)
         self.assertEqual(('20051031', '20080101'), schedule.GetDateRange())
         self.accumulator.AssertNoMoreExceptions()
 
@@ -227,9 +227,9 @@ class ServicePeriodTestCase(util.TestCase):
         period.start_date = '20071226'
         period.end_date = '20071231'
         period.SetWeekdayService(True)
-        period.SetDateHasService('20071230', True)
-        period.SetDateHasService('20071231', False)
-        period.SetDateHasService('20080102', True)
+        period.set_date_has_service('20071230', True)
+        period.set_date_has_service('20071231', False)
+        period.set_date_has_service('20080102', True)
         #      December  2007
         #  Su Mo Tu We Th Fr Sa
         #  23 24 25 26 27 28 29
@@ -264,8 +264,8 @@ class ServicePeriodTestCase(util.TestCase):
 
         # Test of period without start_date, end_date
         period_dates = transitfeed.ServicePeriod()
-        period_dates.SetDateHasService('20071230', True)
-        period_dates.SetDateHasService('20071231', False)
+        period_dates.set_date_has_service('20071230', True)
+        period_dates.set_date_has_service('20071231', False)
 
         self.assertFalse(period_dates.IsActiveOn(date='20071229'))
         self.assertFalse(period_dates.IsActiveOn(date='20071229',
@@ -311,7 +311,7 @@ class DuplicateServiceIdDateWarningTestCase(util.MemoryZipTestCase):
             'FULLW,20100604,1\n'
             'FULLW,20100604,2\n')
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException('DuplicateID')
+        e = self.accumulator.PopException('duplicate_id')
         self.assertEquals('(service_id, date)', e.column_name)
         self.assertEquals('(FULLW, 20100604)', e.value)
 
@@ -383,7 +383,7 @@ class FutureServiceStartDateTestCase(util.TestCase):
 
 class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
     def test_bad_end_date_format(self):
-        # A badly formatted end_date used to generate an InvalidValue report from
+        # A badly formatted end_date used to generate an invalid_value report from
         # Schedule.Validate and ServicePeriod.Validate. Test for the bug.
         self.set_archive_contents(
             "calendar.txt",
@@ -392,7 +392,7 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
             "FULLW,1,1,1,1,1,1,1,20070101,20101232\n"
             "WE,0,0,0,0,0,1,1,20070101,20101231\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopInvalidValue('end_date')
+        e = self.accumulator.Popinvalid_value('end_date')
         self.accumulator.AssertNoMoreExceptions()
 
     def test_bad_start_date_format(self):
@@ -403,7 +403,7 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
             "FULLW,1,1,1,1,1,1,1,200701xx,20101231\n"
             "WE,0,0,0,0,0,1,1,20070101,20101231\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopInvalidValue('start_date')
+        e = self.accumulator.Popinvalid_value('start_date')
         self.accumulator.AssertNoMoreExceptions()
 
     def test_no_start_date_and_end_date(self):
@@ -418,10 +418,10 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
             "FULLW,1,1,1,1,1,1,1,    ,\t\n"
             "WE,0,0,0,0,0,1,1,20070101,20101231\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException("MissingValue")
+        e = self.accumulator.PopException("missing_value")
         self.assertEquals(2, e.row_num)
         self.assertEquals("start_date", e.column_name)
-        e = self.accumulator.PopException("MissingValue")
+        e = self.accumulator.PopException("missing_value")
         self.assertEquals(2, e.row_num)
         self.assertEquals("end_date", e.column_name)
         self.accumulator.AssertNoMoreExceptions()
@@ -434,10 +434,10 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
             "FULLW,1,1,1,1,1,1,1,,abc\n"
             "WE,0,0,0,0,0,1,1,20070101,20101231\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException("MissingValue")
+        e = self.accumulator.PopException("missing_value")
         self.assertEquals(2, e.row_num)
         self.assertEquals("start_date", e.column_name)
-        e = self.accumulator.PopInvalidValue("end_date")
+        e = self.accumulator.Popinvalid_value("end_date")
         self.assertEquals(2, e.row_num)
         self.accumulator.AssertNoMoreExceptions()
 
@@ -449,7 +449,7 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
             "FULLW,1,1,1,1,1,1,1,20070101\n"
             "WE,0,0,0,0,0,1,1,20070101\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException("MissingColumn")
+        e = self.accumulator.PopException("missing_column")
         self.assertEquals("end_date", e.column_name)
         self.accumulator.AssertNoMoreExceptions()
 
@@ -485,7 +485,7 @@ class DefaultServicePeriodTestCase(util.TestCase):
     def test__set_default(self):
         schedule = transitfeed.Schedule()
         service1 = transitfeed.ServicePeriod()
-        service1.SetDateHasService('20070101', True)
+        service1.set_date_has_service('20070101', True)
         service1.service_id = 'SERVICE1'
         schedule.SetDefaultServicePeriod(service1)
         self.assertEqual(service1, schedule.GetDefaultServicePeriod())
@@ -496,7 +496,7 @@ class DefaultServicePeriodTestCase(util.TestCase):
         service1 = schedule.NewDefaultServicePeriod()
         self.assertTrue(service1.service_id)
         schedule.GetServicePeriod(service1.service_id)
-        service1.SetDateHasService('20070101', True)  # Make service1 different
+        service1.set_date_has_service('20070101', True)  # Make service1 different
         service2 = schedule.NewDefaultServicePeriod()
         schedule.GetServicePeriod(service2.service_id)
         self.assertTrue(service1.service_id)
@@ -512,9 +512,9 @@ class DefaultServicePeriodTestCase(util.TestCase):
     def test__assume_single_service_is_default(self):
         schedule = transitfeed.Schedule()
         service1 = transitfeed.ServicePeriod()
-        service1.SetDateHasService('20070101', True)
+        service1.set_date_has_service('20070101', True)
         service1.service_id = 'SERVICE1'
-        schedule.AddServicePeriodObject(service1)
+        schedule.add_service_period_object(service1)
         self.assertEqual(service1, schedule.GetDefaultServicePeriod())
         self.assertEqual(service1.service_id, schedule.GetDefaultServicePeriod().service_id)
 
@@ -522,11 +522,11 @@ class DefaultServicePeriodTestCase(util.TestCase):
         schedule = transitfeed.Schedule()
         service1 = transitfeed.ServicePeriod()
         service1.service_id = 'SERVICE1'
-        service1.SetDateHasService('20070101', True)
-        schedule.AddServicePeriodObject(service1)
+        service1.set_date_has_service('20070101', True)
+        schedule.add_service_period_object(service1)
         service2 = transitfeed.ServicePeriod()
         service2.service_id = 'SERVICE2'
-        service2.SetDateHasService('20070201', True)
-        schedule.AddServicePeriodObject(service2)
+        service2.set_date_has_service('20070201', True)
+        schedule.add_service_period_object(service2)
         service_d = schedule.GetDefaultServicePeriod()
         self.assertEqual(service_d, None)

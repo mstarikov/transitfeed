@@ -1,4 +1,4 @@
-#!/usr/bin/python2.5
+#!/usr/bin/python
 
 # Copyright (C) 2007 Google Inc.
 #
@@ -106,7 +106,7 @@ class ScheduleRequestHandler(BaseHTTPRequestHandler):
                 try:
                     parsed_params[k] = str(v, 'utf-8')
                 except NameError:
-                    parsed_params[k] = unicode(v, 'utf8')
+                    parsed_params[k] = str(v, 'utf8')
             else:
                 parsed_params[k] = ''
 
@@ -550,7 +550,7 @@ def main(request_handler=ScheduleRequestHandler):
     schedule = transitfeed.Schedule(problem_reporter=transitfeed.ProblemReporter())
     print('Loading data from feed "%s"...' % options.feed_filename)
     print('(this may take a few minutes for larger cities)')
-    schedule.Load(options.feed_filename)
+    schedule.load(options.feed_filename)
 
     server = StoppableHTTPServer(server_address=('', options.port),
                                  RequestHandlerClass=request_handler)

@@ -50,7 +50,7 @@ class Shape(GtfsFactoryUser):
         shapepoint_class = self.get_gtfs_factory().ShapePoint
         shapepoint = shapepoint_class(
             self.shape_id, lat, lon, len(self.sequence), distance)
-        if shapepoint.ParseAttributes(problems):
+        if shapepoint.parse_attributes(problems):
             self.add_shape_point_object_unsorted(shapepoint, problems)
 
     def add_shape_point_object_unsorted(self, shapepoint, problems):
@@ -64,7 +64,7 @@ class Shape(GtfsFactoryUser):
             index = bisect.bisect(self.sequence, shapepoint.shape_pt_sequence)
 
         if shapepoint.shape_pt_sequence in self.sequence:
-            problems.InvalidValue('shape_pt_sequence', shapepoint.shape_pt_sequence,
+            problems.invalid_value('shape_pt_sequence', shapepoint.shape_pt_sequence,
                                   'The sequence number %d occurs more than once in '
                                   'shape %s.' %
                                   (shapepoint.shape_pt_sequence, self.shape_id))
@@ -72,7 +72,7 @@ class Shape(GtfsFactoryUser):
         if shapepoint.shape_dist_traveled is not None and len(self.sequence) > 0:
             if (index != len(self.sequence) and
                     shapepoint.shape_dist_traveled > self.distance[index]):
-                problems.InvalidValue('shape_dist_traveled',
+                problems.invalid_value('shape_dist_traveled',
                                       shapepoint.shape_dist_traveled,
                                       'Each subsequent point in a shape should have '
                                       'a distance value that shouldn\'t be larger '
@@ -81,7 +81,7 @@ class Shape(GtfsFactoryUser):
 
             if (index > 0 and
                     shapepoint.shape_dist_traveled < self.distance[index - 1]):
-                problems.InvalidValue('shape_dist_traveled',
+                problems.invalid_value('shape_dist_traveled',
                                       shapepoint.shape_dist_traveled,
                                       'Each subsequent point in a shape should have '
                                       'a distance value that\'s at least as large as '
@@ -116,12 +116,12 @@ class Shape(GtfsFactoryUser):
         return "<Shape %s>" % self.__dict__
 
     def validate_shape_id(self, problems):
-        if util.IsEmpty(self.shape_id):
-            problems.MissingValue('shape_id')
+        if util.is_empty(self.shape_id):
+            problems.missing_value('shape_id')
 
     def validate_shape_points(self, problems):
         if not self.points:
-            problems.OtherProblem('The shape with shape_id "%s" contains no points.' %
+            problems.other_problem('The shape with shape_id "%s" contains no points.' %
                                   self.shape_id, type=problems_module.TYPE_WARNING)
 
     def validate(self, problems=problems_module.default_problem_reporter):

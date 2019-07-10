@@ -53,7 +53,7 @@ class FeedInfo(transitfeed.GtfsObjectBase):
 
         if (start_date_valid and end_date_valid and
                 self.feed_end_date < self.feed_start_date):
-            problems.InvalidValue('feed_end_date', self.feed_end_date,
+            problems.invalid_value('feed_end_date', self.feed_end_date,
                                   'feed_end_date %s is earlier than '
                                   'feed_start_date "%s"' %
                                   (self.feed_end_date, self.feed_start_date))

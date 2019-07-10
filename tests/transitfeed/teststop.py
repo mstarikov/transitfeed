@@ -41,11 +41,11 @@ class StopHierarchyTestCase(util.MemoryZipTestCase):
             "BULLFROG,Bullfrog,36.88108,-116.81797,notvalid\n"
             "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException("InvalidValue")
+        e = self.accumulator.PopException("invalid_value")
         self.assertEquals("location_type", e.column_name)
         self.assertEquals(3, e.row_num)
         self.assertEquals(0, e.type)
-        e = self.accumulator.PopException("InvalidValue")
+        e = self.accumulator.PopException("invalid_value")
         self.assertEquals("location_type", e.column_name)
         self.assertEquals(2, e.row_num)
         self.assertEquals(1, e.type)
@@ -60,9 +60,9 @@ class StopHierarchyTestCase(util.MemoryZipTestCase):
             "BULLFROG,Bullfrog,36.88108,-116.81797,,\n"
             "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,,\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException("InvalidValue")
+        e = self.accumulator.PopException("invalid_value")
         self.assertEquals("parent_station", e.column_name)
-        e = self.accumulator.PopException("InvalidValue")
+        e = self.accumulator.PopException("invalid_value")
         self.assertEquals("location_type", e.column_name)
         self.assertEquals(3, e.row_num)
         self.accumulator.AssertNoMoreExceptions()
@@ -86,7 +86,7 @@ class StopHierarchyTestCase(util.MemoryZipTestCase):
             "BULLFROG,Bullfrog,36.88108,-116.81797,,\n"
             "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,,\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException("InvalidValue")
+        e = self.accumulator.PopException("invalid_value")
         self.assertEquals("parent_station", e.column_name)
         self.accumulator.AssertNoMoreExceptions()
 
@@ -98,7 +98,7 @@ class StopHierarchyTestCase(util.MemoryZipTestCase):
             "BULLFROG,Bullfrog,36.88108,-116.81797,,\n"
             "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,,\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException("InvalidValue")
+        e = self.accumulator.PopException("invalid_value")
         self.assertEquals("parent_station", e.column_name)
         self.accumulator.AssertNoMoreExceptions()
 
@@ -110,10 +110,10 @@ class StopHierarchyTestCase(util.MemoryZipTestCase):
             "BULLFROG,Bullfrog,36.88108,-116.81797,,\n"
             "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,,\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException("InvalidValue")
+        e = self.accumulator.PopException("invalid_value")
         self.assertEquals("parent_station", e.column_name)
         self.assertTrue(e.FormatProblem().find("location_type=1") != -1)
-        e = self.accumulator.PopException("InvalidValue")
+        e = self.accumulator.PopException("invalid_value")
         self.assertEquals("location_type", e.column_name)
         self.accumulator.AssertNoMoreExceptions()
 
@@ -127,7 +127,7 @@ class StopHierarchyTestCase(util.MemoryZipTestCase):
             "BULLFROG,Bullfrog,36.868088,-116.784797,,STATION2\n"
             "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,,\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException("InvalidValue")
+        e = self.accumulator.PopException("invalid_value")
         self.assertEquals("parent_station", e.column_name)
         self.assertEquals(3, e.row_num)
         self.accumulator.AssertNoMoreExceptions()
@@ -141,7 +141,7 @@ class StopHierarchyTestCase(util.MemoryZipTestCase):
             "BULLFROG,Bullfrog,36.88108,-116.81797,,\n"
             "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,,\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException("InvalidValue")
+        e = self.accumulator.PopException("invalid_value")
         self.assertEquals("parent_station", e.column_name)
         self.assertEquals(3, e.row_num)
         self.accumulator.AssertNoMoreExceptions()
@@ -199,7 +199,7 @@ class StopHierarchyTestCase(util.MemoryZipTestCase):
             "BULLFROG,Bullfrog,36.88108,-116.81797,,,\n"
             "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,,,\n")
         self.make_loader_and_load()
-        e = self.accumulator.PopException("InvalidValue")
+        e = self.accumulator.PopException("invalid_value")
         self.assertEqual(1, e.type)  # Warning
         self.assertEquals(2, e.row_num)
         self.assertEquals("stop_timezone", e.column_name)
@@ -215,7 +215,7 @@ class StopHierarchyTestCase(util.MemoryZipTestCase):
     #      "BULLFROG,Bullfrog,36.88108,-116.81797,,\n"
     #      "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,,\n")
     #  schedule = self.make_loader_and_load()
-    #  e = self.accumulator.PopException("OtherProblem")
+    #  e = self.accumulator.PopException("other_problem")
     #  self.assertEquals("parent_station", e.column_name)
     #  self.assertEquals(2, e.row_num)
     #  self.accumulator.AssertNoMoreExceptions()
@@ -242,10 +242,10 @@ class StopSpacesTestCase(util.MemoryZipTestCase):
             'STAGECOACH,Stagecoach Hotel,36.915682,"",,STAGECOACH-STA\n'
             'STAGECOACH-STA,Stagecoach Hotel Station,36.915682,-116.751677,1,\n')
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException('MissingValue')
+        e = self.accumulator.PopException('missing_value')
         self.assertEquals('stop_lat', e.column_name)
         self.assertEquals(2, e.row_num)
-        e = self.accumulator.PopException('MissingValue')
+        e = self.accumulator.PopException('missing_value')
         self.assertEquals('stop_lon', e.column_name)
         self.assertEquals(4, e.row_num)
         self.accumulator.AssertNoMoreExceptions()
@@ -317,7 +317,7 @@ class BadLatLonInStopUnitTest(util.ValidationTestCase):
                                             "stop_name": "Stop one",
                                             "stop_lat": "0x20",
                                             "stop_lon": "140.01"})
-        self.ValidateAndExpectInvalidValue(stop, "stop_lat")
+        self.ValidateAndExpectinvalid_value(stop, "stop_lat")
 
         stop = transitfeed.Stop(field_dict={"stop_id": "STOP1",
                                             "stop_name": "Stop one",
@@ -335,10 +335,10 @@ class BadLatLonInFileUnitTest(util.MemoryZipTestCase):
             "BULLFROG,Bullfrog,48.20001,140.0123\n"
             "STAGECOACH,Stagecoach Hotel,48.002,bogus\n")
         schedule = self.make_loader_and_load()
-        e = self.accumulator.PopException('InvalidValue')
+        e = self.accumulator.PopException('invalid_value')
         self.assertEquals(2, e.row_num)
         self.assertEquals("stop_lat", e.column_name)
-        e = self.accumulator.PopException('InvalidValue')
+        e = self.accumulator.PopException('invalid_value')
         self.assertEquals(4, e.row_num)
         self.assertEquals("stop_lon", e.column_name)
         self.accumulator.AssertNoMoreExceptions()
@@ -360,81 +360,81 @@ class StopValidationTestCase(util.ValidationTestCase):
 
         # latitude too large
         stop.stop_lat = 100.0
-        self.ValidateAndExpectInvalidValue(stop, 'stop_lat')
+        self.ValidateAndExpectinvalid_value(stop, 'stop_lat')
         stop.stop_lat = 50.0
 
         # latitude as a string works when it is valid
-        # empty strings or whitespaces should get reported as MissingValue
+        # empty strings or whitespaces should get reported as missing_value
         stop.stop_lat = '50.0'
         stop.Validate(self.problems)
         self.accumulator.AssertNoMoreExceptions()
         stop.stop_lat = '10f'
-        self.ValidateAndExpectInvalidValue(stop, 'stop_lat')
+        self.ValidateAndExpectinvalid_value(stop, 'stop_lat')
         stop.stop_lat = 'None'
-        self.ValidateAndExpectInvalidValue(stop, 'stop_lat')
+        self.ValidateAndExpectinvalid_value(stop, 'stop_lat')
         stop.stop_lat = ''
-        self.ValidateAndExpectMissingValue(stop, 'stop_lat')
+        self.ValidateAndExpectmissing_value(stop, 'stop_lat')
         stop.stop_lat = ' '
-        self.ValidateAndExpectMissingValue(stop, 'stop_lat')
+        self.ValidateAndExpectmissing_value(stop, 'stop_lat')
         stop.stop_lat = 50.0
 
         # longitude too large
         stop.stop_lon = 200.0
-        self.ValidateAndExpectInvalidValue(stop, 'stop_lon')
+        self.ValidateAndExpectinvalid_value(stop, 'stop_lon')
         stop.stop_lon = 50.0
 
         # longitude as a string works when it is valid
-        # empty strings or whitespaces should get reported as MissingValue
+        # empty strings or whitespaces should get reported as missing_value
         stop.stop_lon = '50.0'
         stop.Validate(self.problems)
         self.accumulator.AssertNoMoreExceptions()
         stop.stop_lon = '10f'
-        self.ValidateAndExpectInvalidValue(stop, 'stop_lon')
+        self.ValidateAndExpectinvalid_value(stop, 'stop_lon')
         stop.stop_lon = 'None'
-        self.ValidateAndExpectInvalidValue(stop, 'stop_lon')
+        self.ValidateAndExpectinvalid_value(stop, 'stop_lon')
         stop.stop_lon = ''
-        self.ValidateAndExpectMissingValue(stop, 'stop_lon')
+        self.ValidateAndExpectmissing_value(stop, 'stop_lon')
         stop.stop_lon = ' '
-        self.ValidateAndExpectMissingValue(stop, 'stop_lon')
+        self.ValidateAndExpectmissing_value(stop, 'stop_lon')
         stop.stop_lon = 50.0
 
         # lat, lon too close to 0, 0
         stop.stop_lat = 0.0
         stop.stop_lon = 0.0
-        self.ValidateAndExpectInvalidValue(stop, 'stop_lat')
+        self.ValidateAndExpectinvalid_value(stop, 'stop_lat')
         stop.stop_lat = 50.0
         stop.stop_lon = 50.0
 
         # invalid stop_url
         stop.stop_url = 'www.example.com'
-        self.ValidateAndExpectInvalidValue(stop, 'stop_url')
+        self.ValidateAndExpectinvalid_value(stop, 'stop_url')
         stop.stop_url = 'http://example.com'
 
         stop.stop_id = '   '
-        self.ValidateAndExpectMissingValue(stop, 'stop_id')
+        self.ValidateAndExpectmissing_value(stop, 'stop_id')
         stop.stop_id = '45'
 
         stop.stop_name = ''
-        self.ValidateAndExpectMissingValue(stop, 'stop_name')
+        self.ValidateAndExpectmissing_value(stop, 'stop_name')
         stop.stop_name = ' '
-        self.ValidateAndExpectMissingValue(stop, 'stop_name')
+        self.ValidateAndExpectmissing_value(stop, 'stop_name')
         stop.stop_name = 'Couch AT End Table'
 
         # description same as name
         stop.stop_desc = 'Couch AT End Table'
-        self.ValidateAndExpectInvalidValue(stop, 'stop_desc')
+        self.ValidateAndExpectinvalid_value(stop, 'stop_desc')
         stop.stop_desc = 'Edge of the Couch'
         self.accumulator.AssertNoMoreExceptions()
 
         stop.stop_timezone = 'This_Timezone/Does_Not_Exist'
-        self.ValidateAndExpectInvalidValue(stop, 'stop_timezone')
+        self.ValidateAndExpectinvalid_value(stop, 'stop_timezone')
         stop.stop_timezone = 'America/Los_Angeles'
         stop.Validate(self.problems)
         self.accumulator.AssertNoMoreExceptions()
 
         # invalid wheelchair_boarding
         stop.wheelchair_boarding = '3'
-        self.ValidateAndExpectInvalidValue(stop, 'wheelchair_boarding')
+        self.ValidateAndExpectinvalid_value(stop, 'wheelchair_boarding')
         stop.wheelchair_boarding = None
 
 
@@ -443,7 +443,7 @@ class StopAttributes(util.ValidationTestCase):
         stop = transitfeed.Stop()
         stop.Validate(self.problems)
         for name in "stop_id stop_name stop_lat stop_lon".split():
-            e = self.accumulator.PopException('MissingValue')
+            e = self.accumulator.PopException('missing_value')
             self.assertEquals(name, e.column_name)
         self.accumulator.AssertNoMoreExceptions()
 
@@ -497,7 +497,7 @@ class StopAttributes(util.ValidationTestCase):
         schedule.AddStopObject(stop)
         stop.Validate(self.problems)
         for name in "stop_name stop_lat stop_lon".split():
-            e = self.accumulator.PopException("MissingValue")
+            e = self.accumulator.PopException("missing_value")
             self.assertEquals(name, e.column_name)
         self.accumulator.AssertNoMoreExceptions()
 
@@ -506,5 +506,5 @@ class StopAttributes(util.ValidationTestCase):
 
         # Adding a duplicate stop_id fails
         schedule.AddStopObject(transitfeed.Stop(field_dict={"stop_id": "b"}))
-        self.accumulator.PopException("DuplicateID")
+        self.accumulator.PopException("duplicate_id")
         self.accumulator.AssertNoMoreExceptions()

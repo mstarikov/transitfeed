@@ -43,7 +43,7 @@ class MinimalWriteTestCase(util.TempFileTestCaseBase):
         service_period.SetStartDate("20070101")
         service_period.SetEndDate("20071231")
         service_period.SetWeekdayService(True)
-        schedule.AddServicePeriodObject(service_period)
+        schedule.add_service_period_object(service_period)
 
         trip = transitfeed.Trip()
         trip.route_id = "SAMPLE_ID"
@@ -80,7 +80,7 @@ class ScheduleBuilderTestCase(util.TempFileTestCaseBase):
         schedule.AddAgency("\xc8\x8b Fly Agency", "http://iflyagency.com",
                            "America/Los_Angeles")
         service_period = schedule.GetDefaultServicePeriod()
-        service_period.SetDateHasService('20070101')
+        service_period.set_date_has_service('20070101')
         # "u020b i with inverted accent breve" encoded in utf-8
         stop1 = schedule.AddStop(lng=140, lat=48.2, name="\xc8\x8b hub")
         # "u020b i with inverted accent breve" as unicode string
@@ -195,7 +195,7 @@ class ScheduleBuilderTestCase(util.TempFileTestCaseBase):
         problems = util.GetTestFailureProblemReporter(self)
         schedule = transitfeed.Schedule(problem_reporter=problems)
         service_period = schedule.GetDefaultServicePeriod()
-        service_period.SetDateHasService("20070101")
+        service_period.set_date_has_service("20070101")
         route = schedule.AddRoute("0", "Long Name", "Bus")
         route.AddTrip()
         route.AddTrip(schedule=schedule, headsign="hs1",
@@ -277,7 +277,7 @@ class WriteSampleFeedTestCase(util.TempFileTestCaseBase):
         shape = transitfeed.Shape("BFC1S")
         for (lat, lon) in shape_data:
             shape.AddPoint(lat, lon)
-        schedule.AddShapeObject(shape)
+        schedule.add_shape_object(shape)
 
         week_period = transitfeed.ServicePeriod()
         week_period.service_id = "FULLW"
@@ -285,15 +285,15 @@ class WriteSampleFeedTestCase(util.TempFileTestCaseBase):
         week_period.end_date = "20071231"
         week_period.SetWeekdayService()
         week_period.SetWeekendService()
-        week_period.SetDateHasService("20070604", False)
-        schedule.AddServicePeriodObject(week_period)
+        week_period.set_date_has_service("20070604", False)
+        schedule.add_service_period_object(week_period)
 
         weekend_period = transitfeed.ServicePeriod()
         weekend_period.service_id = "WE"
         weekend_period.start_date = "20070101"
         weekend_period.end_date = "20071231"
         weekend_period.SetWeekendService()
-        schedule.AddServicePeriodObject(weekend_period)
+        schedule.add_service_period_object(weekend_period)
 
         stops = []
         stop_data = [

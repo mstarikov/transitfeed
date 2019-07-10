@@ -53,20 +53,20 @@ class Frequency(GtfsObjectBase):
         return self.exact_times
 
     def validateexact_times(self, problems):
-        if util.IsEmpty(self.exact_times):
+        if util.is_empty(self.exact_times):
             self.exact_times = 0
             return
         try:
             self.exact_times = int(self.exact_times)
         except (ValueError, TypeError):
-            problems.InvalidValue('exact_times', self.exact_times,
+            problems.invalid_value('exact_times', self.exact_times,
                                   'Should be 0 (no fixed schedule) or 1 (fixed and ' \
                                   'regular schedule, shortcut for a repetitive ' \
                                   'stop_times file).')
             del self.exact_times
             return
         if self.exact_times not in (0, 1):
-            problems.InvalidValue('exact_times', self.exact_times,
+            problems.invalid_value('exact_times', self.exact_times,
                                   'Should be 0 (no fixed schedule) or 1 (fixed and ' \
                                   'regular schedule, shortcut for a repetitive ' \
                                   'stop_times file).')
@@ -88,6 +88,6 @@ class Frequency(GtfsObjectBase):
         try:
             trip = schedule.GetTrip(self.trip_id)
         except KeyError:
-            problems.InvalidValue('trip_id', self.trip_id)
+            problems.invalid_value('trip_id', self.trip_id)
             return
         trip.AddFrequencyObject(self, problems)

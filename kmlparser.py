@@ -135,7 +135,7 @@ class Kmlparser(object):
             # No existing shape with that id, so no worries.
             pass
 
-        feed.AddShapeObject(shape)
+        feed.add_shape_object(shape)
 
 
 def main():

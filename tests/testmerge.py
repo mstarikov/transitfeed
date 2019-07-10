@@ -428,8 +428,8 @@ class TestServicePeriodmerger(util.TestCase):
         sp2fields = ['test2', start2, end2] + ['1'] * 7
         self.sp2 = transitfeed.ServicePeriod(field_list=sp2fields)
 
-        self.fm.a_schedule.AddServicePeriodObject(self.sp1)
-        self.fm.b_schedule.AddServicePeriodObject(self.sp2)
+        self.fm.a_schedule.add_service_period_object(self.sp1)
+        self.fm.b_schedule.add_service_period_object(self.sp2)
 
     def test_check_disjoint__true(self):
         self._add_two_periods('20071213', '20071231',
@@ -463,10 +463,10 @@ class TestServicePeriodmerger(util.TestCase):
     def test_disjoin_calendars__dates(self):
         self._add_two_periods('20071213', '20080201',
                               '20080101', '20080301')
-        self.sp1.SetDateHasService('20071201')
-        self.sp1.SetDateHasService('20081231')
-        self.sp2.SetDateHasService('20071201')
-        self.sp2.SetDateHasService('20081231')
+        self.sp1.set_date_has_service('20071201')
+        self.sp1.set_date_has_service('20081231')
+        self.sp2.set_date_has_service('20071201')
+        self.sp2.set_date_has_service('20081231')
 
         self.spm.DisjoinCalendars('20080101')
 
@@ -579,7 +579,7 @@ class TestAgencymerger(util.TestCase):
         # Force a1.agency_id to be unicode to make sure it is correctly encoded
         # to utf-8 before concatinating to the agency_name containing non-ascii
         # characters.
-        self.a1.agency_id = unicode(self.a1.agency_id)
+        self.a1.agency_id = str(self.a1.agency_id)
         self.a2.agency_id = str(self.a1.agency_id)
         self.a2.agency_name = 'different \xc3\xa9'
         self.fm.a_schedule.AddAgencyObject(self.a1)
@@ -1017,8 +1017,8 @@ class TestTripmerger(util.TestCase):
         a_schedule.AddAgencyObject(self.a1)
         a_schedule.AddStopObject(self.stop)
         a_schedule.AddRouteObject(self.r1)
-        a_schedule.AddServicePeriodObject(self.s1)
-        a_schedule.AddShapeObject(self.shape)
+        a_schedule.add_service_period_object(self.s1)
+        a_schedule.add_shape_object(self.shape)
 
     def testmigrate(self):
         self.accumulator.expect_problem_class(merge.MergeNotImplemented)
@@ -1062,9 +1062,9 @@ class TestTripmerger(util.TestCase):
 
         self.fm.b_schedule.AddAgencyObject(a1_in_b)
         self.fm.b_schedule.AddRouteObject(r1_in_b)
-        self.fm.b_schedule.AddShapeObject(shape_in_b)
+        self.fm.b_schedule.add_shape_object(shape_in_b)
         self.fm.b_schedule.AddTripObject(t1_in_b, validate=False)
-        self.fm.b_schedule.AddServicePeriodObject(s_in_b, validate=False)
+        self.fm.b_schedule.add_service_period_object(s_in_b, validate=False)
         self.accumulator.expect_problem_class(merge.MergeNotImplemented)
         self.fm.MergeSchedules()
         # 3 trips moved to merged_schedule: from a_schedule t1, t2 and from
@@ -1165,8 +1165,8 @@ class TestShapemerger(util.TestCase):
 
     def test_merge(self):
         self.s2.shape_id = self.s1.shape_id
-        self.fm.a_schedule.AddShapeObject(self.s1)
-        self.fm.b_schedule.AddShapeObject(self.s2)
+        self.fm.a_schedule.add_shape_object(self.s1)
+        self.fm.b_schedule.add_shape_object(self.s2)
         self.fm.MergeSchedules()
         self.assertEquals(len(self.fm.merged_schedule.GetShapeList()), 1)
         self.assertEquals(self.fm.merged_schedule.GetShapeList()[0], self.s2)
@@ -1176,8 +1176,8 @@ class TestShapemerger(util.TestCase):
         self.assertEquals(self.fm.a_merge_map[self.s1].shape_id, self.s1.shape_id)
 
     def test_no_merge__different_id(self):
-        self.fm.a_schedule.AddShapeObject(self.s1)
-        self.fm.b_schedule.AddShapeObject(self.s2)
+        self.fm.a_schedule.add_shape_object(self.s1)
+        self.fm.b_schedule.add_shape_object(self.s2)
         self.fm.MergeSchedules()
         self.assertEquals(len(self.fm.merged_schedule.GetShapeList()), 2)
         self.assertEquals(self.s1, self.fm.a_merge_map[self.s1])
@@ -1190,8 +1190,8 @@ class TestShapemerger(util.TestCase):
 
     def test_no_merge__far_endpoints(self):
         self.s3.shape_id = self.s1.shape_id
-        self.fm.a_schedule.AddShapeObject(self.s1)
-        self.fm.b_schedule.AddShapeObject(self.s3)
+        self.fm.a_schedule.add_shape_object(self.s1)
+        self.fm.b_schedule.add_shape_object(self.s3)
         self.accumulator.expect_problem_class(merge.SameIdButNotMerged)
         self.fm.MergeSchedules()
         self.assertEquals(len(self.fm.merged_schedule.GetShapeList()), 2)
@@ -1214,8 +1214,8 @@ class TestShapemerger(util.TestCase):
           The distance in metres, a value greater than zero.
         """
         self.s3.shape_id = self.s1.shape_id
-        self.fm.a_schedule.AddShapeObject(self.s1)
-        self.fm.b_schedule.AddShapeObject(self.s3)
+        self.fm.a_schedule.add_shape_object(self.s1)
+        self.fm.b_schedule.add_shape_object(self.s3)
         distance1 = merge.ApproximateDistanceBetweenPoints(
             self.s1.points[0][:2], self.s3.points[0][:2])
         distance2 = merge.ApproximateDistanceBetweenPoints(

@@ -158,7 +158,7 @@ def main():
         writer.writerow([desc[0] for desc in cursor.description])
         for row in cursor:
             try:
-                writer.writerow([unicode(v).encode('utf8') for v in row])
+                writer.writerow([str(v).encode('utf8') for v in row])
             except NameError:
                 writer.writerow(str(v, 'utf-8') for v in row)
     elif options.interactive:

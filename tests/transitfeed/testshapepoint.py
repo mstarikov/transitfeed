@@ -21,14 +21,14 @@ import transitfeed
 
 class ShapeValidationTestCase(util.ValidationTestCase):
     def expect_failed_add(self, shape, lat, lon, dist, column_name, value):
-        self.ExpectInvalidValueInClosure(
+        self.Expectinvalid_valueInClosure(
             column_name, value,
             lambda: shape.AddPoint(lat, lon, dist, self.problems))
 
     def run_test(self):
         shape = transitfeed.Shape('TEST')
         repr(shape)  # shouldn't crash
-        self.ValidateAndExpectOtherProblem(shape)  # no points!
+        self.ValidateAndExpectother_problem(shape)  # no points!
 
         self.expect_failed_add(shape, 36.905019, -116.763207, -1,
                                'shape_dist_traveled', -1)
@@ -38,7 +38,7 @@ class ShapeValidationTestCase(util.ValidationTestCase):
         shape.Validate(self.problems)
 
         shape.shape_id = None
-        self.ValidateAndExpectMissingValue(shape, 'shape_id')
+        self.ValidateAndExpectmissing_value(shape, 'shape_id')
         shape.shape_id = 'TEST'
 
         self.expect_failed_add(shape, 91, -116.751709, 6, 'shape_pt_lat', 91)
@@ -52,7 +52,7 @@ class ShapeValidationTestCase(util.ValidationTestCase):
 
         # distance decreasing is bad, but staying the same is OK
         shape.AddPoint(36.905019, -116.763206, 4, self.problems)
-        e = self.accumulator.PopException('InvalidValue')
+        e = self.accumulator.PopException('invalid_value')
         self.assertMatchesRegex('Each subsequent point', e.FormatProblem())
         self.assertMatchesRegex('distance was 5.000000.', e.FormatProblem())
         self.accumulator.AssertNoMoreExceptions()
@@ -61,17 +61,17 @@ class ShapeValidationTestCase(util.ValidationTestCase):
         self.accumulator.AssertNoMoreExceptions()
 
         shapepoint = transitfeed.ShapePoint('TEST', 36.915760, -116.7156, 6, 8)
-        shape.AddShapePointObjectUnsorted(shapepoint, self.problems)
+        shape.add_shape_point_object_unsorted(shapepoint, self.problems)
         shapepoint = transitfeed.ShapePoint('TEST', 36.915760, -116.7156, 5, 10)
-        shape.AddShapePointObjectUnsorted(shapepoint, self.problems)
-        e = self.accumulator.PopException('InvalidValue')
+        shape.add_shape_point_object_unsorted(shapepoint, self.problems)
+        e = self.accumulator.PopException('invalid_value')
         self.assertMatchesRegex('Each subsequent point', e.FormatProblem())
         self.assertMatchesRegex('distance was 8.000000.', e.FormatProblem())
         self.accumulator.AssertNoMoreExceptions()
 
         shapepoint = transitfeed.ShapePoint('TEST', 36.915760, -116.7156, 6, 11)
-        shape.AddShapePointObjectUnsorted(shapepoint, self.problems)
-        e = self.accumulator.PopException('InvalidValue')
+        shape.add_shape_point_object_unsorted(shapepoint, self.problems)
+        e = self.accumulator.PopException('invalid_value')
         self.assertMatchesRegex('The sequence number 6 occurs ', e.FormatProblem())
         self.assertMatchesRegex('once in shape TEST.', e.FormatProblem())
         self.accumulator.AssertNoMoreExceptions()
@@ -80,32 +80,32 @@ class ShapeValidationTestCase(util.ValidationTestCase):
 class ShapePointValidationTestCase(util.ValidationTestCase):
     def run_test(self):
         shapepoint = transitfeed.ShapePoint('', 36.915720, -116.7156, 0, 0)
-        self.ExpectMissingValueInClosure('shape_id',
-                                         lambda: shapepoint.ParseAttributes(self.problems))
+        self.Expectmissing_valueInClosure('shape_id',
+                                         lambda: shapepoint.parse_attributes(self.problems))
 
         shapepoint = transitfeed.ShapePoint('T', '36.9151', '-116.7611', '00', '0')
-        shapepoint.ParseAttributes(self.problems)
+        shapepoint.parse_attributes(self.problems)
         e = self.accumulator.PopException('InvalidNonNegativeIntegerValue')
         self.assertMatchesRegex('not have a leading zero', e.FormatProblem())
         self.accumulator.AssertNoMoreExceptions()
 
         shapepoint = transitfeed.ShapePoint('T', '36.9151', '-116.7611', -1, '0')
-        shapepoint.ParseAttributes(self.problems)
-        e = self.accumulator.PopException('InvalidValue')
+        shapepoint.parse_attributes(self.problems)
+        e = self.accumulator.PopException('invalid_value')
         self.assertMatchesRegex('Value should be a number', e.FormatProblem())
         self.accumulator.AssertNoMoreExceptions()
 
         shapepoint = transitfeed.ShapePoint('T', '0.1', '0.1', '1', '0')
-        shapepoint.ParseAttributes(self.problems)
-        e = self.accumulator.PopException('InvalidValue')
+        shapepoint.parse_attributes(self.problems)
+        e = self.accumulator.PopException('invalid_value')
         self.assertMatchesRegex('too close to 0, 0,', e.FormatProblem())
         self.accumulator.AssertNoMoreExceptions()
 
         shapepoint = transitfeed.ShapePoint('T', '36.9151', '-116.7611', '0', '')
-        shapepoint.ParseAttributes(self.problems)
+        shapepoint.parse_attributes(self.problems)
         shapepoint = transitfeed.ShapePoint('T', '36.9151', '-116.7611', '0', '-1')
-        shapepoint.ParseAttributes(self.problems)
-        e = self.accumulator.PopException('InvalidValue')
+        shapepoint.parse_attributes(self.problems)
+        e = self.accumulator.PopException('invalid_value')
         self.assertMatchesRegex('Invalid value -1.0', e.FormatProblem())
         self.assertMatchesRegex('should be a positive number', e.FormatProblem())
         self.accumulator.AssertNoMoreExceptions()

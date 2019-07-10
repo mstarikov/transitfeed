@@ -259,7 +259,7 @@ def main(key_cols):
                         for point in shape_match.GetPoints():
                             (lat, lng) = point.ToLatLng()
                             shape.AddPoint(lat, lng)
-                        schedule.AddShapeObject(shape)
+                        schedule.add_shape_object(shape)
                     trip.shape_id = shape.shape_id
 
     print("Matched %d shapes out of %d patterns" % (shape_count, pattern_count))

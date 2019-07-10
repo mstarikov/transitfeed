@@ -33,7 +33,7 @@ def is_valid_language_code(lang):
 def validate_language_code(lang, column_name=None, problems=None):
   """
   Validates a non-required language code value using the pybcp47 module:
-    - if invalid adds InvalidValue error (if problems accumulator is provided)
+    - if invalid adds invalid_value error (if problems accumulator is provided)
     - distinguishes between 'not well-formed' and 'not valid' and adds error
       reasons accordingly
     - an empty language code is regarded as valid! Otherwise we might end up
@@ -41,18 +41,18 @@ def validate_language_code(lang, column_name=None, problems=None):
     - returns true if the language is valid, false if not well-formed or
       invalid.
   """
-  if util.IsEmpty(lang):
+  if util.is_empty(lang):
     return True
   bcp47_obj = parser.ParseLanguage(str(lang.lower()))
   if not bcp47_obj.wellformed:
     if problems:
-      problems.InvalidValue(column_name, lang,
+      problems.invalid_value(column_name, lang,
                             'language code "%s" is not well-formed' %
                             lang, type=problems_class.TYPE_ERROR)
     return False
   if not bcp47_obj.valid:
     if problems:
-      problems.InvalidValue(column_name, lang,
+      problems.invalid_value(column_name, lang,
                             'language code "%s" is not valid, parses as: %s' %
                             (lang, bcp47_obj), type=problems_class.TYPE_WARNING)
     return False

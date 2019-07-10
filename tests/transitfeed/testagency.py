@@ -30,23 +30,23 @@ class AgencyValidationTestCase(util.ValidationTestCase):
         # bad agency
         agency = transitfeed.Agency(name='   ', url='http://example.com',
                                     timezone='America/Los_Angeles', id='TA')
-        self.ValidateAndExpectMissingValue(agency, 'agency_name')
+        self.ValidateAndExpectmissing_value(agency, 'agency_name')
 
         # missing url
         agency = transitfeed.Agency(name='Test Agency',
                                     timezone='America/Los_Angeles', id='TA')
-        self.ValidateAndExpectMissingValue(agency, 'agency_url')
+        self.ValidateAndExpectmissing_value(agency, 'agency_url')
 
         # bad url
         agency = transitfeed.Agency(name='Test Agency', url='www.example.com',
                                     timezone='America/Los_Angeles', id='TA')
-        self.ValidateAndExpectInvalidValue(agency, 'agency_url')
+        self.ValidateAndExpectinvalid_value(agency, 'agency_url')
 
         # bad time zone
         agency = transitfeed.Agency(name='Test Agency', url='http://example.com',
                                     timezone='America/Alviso', id='TA')
         agency.Validate(self.problems)
-        e = self.accumulator.PopInvalidValue('agency_timezone')
+        e = self.accumulator.Popinvalid_value('agency_timezone')
         self.assertMatchesRegex('"America/Alviso" is not a common timezone',
                                 e.FormatProblem())
         self.accumulator.AssertNoMoreExceptions()
@@ -55,13 +55,13 @@ class AgencyValidationTestCase(util.ValidationTestCase):
         agency = transitfeed.Agency(name='Test Agency', url='http://example.com',
                                     timezone='America/Los_Angeles', id='TA',
                                     lang='English')
-        self.ValidateAndExpectInvalidValue(agency, 'agency_lang')
+        self.ValidateAndExpectinvalid_value(agency, 'agency_lang')
 
         # bad 2-letter language code
         agency = transitfeed.Agency(name='Test Agency', url='http://example.com',
                                     timezone='America/Los_Angeles', id='TA',
                                     lang='xx')
-        self.ValidateAndExpectInvalidValue(agency, 'agency_lang')
+        self.ValidateAndExpectinvalid_value(agency, 'agency_lang')
 
         # capitalized language code is OK
         agency = transitfeed.Agency(name='Test Agency', url='http://example.com',
@@ -93,15 +93,15 @@ class AgencyValidationTestCase(util.ValidationTestCase):
                                     url='http://www.example.com',
                                     timezone='America/Los_Angeles',
                                     agency_fare_url="www.example.com/fares")
-        self.ValidateAndExpectInvalidValue(agency, 'agency_fare_url')
+        self.ValidateAndExpectinvalid_value(agency, 'agency_fare_url')
 
         # Multiple problems
         agency = transitfeed.Agency(name='Test Agency', url='www.example.com',
                                     timezone='America/West Coast', id='TA')
         self.assertEquals(False, agency.Validate(self.problems))
-        e = self.accumulator.PopException('InvalidValue')
+        e = self.accumulator.PopException('invalid_value')
         self.assertEqual(e.column_name, 'agency_url')
-        e = self.accumulator.PopException('InvalidValue')
+        e = self.accumulator.PopException('invalid_value')
         self.assertEqual(e.column_name, 'agency_timezone')
         self.accumulator.AssertNoMoreExceptions()
 
@@ -183,5 +183,5 @@ class MultiAgencyTimeZoneTestCase(util.MemoryZipTestCase):
                                 "DTA,Demo Agency,http://google.com,America/Los_Angeles,en\n"
                                 "DTA2,Demo Agency 2,http://google.com,America/New_York,en\n")
         self.make_loader_and_load(self.problems)
-        self.accumulator.PopInvalidValue("agency_timezone")
+        self.accumulator.Popinvalid_value("agency_timezone")
         self.accumulator.AssertNoMoreExceptions()

@@ -62,44 +62,44 @@ class ShapePoint(GtfsObjectBase):
 
         Return True if all of the values are valid.
         """
-        if util.IsEmpty(self.shape_id):
-            problems.MissingValue('shape_id')
+        if util.is_empty(self.shape_id):
+            problems.missing_value('shape_id')
             return
 
         try:
             if not isinstance(self.shape_pt_sequence, int):
                 self.shape_pt_sequence = \
-                    util.NonNegIntStringToInt(self.shape_pt_sequence, problems)
+                    util.non_neg_int_string_to_int(self.shape_pt_sequence, problems)
             elif self.shape_pt_sequence < 0:
-                problems.InvalidValue('shape_pt_sequence', self.shape_pt_sequence,
+                problems.invalid_value('shape_pt_sequence', self.shape_pt_sequence,
                                       'Value should be a number (0 or higher)')
         except (TypeError, ValueError):
-            problems.InvalidValue('shape_pt_sequence', self.shape_pt_sequence,
+            problems.invalid_value('shape_pt_sequence', self.shape_pt_sequence,
                                   'Value should be a number (0 or higher)')
             return
 
         try:
             if not isinstance(self.shape_pt_lat, (int, float)):
-                self.shape_pt_lat = util.FloatStringToFloat(self.shape_pt_lat, problems)
+                self.shape_pt_lat = util.float_string_to_float(self.shape_pt_lat, problems)
             if abs(self.shape_pt_lat) > 90.0:
-                problems.InvalidValue('shape_pt_lat', self.shape_pt_lat)
+                problems.invalid_value('shape_pt_lat', self.shape_pt_lat)
                 return
         except (TypeError, ValueError):
-            problems.InvalidValue('shape_pt_lat', self.shape_pt_lat)
+            problems.invalid_value('shape_pt_lat', self.shape_pt_lat)
             return
 
         try:
             if not isinstance(self.shape_pt_lon, (int, float)):
-                self.shape_pt_lon = util.FloatStringToFloat(self.shape_pt_lon, problems)
+                self.shape_pt_lon = util.float_string_to_float(self.shape_pt_lon, problems)
             if abs(self.shape_pt_lon) > 180.0:
-                problems.InvalidValue('shape_pt_lon', self.shape_pt_lon)
+                problems.invalid_value('shape_pt_lon', self.shape_pt_lon)
                 return
         except (TypeError, ValueError):
-            problems.InvalidValue('shape_pt_lon', self.shape_pt_lon)
+            problems.invalid_value('shape_pt_lon', self.shape_pt_lon)
             return
 
         if abs(self.shape_pt_lat) < 1.0 and abs(self.shape_pt_lon) < 1.0:
-            problems.InvalidValue('shape_pt_lat', self.shape_pt_lat,
+            problems.invalid_value('shape_pt_lat', self.shape_pt_lat,
                                   'Point location too close to 0, 0, which means '
                                   'that it\'s probably an incorrect location.',
                                   type=problems_module.TYPE_WARNING)
@@ -112,14 +112,14 @@ class ShapePoint(GtfsObjectBase):
                 not isinstance(self.shape_dist_traveled, (int, float))):
             try:
                 self.shape_dist_traveled = \
-                    util.FloatStringToFloat(self.shape_dist_traveled, problems)
+                    util.float_string_to_float(self.shape_dist_traveled, problems)
             except (TypeError, ValueError):
-                problems.InvalidValue('shape_dist_traveled', self.shape_dist_traveled,
+                problems.invalid_value('shape_dist_traveled', self.shape_dist_traveled,
                                       'This value should be a positive number.')
                 return
 
         if self.shape_dist_traveled is not None and self.shape_dist_traveled < 0:
-            problems.InvalidValue('shape_dist_traveled', self.shape_dist_traveled,
+            problems.invalid_value('shape_dist_traveled', self.shape_dist_traveled,
                                   'This value should be a positive number.')
             return
 

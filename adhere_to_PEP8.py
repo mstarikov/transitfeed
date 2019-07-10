@@ -24,8 +24,19 @@ class AdhereToPEP8:
                 'except ImportError:\n\timport cStringIO as StringIO',
             'from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer\n':
                 'try:\n\tfrom http.server import BaseHTTPRequestHandler, HTTPServer\n'
-                'except ImportError:\n\tfrom BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer'
+                'except ImportError:\n\tfrom BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer',
+            'basestring': 'str',
+            'raw_input(': 'input(',
+            'str(': 'str('
         }
+
+    # TODO: should leave raw_input above for python2.7 and do something like this insead
+    '''
+     try:
+            raw_input('Press enter to continue...')
+        except EOFError:
+            input('Press enter to continue...')
+    '''
 
     def find_py_files(self):
         for py_file in self.follow_rabbit(self._current_path):

@@ -407,24 +407,24 @@ class ValidationTestCase(TestCase):
     def validate_and_expect_missing_value(self, object, column_name):
         self.accumulator.assert_no_more_exceptions()
         object.Validate(self.problems)
-        self.expect_exception('MissingValue', column_name)
+        self.expect_exception('missing_value', column_name)
 
     def expect_missing_value_in_closure(self, column_name, c):
         self.accumulator.assert_no_more_exceptions()
         rv = c()
-        self.expect_exception('MissingValue', column_name)
+        self.expect_exception('missing_value', column_name)
 
     def validate_andexpect_invalid_value(self, object, column_name,
                                          value=INVALID_VALUE):
         self.accumulator.assert_no_more_exceptions()
         object.Validate(self.problems)
-        self.expect_exception('InvalidValue', column_name, value)
+        self.expect_exception('invalid_value', column_name, value)
 
     def expect_invalid_value_in_closure(self, column_name, value=INVALID_VALUE,
                                         c=None):
         self.accumulator.assert_no_more_exceptions()
         rv = c()
-        self.expect_exception('InvalidValue', column_name, value)
+        self.expect_exception('invalid_value', column_name, value)
 
     def validate_and_expect_invalid_float_value(self, object, value):
         self.accumulator.assert_no_more_exceptions()
@@ -434,12 +434,12 @@ class ValidationTestCase(TestCase):
     def validate_and_expect_other_problem(self, object):
         self.accumulator.assert_no_more_exceptions()
         object.Validate(self.problems)
-        self.expect_exception('OtherProblem')
+        self.expect_exception('other_problem')
 
     def expect_other_problem_in_closure(self, c):
         self.accumulator.assert_no_more_exceptions()
         rv = c()
-        self.expect_exception('OtherProblem')
+        self.expect_exception('other_problem')
 
     def validate_and_expect_date_outside_valid_range(self, object, column_name,
                                                      value=INVALID_VALUE):
@@ -467,8 +467,8 @@ class ValidationTestCase(TestCase):
         service_period.SetWeekdayService(True)
         service_period.SetStartDate("20091203")
         service_period.SetEndDate("20111203")
-        service_period.SetDateHasService("20091203")
-        schedule.AddServicePeriodObject(service_period)
+        service_period.set_date_has_service("20091203")
+        schedule.add_service_period_object(service_period)
         stop1 = schedule.AddStop(lng=1.00, lat=48.2, name="Stop 1", stop_id="stop1")
         stop2 = schedule.AddStop(lng=1.01, lat=48.2, name="Stop 2", stop_id="stop2")
         stop3 = schedule.AddStop(lng=1.03, lat=48.2, name="Stop 3", stop_id="stop3")
@@ -560,7 +560,7 @@ class RecordingProblemAccumulator(transitfeed.ProblemAccumulatorInterface):
         specified file and column.
 
         Arguments:
-            type_name: the type of the exception as string, e.g. 'InvalidValue'
+            type_name: the type of the exception as string, e.g. 'invalid_value'
             column_name: the name of the field (column) which caused the exception
             file_name: optional, the name of the file containing the bad field
 
@@ -574,11 +574,11 @@ class RecordingProblemAccumulator(transitfeed.ProblemAccumulatorInterface):
         return e
 
     def pop_invalid_value(self, column_name, file_name=None):
-        return self.pop_column_specific_exception("InvalidValue", column_name,
+        return self.pop_column_specific_exception("invalid_value", column_name,
                                                   file_name)
 
     def pop_missing_value(self, column_name, file_name=None):
-        return self.pop_column_specific_exception("MissingValue", column_name,
+        return self.pop_column_specific_exception("missing_value", column_name,
                                                   file_name)
 
     def pop_date_outside_valid_range(self, column_name, file_name=None):

@@ -27,8 +27,8 @@ class Stop(GtfsObjectBase):
     """Represents a single stop. A stop must have a latitude, longitude and name.
 
     Callers may assign arbitrary values to instance attributes.
-    Stop.ParseAttributes validates attributes according to GTFS and converts some
-    into native types. ParseAttributes may delete invalid attributes.
+    Stop.parse_attributes validates attributes according to GTFS and converts some
+    into native types. parse_attributes may delete invalid attributes.
     Accessing an attribute that is a column in GTFS will return None if this
     object does not have a value or it is ''.
     A Stop object acts like a dict with string values.
@@ -154,26 +154,26 @@ class Stop(GtfsObjectBase):
             value = self.stop_lat
             try:
                 if not isinstance(value, (float, int)):
-                    self.stop_lat = util.FloatStringToFloat(value, problems)
+                    self.stop_lat = util.float_string_to_float(value, problems)
             except (ValueError, TypeError):
-                problems.InvalidValue('stop_lat', value)
+                problems.invalid_value('stop_lat', value)
                 del self.stop_lat
             else:
                 if self.stop_lat > 90 or self.stop_lat < -90:
-                    problems.InvalidValue('stop_lat', value)
+                    problems.invalid_value('stop_lat', value)
 
     def validate_stop_longitude(self, problems):
         if self.stop_lon is not None:
             value = self.stop_lon
             try:
                 if not isinstance(value, (float, int)):
-                    self.stop_lon = util.FloatStringToFloat(value, problems)
+                    self.stop_lon = util.float_string_to_float(value, problems)
             except (ValueError, TypeError):
-                problems.InvalidValue('stop_lon', value)
+                problems.invalid_value('stop_lon', value)
                 del self.stop_lon
             else:
                 if self.stop_lon > 180 or self.stop_lon < -180:
-                    problems.InvalidValue('stop_lon', value)
+                    problems.invalid_value('stop_lon', value)
 
     def validate_stop_url(self, problems):
         value = self.stop_url
@@ -188,22 +188,22 @@ class Stop(GtfsObjectBase):
             try:
                 self.location_type = int(value)
             except (ValueError, TypeError):
-                problems.InvalidValue('location_type', value)
+                problems.invalid_value('location_type', value)
                 del self.location_type
             else:
                 if self.location_type not in (0, 1):
-                    problems.InvalidValue('location_type', value,
+                    problems.invalid_value('location_type', value,
                                           type=problems_module.TYPE_WARNING)
 
     def validate_stop_required_fields(self, problems):
         for required in self._REQUIRED_FIELD_NAMES:
-            if util.IsEmpty(getattr(self, required, None)):
+            if util.is_empty(getattr(self, required, None)):
                 self._report_missing_required_field(problems, required)
 
     def _report_missing_required_field(self, problems, required):
         # TODO: For now we are keeping the API stable but it would be cleaner to
         # treat whitespace stop_id as invalid, instead of missing
-        problems.MissingValue(required)
+        problems.missing_value(required)
         setattr(self, required, None)
 
     def validate_stop_not_too_close_to_origin(self, problems):
@@ -211,21 +211,21 @@ class Stop(GtfsObjectBase):
                 and self.stop_lon is not None \
                 and abs(self.stop_lat) < 1.0 \
                 and abs(self.stop_lon) < 1.0:
-            problems.InvalidValue('stop_lat', self.stop_lat,
+            problems.invalid_value('stop_lat', self.stop_lat,
                                   'Stop location too close to 0, 0',
                                   type=problems_module.TYPE_WARNING)
 
     def validate_stop_description_and_name_are_different(self, problems):
         if (self.stop_desc and self.stop_name and
-                not util.IsEmpty(self.stop_desc) and
+                not util.is_empty(self.stop_desc) and
                 self.stop_name.strip().lower() == self.stop_desc.strip().lower()):
-            problems.InvalidValue('stop_desc', self.stop_desc,
+            problems.invalid_value('stop_desc', self.stop_desc,
                                   'stop_desc should not be the same as stop_name',
                                   type=problems_module.TYPE_WARNING)
 
     def validate_stop_is_not_station_with_parent(self, problems):
         if self.parent_station and self.location_type == 1:
-            problems.InvalidValue('parent_station', self.parent_station,
+            problems.invalid_value('parent_station', self.parent_station,
                                   'Stop row with location_type=1 (a station) must '
                                   'not have a parent_station')
 
@@ -233,9 +233,9 @@ class Stop(GtfsObjectBase):
         # Entrances or other child stops (having a parent station) must not have a
         # stop_timezone.
         util.validateTimezone(self.stop_timezone, 'stop_timezone', problems)
-        if (not util.IsEmpty(self.parent_station) and
-                not util.IsEmpty(self.stop_timezone)):
-            problems.InvalidValue('stop_timezone', self.stop_timezone,
+        if (not util.is_empty(self.parent_station) and
+                not util.is_empty(self.stop_timezone)):
+            problems.invalid_value('stop_timezone', self.stop_timezone,
                                   reason='a stop having a parent stop must not have a stop_timezone',
                                   type=problems_module.TYPE_WARNING)
 
@@ -245,7 +245,7 @@ class Stop(GtfsObjectBase):
                 self.wheelchair_boarding, 'wheelchair_boarding', problems)
 
     def validate_before_add(self, problems):
-        # First check that all required fields are present because ParseAttributes
+        # First check that all required fields are present because parse_attributes
         # may remove invalid attributes.
         self.validate_stop_required_fields(problems)
 

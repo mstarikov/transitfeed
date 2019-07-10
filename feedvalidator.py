@@ -310,14 +310,14 @@ class HTMLCountingProblemAccumulator(LimitPerTypeProblemAccumulator):
             problem_class += ' notice'
         output.append('<li>')
         output.append('<div class="%s">%s</div>' %
-                      (problem_class, transitfeed.EncodeUnicode(problem_text)))
+                      (problem_class, transitfeed.encode_str(problem_text)))
         try:
             if hasattr(e, 'row_num'):
                 line_str = 'line %d of ' % e.row_num
             else:
                 line_str = ''
             output.append('in %s<code>%s</code><br>\n' %
-                          (line_str, transitfeed.EncodeUnicode(e.file_name)))
+                          (line_str, transitfeed.encode_str(e.file_name)))
             row = e.row
             headers = e.headers
             column_name = e.column_name
@@ -331,9 +331,9 @@ class HTMLCountingProblemAccumulator(LimitPerTypeProblemAccumulator):
                 table_data += '<td%s>%s</td>' % (attributes, value)
             # Make sure output is encoded into UTF-8
             output.append('<table class="dump"><tr>%s</tr>\n' %
-                          transitfeed.EncodeUnicode(table_header))
+                          transitfeed.encode_str(table_header))
             output.append('<tr>%s</tr></table>\n' %
-                          transitfeed.EncodeUnicode(table_data))
+                          transitfeed.encode_str(table_data))
         except AttributeError as e:
             pass  # Hope this was getting an attribute from e ;-)
         output.append('<br></li>\n')
@@ -490,14 +490,14 @@ FeedValidator</a> version %s on %s.
 </body>
 </html>""" % (transitfeed.__version__, time_unicode)
 
-        f.write(transitfeed.EncodeUnicode(output_prefix))
+        f.write(transitfeed.encode_str(output_prefix))
         if self.problem_list_map(TYPE_ERROR):
             f.write('<h3 class="issueHeader">Errors:</h3>')
             f.write(self.format_type("Error", self.problem_list_map(TYPE_ERROR).items()))
         if self.problem_list_map(TYPE_WARNING):
             f.write('<h3 class="issueHeader">Warnings:</h3>')
             f.write(self.format_type("Warning", self.problem_list_map(TYPE_WARNING).items()))
-        f.write(transitfeed.EncodeUnicode(output_suffix))
+        f.write(transitfeed.encode_str(output_suffix))
 
 
 def run_validation_output_from_options(feed, options):

@@ -328,19 +328,19 @@ class LimitPerTypeProblemReporterTestCase(util.TestCase):
         self.problems = self.create_limit_per_type_problem_reporter(2)
         self.accumulator = self.problems.GetAccumulator()
 
-        self.problems.OtherProblem("e1", type=transitfeed.TYPE_ERROR)
-        self.problems.OtherProblem("w1", type=transitfeed.TYPE_WARNING)
-        self.problems.OtherProblem("e2", type=transitfeed.TYPE_ERROR)
-        self.problems.OtherProblem("e3", type=transitfeed.TYPE_ERROR)
-        self.problems.OtherProblem("w2", type=transitfeed.TYPE_WARNING)
+        self.problems.other_problem("e1", type=transitfeed.TYPE_ERROR)
+        self.problems.other_problem("w1", type=transitfeed.TYPE_WARNING)
+        self.problems.other_problem("e2", type=transitfeed.TYPE_ERROR)
+        self.problems.other_problem("e3", type=transitfeed.TYPE_ERROR)
+        self.problems.other_problem("w2", type=transitfeed.TYPE_WARNING)
         self.assertEquals(2, self.accumulator.WarningCount())
         self.assertEquals(3, self.accumulator.ErrorCount())
 
         # These are BoundedProblemList objects
         warning_bounded_list = self.accumulator.ProblemList(
-            transitfeed.TYPE_WARNING, "OtherProblem")
+            transitfeed.TYPE_WARNING, "other_problem")
         error_bounded_list = self.accumulator.ProblemList(
-            transitfeed.TYPE_ERROR, "OtherProblem")
+            transitfeed.TYPE_ERROR, "other_problem")
 
         self.assertEquals(2, warning_bounded_list.count)
         self.assertEquals(3, error_bounded_list.count)
@@ -348,9 +348,9 @@ class LimitPerTypeProblemReporterTestCase(util.TestCase):
         self.assertEquals(0, warning_bounded_list.dropped_count)
         self.assertEquals(1, error_bounded_list.dropped_count)
 
-        self.assert_problems_attribute(transitfeed.TYPE_ERROR, "OtherProblem",
+        self.assert_problems_attribute(transitfeed.TYPE_ERROR, "other_problem",
                                        "description", "e1 e2")
-        self.assert_problems_attribute(transitfeed.TYPE_WARNING, "OtherProblem",
+        self.assert_problems_attribute(transitfeed.TYPE_WARNING, "other_problem",
                                        "description", "w1 w2")
 
     def test_keep_unsorted(self):
@@ -363,7 +363,7 @@ class LimitPerTypeProblemReporterTestCase(util.TestCase):
         # or cmp(id(self), id(y)).
         exceptions = []
         for i in range(20):
-            exceptions.append(transitfeed.OtherProblem(description="e%i" % i))
+            exceptions.append(transitfeed.other_problem(description="e%i" % i))
         exceptions = exceptions[10:] + exceptions[:10]
         self.problems = self.create_limit_per_type_problem_reporter(3)
         self.accumulator = self.problems.GetAccumulator()
@@ -374,10 +374,10 @@ class LimitPerTypeProblemReporterTestCase(util.TestCase):
         self.assertEquals(20, self.accumulator.ErrorCount())
 
         bounded_list = self.accumulator.ProblemList(
-            transitfeed.TYPE_ERROR, "OtherProblem")
+            transitfeed.TYPE_ERROR, "other_problem")
         self.assertEquals(20, bounded_list.count)
         self.assertEquals(17, bounded_list.dropped_count)
-        self.assert_problems_attribute(transitfeed.TYPE_ERROR, "OtherProblem",
+        self.assert_problems_attribute(transitfeed.TYPE_ERROR, "other_problem",
                                        "description", "e10 e11 e12")
 
     def test_limit_sorted_too_fast_travel(self):

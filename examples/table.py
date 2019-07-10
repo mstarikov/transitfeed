@@ -105,9 +105,9 @@ def process_options(schedule, table):
         elif command == 'end_date':
             service_period.SetEndDate(row[1])
         elif command == 'add_date':
-            service_period.SetDateHasService(date=row[1])
+            service_period.set_date_has_service(date=row[1])
         elif command == 'remove_date':
-            service_period.SetDateHasService(date=row[1], has_service=False)
+            service_period.set_date_has_service(date=row[1], has_service=False)
         elif command == 'agency_name':
             agency_name = row[1]
         elif command == 'agency_url':

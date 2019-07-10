@@ -89,7 +89,7 @@ class StopTime(object):
             try:
                 self.arrival_secs = util.TimeToSecondsSinceMidnight(arrival_time)
             except problems_module.Error:
-                problems.InvalidValue('arrival_time', arrival_time)
+                problems.invalid_value('arrival_time', arrival_time)
                 self.arrival_secs = None
 
         if departure_secs != None:
@@ -101,12 +101,12 @@ class StopTime(object):
             try:
                 self.departure_secs = util.TimeToSecondsSinceMidnight(departure_time)
             except problems_module.Error:
-                problems.InvalidValue('departure_time', departure_time)
+                problems.invalid_value('departure_time', departure_time)
                 self.departure_secs = None
 
         if not isinstance(stop, self._STOP_CLASS):
             # Not quite correct, but better than letting the problem propagate
-            problems.InvalidValue('stop', stop)
+            problems.invalid_value('stop', stop)
         self.stop = stop
         self.stop_headsign = stop_headsign
         self.timepoint = util.ValidateAndReturnIntValue(
@@ -119,7 +119,7 @@ class StopTime(object):
 
         if (self.pickup_type == 1 and self.drop_off_type == 1 and
                 self.arrival_secs == None and self.departure_secs == None):
-            problems.OtherProblem('This stop time has a pickup_type and '
+            problems.other_problem('This stop time has a pickup_type and '
                                   'drop_off_type of 1, indicating that riders '
                                   'can\'t get on or off here.  Since it doesn\'t '
                                   'define a timepoint either, this entry serves no '
@@ -128,7 +128,7 @@ class StopTime(object):
 
         if ((self.arrival_secs != None) and (self.departure_secs != None) and
                 (self.departure_secs < self.arrival_secs)):
-            problems.InvalidValue('departure_time', departure_time,
+            problems.invalid_value('departure_time', departure_time,
                                   'The departure time at this stop (%s) is before '
                                   'the arrival time (%s).  This is often caused by '
                                   'problems in the feed exporter\'s time conversion'
@@ -140,7 +140,7 @@ class StopTime(object):
                 self.departure_secs == None and departure_time == None):
             # self.departure_secs might be None because departure_time was invalid,
             # so we need to check both
-            problems.MissingValue('departure_time',
+            problems.missing_value('departure_time',
                                   'arrival_time and departure_time should either '
                                   'both be provided or both be left blank.  '
                                   'It\'s OK to set them both to the same value.')
@@ -148,7 +148,7 @@ class StopTime(object):
         # arrival time complain
         if (self.departure_secs != None and
                 self.arrival_secs == None and arrival_time == None):
-            problems.MissingValue('arrival_time',
+            problems.missing_value('arrival_time',
                                   'arrival_time and departure_time should either '
                                   'both be provided or both be left blank.  '
                                   'It\'s OK to set them both to the same value.')
@@ -159,7 +159,7 @@ class StopTime(object):
             try:
                 self.shape_dist_traveled = float(shape_dist_traveled)
             except ValueError:
-                problems.InvalidValue('shape_dist_traveled', shape_dist_traveled)
+                problems.invalid_value('shape_dist_traveled', shape_dist_traveled)
 
         if stop_sequence is not None:
             self.stop_sequence = stop_sequence

@@ -47,7 +47,7 @@ class TransitFeedSampleCodeTestCase(util.TestCase):
         service_period.SetStartDate("20070101")
         service_period.SetEndDate("20071231")
         service_period.SetWeekdayService(True)
-        schedule.AddServicePeriodObject(service_period)
+        schedule.add_service_period_object(service_period)
 
         trip = transitfeed.Trip()
         trip.route_id = "SAMPLE_ID"

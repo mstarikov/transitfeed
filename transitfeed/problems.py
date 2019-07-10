@@ -120,7 +120,7 @@ class ProblemReporter(object):
     def deprecated_column(self, file_name, column_name, new_name, context=None,
                           type=TYPE_WARNING):
         reason = None
-        if not util.IsEmpty(new_name):
+        if not util.is_empty(new_name):
             reason = 'Please use the new column "%s" instead.' % (new_name)
         e = deprecated_column(file_name=file_name, column_name=column_name,
                               reason=reason, context=context, context2=self._context,
@@ -167,18 +167,18 @@ class ProblemReporter(object):
                                                type=type)
         self.add_to_accumulator(e)
 
-    def duplicate_i_d(self, column_names, values, context=None, type=TYPE_ERROR):
+    def duplicate_id(self, column_names, values, context=None, type=TYPE_ERROR):
         if isinstance(column_names, (tuple, list)):
             column_names = '(' + ', '.join(column_names) + ')'
         if isinstance(values, tuple):
             values = '(' + ', '.join(values) + ')'
-        e = duplicate_i_d(column_name=column_names, value=values,
+        e = duplicate_id(column_name=column_names, value=values,
                           context=context, context2=self._context, type=type)
         self.add_to_accumulator(e)
 
-    def invalid_agency_i_d(self, column_name, value, relating_type, relating_id,
+    def invalid_agency_id(self, column_name, value, relating_type, relating_id,
                            context=None, type=TYPE_ERROR):
-        e = invalid_agency_i_d(column_name=column_name, value=value,
+        e = invalid_agency_id(column_name=column_name, value=value,
                                relating_type=relating_type, relating_id=relating_id,
                                context=context, context2=self._context, type=type)
         self.add_to_accumulator(e)
@@ -376,7 +376,7 @@ class SimpleProblemAccumulator(ProblemAccumulatorInterface):
         context = e.format_context()
         if context:
             print(context)
-        print(util.EncodeUnicode(self._line_wrap(e.format_problem(), 78)))
+        print(util.encode_str(self._line_wrap(e.format_problem(), 78)))
 
     @staticmethod
     def _line_wrap(text, width):
@@ -457,7 +457,7 @@ class ExceptionWithContext(Exception):
             # the problem reporter convert all unicode attributes to utf-8.
             # Currently valid utf-8 fields are converted to unicode in _ReadCsvDict.
             # Perhaps all fields should be left as utf-8.
-            d[k] = util.EncodeUnicode(v)
+            d[k] = util.encode_str(v)
         return d
 
     def format_problem(self, d=None):
@@ -628,11 +628,11 @@ class invalid_non_negative_integer_value(ExceptionWithContext):
         "3 instead of 03), and that it is a properly formated integer value.")
 
 
-class duplicate_i_d(ExceptionWithContext):
+class duplicate_id(ExceptionWithContext):
     ERROR_TEXT = 'Duplicate ID %(value)s in column %(column_name)s'
 
 
-class invalid_agency_i_d(ExceptionWithContext):
+class invalid_agency_id(ExceptionWithContext):
     ERROR_TEXT = 'The %(relating_type)s with ID %(relating_id)s specifies ' \
                  '%(column_name)s %(value)s which does not exist.'
 

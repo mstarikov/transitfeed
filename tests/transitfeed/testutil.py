@@ -129,7 +129,7 @@ class ValidationUtilsTestCase(test_util.TestCase):
         accumulator.AssertNoMoreExceptions()
         self.assertFalse(util.ValidateURL("ftp://www.example.com", "col",
                                           problems))
-        e = accumulator.PopInvalidValue("col")
+        e = accumulator.Popinvalid_value("col")
         accumulator.AssertNoMoreExceptions()
 
     def test_is_valid_hex_color(self):
@@ -151,7 +151,7 @@ class ValidationUtilsTestCase(test_util.TestCase):
         accumulator.AssertNoMoreExceptions()
         self.assertFalse(util.ValidateLanguageCode("Swiss German", "col",
                                                    problems))
-        e = accumulator.PopInvalidValue("col")
+        e = accumulator.Popinvalid_value("col")
         accumulator.AssertNoMoreExceptions()
 
     def test_is_valid_timezone(self):
@@ -169,7 +169,7 @@ class ValidationUtilsTestCase(test_util.TestCase):
         accumulator.AssertNoMoreExceptions()
         self.assertFalse(util.ValidateTimezone("Switzerland/Wil", "col",
                                                problems))
-        e = accumulator.PopInvalidValue("col")
+        e = accumulator.Popinvalid_value("col")
         accumulator.AssertNoMoreExceptions()
 
     def test_is_valid_date(self):
@@ -185,71 +185,71 @@ class ValidationUtilsTestCase(test_util.TestCase):
         self.assertTrue(util.ValidateDate("20100801", "col", problems))
         accumulator.AssertNoMoreExceptions()
         self.assertFalse(util.ValidateDate("20100732", "col", problems))
-        e = accumulator.PopInvalidValue("col")
+        e = accumulator.Popinvalid_value("col")
         accumulator.AssertNoMoreExceptions()
 
 
-class FloatStringToFloatTestCase(test_util.TestCase):
+class float_string_to_floatTestCase(test_util.TestCase):
     def run_test(self):
         accumulator = test_util.RecordingProblemAccumulator(self)
         problems = ProblemReporter(accumulator)
 
-        self.assertAlmostEqual(0, util.FloatStringToFloat("0", problems))
-        self.assertAlmostEqual(0, util.FloatStringToFloat(u"0", problems))
-        self.assertAlmostEqual(1, util.FloatStringToFloat("1", problems))
-        self.assertAlmostEqual(1, util.FloatStringToFloat("1.00000", problems))
-        self.assertAlmostEqual(1.5, util.FloatStringToFloat("1.500", problems))
-        self.assertAlmostEqual(-2, util.FloatStringToFloat("-2.0", problems))
-        self.assertAlmostEqual(-2.5, util.FloatStringToFloat("-2.5", problems))
-        self.assertRaises(ValueError, util.FloatStringToFloat, ".", problems)
-        self.assertRaises(ValueError, util.FloatStringToFloat, "0x20", problems)
-        self.assertRaises(ValueError, util.FloatStringToFloat, "-0x20", problems)
-        self.assertRaises(ValueError, util.FloatStringToFloat, "0b10", problems)
+        self.assertAlmostEqual(0, util.float_string_to_float("0", problems))
+        self.assertAlmostEqual(0, util.float_string_to_float(u"0", problems))
+        self.assertAlmostEqual(1, util.float_string_to_float("1", problems))
+        self.assertAlmostEqual(1, util.float_string_to_float("1.00000", problems))
+        self.assertAlmostEqual(1.5, util.float_string_to_float("1.500", problems))
+        self.assertAlmostEqual(-2, util.float_string_to_float("-2.0", problems))
+        self.assertAlmostEqual(-2.5, util.float_string_to_float("-2.5", problems))
+        self.assertRaises(ValueError, util.float_string_to_float, ".", problems)
+        self.assertRaises(ValueError, util.float_string_to_float, "0x20", problems)
+        self.assertRaises(ValueError, util.float_string_to_float, "-0x20", problems)
+        self.assertRaises(ValueError, util.float_string_to_float, "0b10", problems)
 
         # These should issue a warning, but otherwise parse successfully
-        self.assertAlmostEqual(0.001, util.FloatStringToFloat("1E-3", problems))
+        self.assertAlmostEqual(0.001, util.float_string_to_float("1E-3", problems))
         e = accumulator.PopException("InvalidFloatValue")
-        self.assertAlmostEqual(0.001, util.FloatStringToFloat(".001", problems))
+        self.assertAlmostEqual(0.001, util.float_string_to_float(".001", problems))
         e = accumulator.PopException("InvalidFloatValue")
-        self.assertAlmostEqual(-0.001, util.FloatStringToFloat("-.001", problems))
+        self.assertAlmostEqual(-0.001, util.float_string_to_float("-.001", problems))
         e = accumulator.PopException("InvalidFloatValue")
-        self.assertAlmostEqual(0, util.FloatStringToFloat("0.", problems))
+        self.assertAlmostEqual(0, util.float_string_to_float("0.", problems))
         e = accumulator.PopException("InvalidFloatValue")
 
         accumulator.AssertNoMoreExceptions()
 
 
-class NonNegIntStringToIntTestCase(test_util.TestCase):
+class non_neg_int_string_to_intTestCase(test_util.TestCase):
     def run_test(self):
         accumulator = test_util.RecordingProblemAccumulator(self)
         problems = ProblemReporter(accumulator)
 
-        self.assertEqual(0, util.NonNegIntStringToInt("0", problems))
-        self.assertEqual(0, util.NonNegIntStringToInt(u"0", problems))
-        self.assertEqual(1, util.NonNegIntStringToInt("1", problems))
-        self.assertEqual(2, util.NonNegIntStringToInt("2", problems))
-        self.assertEqual(10, util.NonNegIntStringToInt("10", problems))
+        self.assertEqual(0, util.non_neg_int_string_to_int("0", problems))
+        self.assertEqual(0, util.non_neg_int_string_to_int(u"0", problems))
+        self.assertEqual(1, util.non_neg_int_string_to_int("1", problems))
+        self.assertEqual(2, util.non_neg_int_string_to_int("2", problems))
+        self.assertEqual(10, util.non_neg_int_string_to_int("10", problems))
         self.assertEqual(1234567890123456789,
-                         util.NonNegIntStringToInt("1234567890123456789",
+                         util.non_neg_int_string_to_int("1234567890123456789",
                                                    problems))
-        self.assertRaises(ValueError, util.NonNegIntStringToInt, "", problems)
-        self.assertRaises(ValueError, util.NonNegIntStringToInt, "-1", problems)
-        self.assertRaises(ValueError, util.NonNegIntStringToInt, "0x1", problems)
-        self.assertRaises(ValueError, util.NonNegIntStringToInt, "1.0", problems)
-        self.assertRaises(ValueError, util.NonNegIntStringToInt, "1e1", problems)
-        self.assertRaises(ValueError, util.NonNegIntStringToInt, "0x20", problems)
-        self.assertRaises(ValueError, util.NonNegIntStringToInt, "0b10", problems)
-        self.assertRaises(TypeError, util.NonNegIntStringToInt, 1, problems)
-        self.assertRaises(TypeError, util.NonNegIntStringToInt, None, problems)
+        self.assertRaises(ValueError, util.non_neg_int_string_to_int, "", problems)
+        self.assertRaises(ValueError, util.non_neg_int_string_to_int, "-1", problems)
+        self.assertRaises(ValueError, util.non_neg_int_string_to_int, "0x1", problems)
+        self.assertRaises(ValueError, util.non_neg_int_string_to_int, "1.0", problems)
+        self.assertRaises(ValueError, util.non_neg_int_string_to_int, "1e1", problems)
+        self.assertRaises(ValueError, util.non_neg_int_string_to_int, "0x20", problems)
+        self.assertRaises(ValueError, util.non_neg_int_string_to_int, "0b10", problems)
+        self.assertRaises(TypeError, util.non_neg_int_string_to_int, 1, problems)
+        self.assertRaises(TypeError, util.non_neg_int_string_to_int, None, problems)
 
         # These should issue a warning, but otherwise parse successfully
-        self.assertEqual(1, util.NonNegIntStringToInt("+1", problems))
+        self.assertEqual(1, util.non_neg_int_string_to_int("+1", problems))
         e = accumulator.PopException("InvalidNonNegativeIntegerValue")
 
-        self.assertEqual(1, util.NonNegIntStringToInt("01", problems))
+        self.assertEqual(1, util.non_neg_int_string_to_int("01", problems))
         e = accumulator.PopException("InvalidNonNegativeIntegerValue")
 
-        self.assertEqual(0, util.NonNegIntStringToInt("00", problems))
+        self.assertEqual(0, util.non_neg_int_string_to_int("00", problems))
         e = accumulator.PopException("InvalidNonNegativeIntegerValue")
 
         accumulator.AssertNoMoreExceptions()
@@ -268,7 +268,7 @@ class CheckVersionTestCase(test_util.TempDirTestCaseBase):
 
     def test_assigned_different_version(self):
         util.check_version(self.problems, '100.100.100')
-        e = self.accumulator.PopException('NewVersionAvailable')
+        e = self.accumulator.PopException('new_version_available')
         self.assertEqual(e.version, '100.100.100')
         self.assertEqual(e.url, 'https://github.com/google/transitfeed')
         self.accumulator.AssertNoMoreExceptions()
@@ -280,33 +280,33 @@ class CheckVersionTestCase(test_util.TempDirTestCaseBase):
     def test_get_correct_returns(self):
         urllib2.urlopen = self.mock.mocked_connect_success
         util.check_version(self.problems)
-        self.accumulator.PopException('NewVersionAvailable')
+        self.accumulator.PopException('new_version_available')
 
     def test_page_not_found(self):
         urllib2.urlopen = self.mock.mocked_page_not_found
         util.check_version(self.problems)
-        e = self.accumulator.PopException('OtherProblem')
+        e = self.accumulator.PopException('other_problem')
         self.assertTrue(re.search(r'we failed to reach', e.description))
         self.assertTrue(re.search(r'Reason: Not Found \[404\]', e.description))
 
     def test_connection_time_out(self):
         urllib2.urlopen = self.mock.mocked_connection_time_out
         util.check_version(self.problems)
-        e = self.accumulator.PopException('OtherProblem')
+        e = self.accumulator.PopException('other_problem')
         self.assertTrue(re.search(r'we failed to reach', e.description))
         self.assertTrue(re.search(r'Reason: Connection timed', e.description))
 
     def test_get_addr_info_failed(self):
         urllib2.urlopen = self.mock.mocked_get_addr_info_failed
         util.check_version(self.problems)
-        e = self.accumulator.PopException('OtherProblem')
+        e = self.accumulator.PopException('other_problem')
         self.assertTrue(re.search(r'we failed to reach', e.description))
         self.assertTrue(re.search(r'Reason: Getaddrinfo failed', e.description))
 
     def test_empty_is_returned(self):
         urllib2.urlopen = self.mock.mocked_empty_is_returned
         util.check_version(self.problems)
-        e = self.accumulator.PopException('OtherProblem')
+        e = self.accumulator.PopException('other_problem')
         self.assertTrue(re.search(r'we had trouble parsing', e.description))
 
 

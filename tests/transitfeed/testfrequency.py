@@ -79,7 +79,7 @@ class FrequencyValidationTestCase(util.ValidationTestCase):
                                                  })
         headway_period1.AddToSchedule(self.schedule, self.problems)
         headway_period2.AddToSchedule(self.schedule, self.problems)
-        self.ValidateAndExpectOtherProblem(self.trip)
+        self.ValidateAndExpectother_problem(self.trip)
         self.trip.ClearFrequencies()
         self.accumulator.AssertNoMoreExceptions()
 
@@ -90,7 +90,7 @@ class FrequencyValidationTestCase(util.ValidationTestCase):
                                                  'headway_secs': 600,
                                                  })
         headway_period1.AddToSchedule(self.schedule, self.problems)
-        e = self.accumulator.PopException('InvalidValue')
+        e = self.accumulator.PopException('invalid_value')
         self.assertEqual('trip_id', e.column_name)
         self.trip.ClearFrequencies()
 
@@ -155,7 +155,7 @@ class FrequencyValidationTestCase(util.ValidationTestCase):
                         "end_time": "23:01:00", "headway_secs": "1800",
                         "exact_times": 15})
         frequency.ValidateBeforeAdd(self.problems)
-        self.accumulator.PopInvalidValue("exact_times")
+        self.accumulator.Popinvalid_value("exact_times")
         self.accumulator.AssertNoMoreExceptions()
         # Test that exact_times "yes" raises error
         frequency = transitfeed.Frequency(
@@ -163,5 +163,5 @@ class FrequencyValidationTestCase(util.ValidationTestCase):
                         "end_time": "23:01:00", "headway_secs": "1800",
                         "exact_times": "yes"})
         frequency.ValidateBeforeAdd(self.problems)
-        self.accumulator.PopInvalidValue("exact_times")
+        self.accumulator.Popinvalid_value("exact_times")
         self.accumulator.AssertNoMoreExceptions()

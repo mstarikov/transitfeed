@@ -338,13 +338,13 @@ Generated using transitfeed version %s on %s.
 </html>""" % (transitfeed.__version__,
               time.strftime('%B %d, %Y at %I:%M %p %Z'))
 
-        output_file.write(transitfeed.EncodeUnicode(html_header))
-        output_file.write(transitfeed.EncodeUnicode(html_stats))
-        output_file.write(transitfeed.EncodeUnicode(html_summary))
-        output_file.write(transitfeed.EncodeUnicode(html_notices))
-        output_file.write(transitfeed.EncodeUnicode(html_errors))
-        output_file.write(transitfeed.EncodeUnicode(html_warnings))
-        output_file.write(transitfeed.EncodeUnicode(html_footer))
+        output_file.write(transitfeed.encode_str(html_header))
+        output_file.write(transitfeed.encode_str(html_stats))
+        output_file.write(transitfeed.encode_str(html_summary))
+        output_file.write(transitfeed.encode_str(html_notices))
+        output_file.write(transitfeed.encode_str(html_errors))
+        output_file.write(transitfeed.encode_str(html_warnings))
+        output_file.write(transitfeed.encode_str(html_footer))
 
 
 def load_without_errors(path, memory_db):
@@ -360,7 +360,7 @@ def load_without_errors(path, memory_db):
         print((
                 "\n\nFeeds to merge must load without any errors.\n"
                 "While loading %s the following error was found:\n%s\n%s\n" %
-                (path, e.format_context(), transitfeed.EncodeUnicode(e.FormatProblem()))), file=sys.stderr)
+                (path, e.format_context(), transitfeed.encode_str(e.FormatProblem()))), file=sys.stderr)
         sys.exit(1)
     return schedule
 
@@ -403,8 +403,8 @@ class DataSetMerger(object):
         """
         if a != b:
             raise MergeError("values must be identical ('%s' vs '%s')" %
-                             (transitfeed.EncodeUnicode(a),
-                              transitfeed.EncodeUnicode(b)))
+                             (transitfeed.encode_str(a),
+                              transitfeed.encode_str(b)))
         return b
 
     def _merge_identical_case_insensitive(self, a, b):
@@ -425,8 +425,8 @@ class DataSetMerger(object):
         """
         if a.lower() != b.lower():
             raise MergeError("values must be the same (case insensitive) "
-                             "('%s' vs '%s')" % (transitfeed.EncodeUnicode(a),
-                                                 transitfeed.EncodeUnicode(b)))
+                             "('%s' vs '%s')" % (transitfeed.encode_str(a),
+                                                 transitfeed.encode_str(b)))
         return b
 
     def _merge_optional(self, a, b):
@@ -450,8 +450,8 @@ class DataSetMerger(object):
         if a and b:
             if a != b:
                 raise MergeError("values must be identical if both specified "
-                                 "('%s' vs '%s')" % (transitfeed.EncodeUnicode(a),
-                                                     transitfeed.EncodeUnicode(b)))
+                                 "('%s' vs '%s')" % (transitfeed.encode_str(a),
+                                                     transitfeed.encode_str(b)))
         return a or b
 
     def _merge_same_agency(self, a_agency_id, b_agency_id):

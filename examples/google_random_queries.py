@@ -174,11 +174,11 @@ If you find a problem be sure to save the URL. This file is generated randomly.
 </html>
 """ % locals()
 
-    f.write(transitfeed.EncodeUnicode(output_prefix))
+    f.write(transitfeed.encode_str(output_prefix))
     for source, destination in zip(locations[0:limit], locations[1:limit + 1]):
-        f.write(transitfeed.EncodeUnicode("<li>%s\n" %
+        f.write(transitfeed.encode_str("<li>%s\n" %
                                           lat_lngs_to_google_link(source, destination)))
-    f.write(transitfeed.EncodeUnicode(output_suffix))
+    f.write(transitfeed.encode_str(output_suffix))
 
 
 def parent_and_base_name(path):

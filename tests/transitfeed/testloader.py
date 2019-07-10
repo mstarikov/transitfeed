@@ -84,7 +84,7 @@ class EndOfLineCheckerTestCase(util.TestCase):
         self.assertEqual(e.file_name, "<StringIO>")
         self.assertEqual(e.row_num, 3)
         self.assertEqual(e.bad_line_end, r"\r\r\r\n")
-        e = self.accumulator.PopException("OtherProblem")
+        e = self.accumulator.PopException("other_problem")
         self.assertEqual(e.file_name, "<StringIO>")
         self.assertTrue(e.description.find("consistent line end") != -1)
         self.accumulator.AssertNoMoreExceptions()
@@ -94,7 +94,7 @@ class EndOfLineCheckerTestCase(util.TestCase):
             StringIO("line1\rline1b"),
             "<StringIO>", self.problems)
         self.run_end_of_line_checker(f)
-        e = self.accumulator.PopException("OtherProblem")
+        e = self.accumulator.PopException("other_problem")
         self.assertEqual(e.file_name, "<StringIO>")
         self.assertEqual(e.row_num, 1)
         self.assertEqual(e.FormatProblem(),
@@ -106,7 +106,7 @@ class EndOfLineCheckerTestCase(util.TestCase):
             StringIO("line1b\xc2\x85"),
             "<StringIO>", self.problems)
         self.run_end_of_line_checker(f)
-        e = self.accumulator.PopException("OtherProblem")
+        e = self.accumulator.PopException("other_problem")
         self.assertEqual(e.file_name, "<StringIO>")
         self.assertEqual(e.row_num, 1)
         self.assertEqual(e.FormatProblem(),
@@ -118,7 +118,7 @@ class EndOfLineCheckerTestCase(util.TestCase):
             StringIO("line1\nline2\r\nline3\nline4"),
             "<StringIO>", self.problems)
         self.run_end_of_line_checker(f)
-        e = self.accumulator.PopException("OtherProblem")
+        e = self.accumulator.PopException("other_problem")
         self.assertEqual(e.file_name, "<StringIO>")
         self.assertEqual(e.FormatProblem(),
                          "Found 1 CR LF \"\\r\\n\" line end (line 2) and "
@@ -131,7 +131,7 @@ class EndOfLineCheckerTestCase(util.TestCase):
             StringIO("1\n2\n3\n4\n5\n6\n7\r\n8\r\n9\r\n10\r\n11\r\n"),
             "<StringIO>", self.problems)
         self.run_end_of_line_checker(f)
-        e = self.accumulator.PopException("OtherProblem")
+        e = self.accumulator.PopException("other_problem")
         self.assertEqual(e.file_name, "<StringIO>")
         self.assertEqual(e.FormatProblem(),
                          "Found 5 CR LF \"\\r\\n\" line ends (lines 7, 8, 9, 10, "
@@ -146,7 +146,7 @@ class EndOfLineCheckerTestCase(util.TestCase):
             extra_validation=True)
         loader.Load()
 
-        e = self.accumulator.PopException("OtherProblem")
+        e = self.accumulator.PopException("other_problem")
         self.assertEqual(e.file_name, "calendar.txt")
         self.assertTrue(re.search(
             r"Found 1 CR LF.* \(line 2\) and 2 LF .*\(lines 1, 3\)",
@@ -157,7 +157,7 @@ class EndOfLineCheckerTestCase(util.TestCase):
         self.assertEqual(e.row_num, 5)
         self.assertTrue(e.FormatProblem().find(r"\r\r\n") != -1)
 
-        e = self.accumulator.PopException("OtherProblem")
+        e = self.accumulator.PopException("other_problem")
         self.assertEqual(e.file_name, "trips.txt")
         self.assertEqual(e.row_num, 1)
         self.assertTrue(re.search(
@@ -319,7 +319,7 @@ class LoadExtraCellValidationTestCase(util.LoadTestCase):
 
     def run_test(self):
         self.Load('extra_row_cells')
-        e = self.accumulator.PopException("OtherProblem")
+        e = self.accumulator.PopException("other_problem")
         self.assertEquals("routes.txt", e.file_name)
         self.assertEquals(4, e.row_num)
         self.accumulator.AssertNoMoreExceptions()
@@ -330,7 +330,7 @@ class LoadMissingCellValidationTestCase(util.LoadTestCase):
 
     def run_test(self):
         self.Load('missing_row_cells')
-        e = self.accumulator.PopException("OtherProblem")
+        e = self.accumulator.PopException("other_problem")
         self.assertEquals("routes.txt", e.file_name)
         self.assertEquals(4, e.row_num)
         self.accumulator.AssertNoMoreExceptions()
@@ -397,7 +397,7 @@ class EmptyFileTestCase(util.TestCase):
             self.assertEqual('agency.txt', e.file_name)
 
 
-class MissingColumnTestCase(util.TestCase):
+class missing_columnTestCase(util.TestCase):
     def run_test(self):
         loader = transitfeed.Loader(
             util.DataPath('missing_column'),
@@ -405,8 +405,8 @@ class MissingColumnTestCase(util.TestCase):
             extra_validation=True)
         try:
             loader.Load()
-            self.fail('MissingColumn exception expected')
-        except transitfeed.MissingColumn as e:
+            self.fail('missing_column exception expected')
+        except transitfeed.missing_column as e:
             self.assertEqual('agency.txt', e.file_name)
             self.assertEqual('agency_name', e.column_name)
 
@@ -443,12 +443,12 @@ class BadUtf8TestCase(util.LoadTestCase):
     def run_test(self):
         self.Load('bad_utf8')
         self.accumulator.PopException("unrecognized_column")
-        self.accumulator.PopInvalidValue("agency_name", "agency.txt")
-        self.accumulator.PopInvalidValue("route_long_name", "routes.txt")
-        self.accumulator.PopInvalidValue("route_short_name", "routes.txt")
-        self.accumulator.PopInvalidValue("stop_headsign", "stop_times.txt")
-        self.accumulator.PopInvalidValue("stop_name", "stops.txt")
-        self.accumulator.PopInvalidValue("trip_headsign", "trips.txt")
+        self.accumulator.Popinvalid_value("agency_name", "agency.txt")
+        self.accumulator.Popinvalid_value("route_long_name", "routes.txt")
+        self.accumulator.Popinvalid_value("route_short_name", "routes.txt")
+        self.accumulator.Popinvalid_value("stop_headsign", "stop_times.txt")
+        self.accumulator.Popinvalid_value("stop_name", "stops.txt")
+        self.accumulator.Popinvalid_value("trip_headsign", "trips.txt")
         self.accumulator.AssertNoMoreExceptions()
 
 
@@ -667,7 +667,7 @@ class CsvDictTestCase(util.TestCase):
                                                 ["test_id", "test_size"],
                                                 ["test_name"], []))
         self.assertEquals([], results)
-        e = self.accumulator.PopException("MissingColumn")
+        e = self.accumulator.PopException("missing_column")
         self.assertEquals("test_name", e.column_name)
         self.accumulator.AssertNoMoreExceptions()
 
@@ -702,7 +702,7 @@ class CsvDictTestCase(util.TestCase):
         self.assertEquals([({"test_id": "id1", "test_name": "my name"}, 2,
                             ["test_id", "test_name"], ["id1", "my name"])],
                           results)
-        e = self.accumulator.PopException("OtherProblem")
+        e = self.accumulator.PopException("other_problem")
         self.assertTrue(e.FormatProblem().find("too many cells") != -1)
         self.accumulator.AssertNoMoreExceptions()
 
@@ -714,7 +714,7 @@ class CsvDictTestCase(util.TestCase):
                                                 ["test_id", "test_name"], [], []))
         self.assertEquals([({"test_id": "id1 my name"}, 2,
                             ["test_id", "test_name"], ["id1 my name"])], results)
-        e = self.accumulator.PopException("OtherProblem")
+        e = self.accumulator.PopException("other_problem")
         self.assertTrue(e.FormatProblem().find("missing cells") != -1)
         self.accumulator.AssertNoMoreExceptions()
 
@@ -837,7 +837,7 @@ class BasicParsingTestCase(util.TestCase):
 
     def test__no_load_stop_times(self):
         problems = util.GetTestFailureProblemReporter(
-            self, ignore_types=("ExpirationDate", "UnusedStop", "OtherProblem"))
+            self, ignore_types=("ExpirationDate", "UnusedStop", "other_problem"))
         loader = transitfeed.Loader(
             util.DataPath('good_feed.zip'),
             problems=problems,
@@ -850,4 +850,4 @@ class BasicParsingTestCase(util.TestCase):
 
 class UndefinedStopAgencyTestCase(util.LoadTestCase):
     def run_test(self):
-        self.ExpectInvalidValue('undefined_stop', 'stop_id')
+        self.Expectinvalid_value('undefined_stop', 'stop_id')

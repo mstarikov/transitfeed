@@ -140,16 +140,16 @@ class Trip(GtfsObjectBase):
             # This is the first stop_time of the trip
             stoptime.stop_sequence = 1
             if new_secs == None:
-                problems.OtherProblem(
+                problems.other_problem(
                     'No time for first StopTime of trip_id "%s"' % (self.trip_id,))
         else:
             stoptime.stop_sequence = row[0] + 1
             prev_secs = max(row[1], row[2])
             if new_secs != None and new_secs < prev_secs:
-                problems.OtherProblem(
+                problems.other_problem(
                     'out of order stop time for stop_id=%s trip_id=%s %s < %s' %
-                    (util.EncodeUnicode(stoptime.stop_id),
-                     util.EncodeUnicode(self.trip_id),
+                    (util.encode_str(stoptime.stop_id),
+                     util.encode_str(self.trip_id),
                      util.FormatSecondsSinceMidnight(new_secs),
                      util.FormatSecondsSinceMidnight(prev_secs)))
         self._add_stop_time_object_unordered(stoptime, schedule)
@@ -318,7 +318,7 @@ class Trip(GtfsObjectBase):
         elif departure_secs != None:
             return departure_secs
         else:
-            problems.InvalidValue('departure_time', '',
+            problems.invalid_value('departure_time', '',
                                   'The first stop_time in trip %s is missing '
                                   'times.' % self.trip_id)
 
@@ -360,7 +360,7 @@ class Trip(GtfsObjectBase):
         elif arrival_secs != None:
             return arrival_secs
         else:
-            problems.InvalidValue('arrival_time', '',
+            problems.invalid_value('arrival_time', '',
                                   'The last stop_time in trip %s is missing '
                                   'times.' % self.trip_id)
 
@@ -426,51 +426,51 @@ class Trip(GtfsObjectBase):
           None
         """
         if not start_time or start_time == '':  # 0 is OK
-            problem_reporter.MissingValue('start_time')
+            problem_reporter.missing_value('start_time')
             return
         if isinstance(start_time, str):
             try:
                 start_time = util.TimeToSecondsSinceMidnight(start_time)
             except problems_module.Error:
-                problem_reporter.InvalidValue('start_time', start_time)
+                problem_reporter.invalid_value('start_time', start_time)
                 return
         elif start_time < 0:
-            problem_reporter.InvalidValue('start_time', start_time)
+            problem_reporter.invalid_value('start_time', start_time)
 
         if not end_time or end_time == '':
-            problem_reporter.MissingValue('end_time')
+            problem_reporter.missing_value('end_time')
             return
         if isinstance(end_time, str):
             try:
                 end_time = util.TimeToSecondsSinceMidnight(end_time)
             except problems_module.Error:
-                problem_reporter.InvalidValue('end_time', end_time)
+                problem_reporter.invalid_value('end_time', end_time)
                 return
         elif end_time < 0:
-            problem_reporter.InvalidValue('end_time', end_time)
+            problem_reporter.invalid_value('end_time', end_time)
             return
 
         if not headway_secs:
-            problem_reporter.MissingValue('headway_secs')
+            problem_reporter.missing_value('headway_secs')
             return
         try:
             headway_secs = int(headway_secs)
         except ValueError:
-            problem_reporter.InvalidValue('headway_secs', headway_secs)
+            problem_reporter.invalid_value('headway_secs', headway_secs)
             return
 
         if headway_secs <= 0:
-            problem_reporter.InvalidValue('headway_secs', headway_secs)
+            problem_reporter.invalid_value('headway_secs', headway_secs)
             return
 
         if end_time <= start_time:
-            problem_reporter.InvalidValue('end_time', end_time,
+            problem_reporter.invalid_value('end_time', end_time,
                                           'should be greater than start_time')
 
         if not exact_times:
             exact_times = 0
         if exact_times not in (0, 1):
-            problem_reporter.InvalidValue('exact_times', exact_times,
+            problem_reporter.invalid_value('exact_times', exact_times,
                                           'Should be 0 (no fixed schedule) or 1 (fixed and regular schedule)')
 
         self._headways.append((start_time, end_time, headway_secs, exact_times))
@@ -480,8 +480,8 @@ class Trip(GtfsObjectBase):
 
     def _headway_output_tuple(self, headway):
         try:
-            headway2 = unicode(headway[2])
-            headway3 = unicode(headway[3])
+            headway2 = str(headway[2])
+            headway3 = str(headway[3])
         except NameError:
             headway2 = str(headway2, 'utf-8')
             headway3 = str(headway3, 'utf-8')
@@ -512,8 +512,8 @@ class Trip(GtfsObjectBase):
             return GtfsObjectBase.__getattr__(self, name)
 
     def validate_route_id(self, problems):
-        if util.IsEmpty(self.route_id):
-            problems.MissingValue('route_id')
+        if util.is_empty(self.route_id):
+            problems.missing_value('route_id')
 
     def validate_service_period(self, problems):
         if 'service_period' in self.__dict__:
@@ -521,34 +521,34 @@ class Trip(GtfsObjectBase):
             # proceeding with validation. See also comment in Trip.__init__.
             self.service_id = self.__dict__['service_period'].service_id
             del self.service_period
-        if util.IsEmpty(self.service_id):
-            problems.MissingValue('service_id')
+        if util.is_empty(self.service_id):
+            problems.missing_value('service_id')
 
     def validate_trip_id(self, problems):
-        if util.IsEmpty(self.trip_id):
-            problems.MissingValue('trip_id')
+        if util.is_empty(self.trip_id):
+            problems.missing_value('trip_id')
 
     def validate_direction_id(self, problems):
-        if hasattr(self, 'direction_id') and (not util.IsEmpty(self.direction_id)) \
+        if hasattr(self, 'direction_id') and (not util.is_empty(self.direction_id)) \
                 and (self.direction_id != '0') and (self.direction_id != '1'):
-            problems.InvalidValue('direction_id', self.direction_id,
+            problems.invalid_value('direction_id', self.direction_id,
                                   'direction_id must be "0" or "1"')
 
     def validate_shape_ids_exist_in_shape_list(self, problems):
         if self._schedule:
             if self.shape_id and self.shape_id not in self._schedule._shapes:
-                problems.InvalidValue('shape_id', self.shape_id)
+                problems.invalid_value('shape_id', self.shape_id)
 
     def validate_route_id_exists_in_route_list(self, problems):
         if self._schedule:
             if self.route_id and self.route_id not in self._schedule.routes:
-                problems.InvalidValue('route_id', self.route_id)
+                problems.invalid_value('route_id', self.route_id)
 
     def validate_service_id_exists_in_service_list(self, problems):
         if self._schedule:
             if (self.service_id and
                     self.service_id not in self._schedule.service_periods):
-                problems.InvalidValue('service_id', self.service_id)
+                problems.invalid_value('service_id', self.service_id)
 
     def validate_bikes_allowed(self, problems):
         if self.bikes_allowed:
@@ -590,17 +590,17 @@ class Trip(GtfsObjectBase):
                        "WHERE trip_id=? GROUP BY stop_sequence HAVING a > 1",
                        (self.trip_id,))
         for row in cursor:
-            problems.InvalidValue('stop_sequence', row[1],
+            problems.invalid_value('stop_sequence', row[1],
                                   'Duplicate stop_sequence in trip_id %s' %
                                   self.trip_id)
 
     def validate_trip_start_and_end_times(self, problems, stoptimes):
         if stoptimes:
             if stoptimes[0].arrival_time is None and stoptimes[0].departure_time is None:
-                problems.OtherProblem(
+                problems.other_problem(
                     'No time for start of trip_id "%s""' % (self.trip_id))
             if stoptimes[-1].arrival_time is None and stoptimes[-1].departure_time is None:
-                problems.OtherProblem(
+                problems.other_problem(
                     'No time for end of trip_id "%s""' % (self.trip_id))
 
     def validate_stop_times_sequence_has_increasing_time_and_distance(self,
@@ -632,7 +632,7 @@ class Trip(GtfsObjectBase):
                             type = problems_module.TYPE_WARNING
                         else:
                             type = problems_module.TYPE_ERROR
-                        problems.InvalidValue('stoptimes.shape_dist_traveled', distance,
+                        problems.invalid_value('stoptimes.shape_dist_traveled', distance,
                                               'For the trip %s the stop %s has shape_dist_traveled=%s, '
                                               'which should be larger than the previous ones. In this '
                                               'case, the previous distance was %s.' %
@@ -647,7 +647,7 @@ class Trip(GtfsObjectBase):
                         prev_departure = timepoint.departure_secs
                         prev_stop = timepoint.stop
                     else:
-                        problems.OtherProblem('Timetravel detected! Arrival time '
+                        problems.other_problem('Timetravel detected! Arrival time '
                                               'is before previous departure '
                                               'at sequence number %s in trip %s' %
                                               (timepoint.stop_sequence, self.trip_id))
@@ -662,7 +662,7 @@ class Trip(GtfsObjectBase):
                 st = stoptimes[-1]
                 if (st.shape_dist_traveled and
                         st.shape_dist_traveled > max_shape_dist):
-                    problems.OtherProblem(
+                    problems.other_problem(
                         'In stop_times.txt, the stop with trip_id=%s and '
                         'stop_sequence=%d has shape_dist_traveled=%f, which is larger '
                         'than the max shape_dist_traveled=%f of the corresponding '
@@ -700,7 +700,7 @@ class Trip(GtfsObjectBase):
         for headway_index, headway in enumerate(self._headways[0:-1]):
             for other in self._headways[headway_index + 1:]:
                 if (other[0] < headway[1]) and (other[1] > headway[0]):
-                    problems.OtherProblem('Trip contains overlapping headway periods '
+                    problems.other_problem('Trip contains overlapping headway periods '
                                           '%s and %s' %
                                           (self._headway_output_tuple(headway),
                                            self._headway_output_tuple(other)))

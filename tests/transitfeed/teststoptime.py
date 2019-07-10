@@ -21,95 +21,95 @@ from tests import util
 
 class ZeroBasedStopSequenceTestCase(util.LoadTestCase):
     def run_test(self):
-        self.ExpectInvalidValue('negative_stop_sequence', 'stop_sequence')
+        self.Expectinvalid_value('negative_stop_sequence', 'stop_sequence')
 
 
 class StopTimeValidationTestCase(util.ValidationTestCase):
     def run_test(self):
         stop = transitfeed.Stop()
-        self.ExpectInvalidValueInClosure('arrival_time', '1a:00:00',
+        self.Expectinvalid_valueInClosure('arrival_time', '1a:00:00',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="1a:00:00"))
-        self.ExpectInvalidValueInClosure('departure_time', '1a:00:00',
+        self.Expectinvalid_valueInClosure('departure_time', '1a:00:00',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="10:00:00",
                                                                       departure_time='1a:00:00'))
-        self.ExpectInvalidValueInClosure('pickup_type', '7.8',
+        self.Expectinvalid_valueInClosure('pickup_type', '7.8',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="10:00:00",
                                                                       departure_time='10:05:00',
                                                                       pickup_type='7.8',
                                                                       drop_off_type='0'))
-        self.ExpectInvalidValueInClosure('drop_off_type', 'a',
+        self.Expectinvalid_valueInClosure('drop_off_type', 'a',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="10:00:00",
                                                                       departure_time='10:05:00',
                                                                       pickup_type='3',
                                                                       drop_off_type='a'))
-        self.ExpectInvalidValueInClosure('shape_dist_traveled', '$',
+        self.Expectinvalid_valueInClosure('shape_dist_traveled', '$',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="10:00:00",
                                                                       departure_time='10:05:00',
                                                                       pickup_type='3',
                                                                       drop_off_type='0',
                                                                       shape_dist_traveled='$'))
-        self.ExpectInvalidValueInClosure('shape_dist_traveled', '0,53',
+        self.Expectinvalid_valueInClosure('shape_dist_traveled', '0,53',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="10:00:00",
                                                                       departure_time='10:05:00',
                                                                       pickup_type='3',
                                                                       drop_off_type='0',
                                                                       shape_dist_traveled='0,53'))
-        self.ExpectOtherProblemInClosure(
+        self.Expectother_problemInClosure(
             lambda: transitfeed.StopTime(self.problems, stop,
                                          pickup_type='1', drop_off_type='1'))
-        self.ExpectInvalidValueInClosure('timepoint', 'x',
+        self.Expectinvalid_valueInClosure('timepoint', 'x',
                                          lambda: transitfeed.StopTime(self.problems, stop, timepoint='x'))
-        self.ExpectInvalidValueInClosure('timepoint', '2',
+        self.Expectinvalid_valueInClosure('timepoint', '2',
                                          lambda: transitfeed.StopTime(self.problems, stop, timepoint='2'))
-        self.ExpectInvalidValueInClosure('departure_time', '10:00:00',
+        self.Expectinvalid_valueInClosure('departure_time', '10:00:00',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="11:00:00",
                                                                       departure_time="10:00:00"))
-        self.ExpectMissingValueInClosure('arrival_time',
+        self.Expectmissing_valueInClosure('arrival_time',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       departure_time="10:00:00"))
-        self.ExpectMissingValueInClosure('arrival_time',
+        self.Expectmissing_valueInClosure('arrival_time',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       departure_time="10:00:00",
                                                                       arrival_time=""))
-        self.ExpectMissingValueInClosure('departure_time',
+        self.Expectmissing_valueInClosure('departure_time',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="10:00:00"))
-        self.ExpectMissingValueInClosure('departure_time',
+        self.Expectmissing_valueInClosure('departure_time',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="10:00:00",
                                                                       departure_time=""))
-        self.ExpectInvalidValueInClosure('departure_time', '10:70:00',
+        self.Expectinvalid_valueInClosure('departure_time', '10:70:00',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="10:00:00",
                                                                       departure_time="10:70:00"))
-        self.ExpectInvalidValueInClosure('departure_time', '10:00:62',
+        self.Expectinvalid_valueInClosure('departure_time', '10:00:62',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="10:00:00",
                                                                       departure_time="10:00:62"))
-        self.ExpectInvalidValueInClosure('arrival_time', '10:00:63',
+        self.Expectinvalid_valueInClosure('arrival_time', '10:00:63',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="10:00:63",
                                                                       departure_time="10:10:00"))
-        self.ExpectInvalidValueInClosure('arrival_time', '10:60:00',
+        self.Expectinvalid_valueInClosure('arrival_time', '10:60:00',
                                          lambda: transitfeed.StopTime(self.problems, stop,
                                                                       arrival_time="10:60:00",
                                                                       departure_time="11:02:00"))
-        self.ExpectInvalidValueInClosure('stop', "id",
+        self.Expectinvalid_valueInClosure('stop', "id",
                                          lambda: transitfeed.StopTime(self.problems, "id",
                                                                       arrival_time="10:00:00",
                                                                       departure_time="11:02:00"))
-        self.ExpectInvalidValueInClosure('stop', "3",
+        self.Expectinvalid_valueInClosure('stop', "3",
                                          lambda: transitfeed.StopTime(self.problems, "3",
                                                                       arrival_time="10:00:00",
                                                                       departure_time="11:02:00"))
-        self.ExpectInvalidValueInClosure('stop', None,
+        self.Expectinvalid_valueInClosure('stop', None,
                                          lambda: transitfeed.StopTime(self.problems, None,
                                                                       arrival_time="10:00:00",
                                                                       departure_time="11:02:00"))
@@ -255,9 +255,9 @@ class TooManyConsecutiveStopTimesWithSameTime(util.TestCase):
 
     def set_up(self):
 
-        # We ignore the lack of service dates ("OtherProblem")
+        # We ignore the lack of service dates ("other_problem")
         self.accumulator = util.RecordingProblemAccumulator(
-            self, ("OtherProblem"))
+            self, ("other_problem"))
         self.problems = transitfeed.ProblemReporter(self.accumulator)
 
         self.schedule = transitfeed.Schedule(problem_reporter=self.problems)

@@ -187,7 +187,7 @@ class StopExtensionIntegrationTestCase(ExtensionMemoryZipTestCase):
                                 "STAGECOACH,Stagecoach Hotel,36.915682,-116.751677,America/Los_Angeles,"
                                 ",,204\n")
         self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
-        self.accumulator.PopInvalidValue("vehicle_type")
+        self.accumulator.Popinvalid_value("vehicle_type")
         self.accumulator.AssertNoMoreExceptions()
 
 
@@ -220,13 +220,13 @@ class StopExtensionTestCase(ValidationTestCase):
         # Test with non-integer value
         self._stop.vehicle_type = 'abc'
         self._stop.Validate(self.problems)
-        self.accumulator.PopInvalidValue('vehicle_type')
+        self.accumulator.Popinvalid_value('vehicle_type')
         self.accumulator.AssertNoMoreExceptions()
 
         # Test with not known value
         self._stop.vehicle_type = 2547
         self._stop.Validate(self.problems)
-        self.accumulator.PopInvalidValue('vehicle_type')
+        self.accumulator.Popinvalid_value('vehicle_type')
         self.accumulator.AssertNoMoreExceptions()
 
     def test_entrance_exceptions(self):
@@ -237,7 +237,7 @@ class StopExtensionTestCase(ValidationTestCase):
         # An entrance must not have a stop_timezone
         self._entrance.stop_timezone = 'America/Los_Angeles'
         self._entrance.Validate(self.problems)
-        e = self.accumulator.PopInvalidValue('stop_timezone')
+        e = self.accumulator.Popinvalid_value('stop_timezone')
         self.assertMatchesRegex(r'stop_timezone', e.FormatProblem())
         self.accumulator.AssertNoMoreExceptions()
         self._entrance.stop_timezone = None
@@ -245,14 +245,14 @@ class StopExtensionTestCase(ValidationTestCase):
         # An entrance must not have a vehicle type
         self._entrance.vehicle_type = 200
         self._entrance.Validate(self.problems)
-        e = self.accumulator.PopInvalidValue('vehicle_type')
+        e = self.accumulator.Popinvalid_value('vehicle_type')
         self.accumulator.AssertNoMoreExceptions()
         self._entrance.vehicle_type = None
 
         # An entrance should have a parent station
         self._entrance.parent_station = None
         self._entrance.Validate(self.problems)
-        e = self.accumulator.PopInvalidValue('location_type')
+        e = self.accumulator.Popinvalid_value('location_type')
         self.assertMatchesRegex(r'parent_station', e.FormatProblem())
         self.accumulator.AssertNoMoreExceptions()
 
@@ -264,7 +264,7 @@ class StopExtensionTestCase(ValidationTestCase):
         # A _child_stop must not have a stop_timezone
         self._child_stop.stop_timezone = 'America/Los_Angeles'
         self._child_stop.Validate(self.problems)
-        e = self.accumulator.PopInvalidValue('stop_timezone')
+        e = self.accumulator.Popinvalid_value('stop_timezone')
         self.assertMatchesRegex(r'stop_timezone', e.FormatProblem())
         self.assertTrue(e.IsWarning())
         self.accumulator.AssertNoMoreExceptions()
@@ -273,22 +273,22 @@ class StopExtensionTestCase(ValidationTestCase):
         # Adding vehicle_type, Google transit doesn't read child stop vehicle types
         self._child_stop.vehicle_type = 200
         self._child_stop.Validate(self.problems)
-        e = self.accumulator.PopInvalidValue('vehicle_type')
+        e = self.accumulator.Popinvalid_value('vehicle_type')
         self.assertTrue(e.IsWarning())
         self.accumulator.AssertNoMoreExceptions()
         self._child_stop.vehicle_type = None
 
     def test_allow_empty_stop_name_if_entrance(self):
-        # Empty stop_name with default location_type=0 should report MissingValue
+        # Empty stop_name with default location_type=0 should report missing_value
         self._stop.stop_name = ''
         self._stop.Validate(self.problems)
-        self.accumulator.PopMissingValue('stop_name')
+        self.accumulator.Popmissing_value('stop_name')
         self.accumulator.AssertNoMoreExceptions()
 
-        # Empty stop_name in a child stop should report MissingValue
+        # Empty stop_name in a child stop should report missing_value
         self._child_stop.stop_name = ''
         self._child_stop.Validate(self.problems)
-        self.accumulator.PopMissingValue('stop_name')
+        self.accumulator.Popmissing_value('stop_name')
         self.accumulator.AssertNoMoreExceptions()
 
         # Empty stop_name with location_type=2 should report no errors
@@ -315,7 +315,7 @@ class RouteExtensionIntegrationTestCase(ExtensionMemoryZipTestCase):
             "route_id,route_short_name,route_long_name,route_type,co2_per_km\n"
             "AB,,Airport Bullfrog,201,15.5mg\n")
         self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
-        self.accumulator.PopInvalidValue("co2_per_km")
+        self.accumulator.Popinvalid_value("co2_per_km")
         self.accumulator.AssertNoMoreExceptions()
 
     def test_invalid_route_type(self):
@@ -324,7 +324,7 @@ class RouteExtensionIntegrationTestCase(ExtensionMemoryZipTestCase):
             "route_id,route_short_name,route_long_name,route_type,co2_per_km\n"
             "AB,,Airport Bullfrog,2557,15.5\n")
         self.make_loader_and_load(self.problems, gtfs_factory=self.gtfs_factory)
-        self.accumulator.PopInvalidValue("route_type")
+        self.accumulator.Popinvalid_value("route_type")
         self.accumulator.AssertNoMoreExceptions()
 
 
@@ -338,7 +338,7 @@ class AgencyLangTestCase(ExtensionMemoryZipTestCase):
             "DTA,Demo Agency,http://google.com,America/Los_Angeles,lang123456789\n")
         self.make_loader_and_load(self.problems,
                                gtfs_factory=self.gtfs_factory)
-        e = self.accumulator.PopInvalidValue("agency_lang")
+        e = self.accumulator.Popinvalid_value("agency_lang")
         e_msg = e.FormatProblem()
         self.assertTrue(e_msg.find('not well-formed') != -1,
                         '%s should not be well-formed, is: %s' % (e.value, e_msg))
@@ -352,7 +352,7 @@ class AgencyLangTestCase(ExtensionMemoryZipTestCase):
 
         self.make_loader_and_load(self.problems,
                                gtfs_factory=self.gtfs_factory)
-        e = self.accumulator.PopInvalidValue("agency_lang")
+        e = self.accumulator.Popinvalid_value("agency_lang")
         e_msg = e.FormatProblem()
         self.assertTrue(e_msg.find('not valid') != -1,
                         '%s should not be valid, is: %s' % (e.value, e_msg))

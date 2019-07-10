@@ -102,42 +102,42 @@ class FareAttribute(GtfsObjectBase):
         return not self.__eq__(other)
 
     def validate_fare_id(self, problems):
-        if util.IsEmpty(self.fare_id):
-            problems.MissingValue("fare_id")
+        if util.is_empty(self.fare_id):
+            problems.missing_value("fare_id")
 
     def validate_price(self, problems):
         if self.price == None:
-            problems.MissingValue("price")
+            problems.missing_value("price")
         elif not isinstance(self.price, float) and not isinstance(self.price, int):
-            problems.InvalidValue("price", self.price)
+            problems.invalid_value("price", self.price)
         elif self.price < 0:
-            problems.InvalidValue("price", self.price)
+            problems.invalid_value("price", self.price)
 
     def validate_currency_type(self, problems):
-        if util.IsEmpty(self.currency_type):
-            problems.MissingValue("currency_type")
+        if util.is_empty(self.currency_type):
+            problems.missing_value("currency_type")
         elif self.currency_type not in util.ISO4217.codes:
-            problems.InvalidValue("currency_type", self.currency_type)
+            problems.invalid_value("currency_type", self.currency_type)
 
     def validate_payment_method(self, problems):
         if self.payment_method == "" or self.payment_method == None:
-            problems.MissingValue("payment_method")
+            problems.missing_value("payment_method")
         elif (not isinstance(self.payment_method, int) or
               self.payment_method not in range(0, 2)):
-            problems.InvalidValue("payment_method", self.payment_method)
+            problems.invalid_value("payment_method", self.payment_method)
 
     def validate_transfers(self, problems):
         if not ((self.transfers == None) or
                 (isinstance(self.transfers, int) and
                  self.transfers in range(0, 3))):
-            problems.InvalidValue("transfers", self.transfers)
+            problems.invalid_value("transfers", self.transfers)
 
     def validate_transfer_duration(self, problems):
         if ((self.transfer_duration != None) and
                 not isinstance(self.transfer_duration, int)):
-            problems.InvalidValue("transfer_duration", self.transfer_duration)
+            problems.invalid_value("transfer_duration", self.transfer_duration)
         if self.transfer_duration and (self.transfer_duration < 0):
-            problems.InvalidValue("transfer_duration", self.transfer_duration)
+            problems.invalid_value("transfer_duration", self.transfer_duration)
 
     def validate(self, problems=default_problem_reporter):
         self.validate_fare_id(problems)
