@@ -489,7 +489,7 @@ class StopAttributes(util.ValidationTestCase):
         stop = transitfeed.Stop(field_dict={})
         # AddStopObject silently fails for Stop objects without stop_id
         schedule.AddStopObject(stop)
-        self.assertFalse(schedule.GetStopList())
+        self.assertFalse(schedule.get_stop_list())
         self.assertFalse(stop._schedule)
 
         # Okay to add a stop with only stop_id

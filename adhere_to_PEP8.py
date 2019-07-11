@@ -9,22 +9,27 @@ class AdhereToPEP8:
         self.py_files_list = []
         self.file_data = ''
         self.alternative_import_strings = {
-            'import cStringIO as StringIO\n':
-                'try:\n\timport io as StringIO\nexcept ImportError:\n\timport cStringIO as StringIO',
-            'import dircache\n':
-                'try:\n\timport os as dircache\nexcept ImportError:\n\timport dircache',
-            'import urlparse\n':
-                'try:\n\tfrom urllib import parse as urlparse  # Python 3\n'
-                'except ImportError:\n\timport urlparse  # Python 2.7',
-            'import urllib2\n':
-                'try:\n\tfrom urllib import request as urllib2\n'
-                'except ImportError:\n\timport urllib2',
-            'import cStringIO\n':
-                'try:\n\tfrom io import StringIO as cStringIO\n'
-                'except ImportError:\n\timport cStringIO as StringIO',
+            'import cStringIO as StringIO':
+                'try:\n    import io as StringIO\nexcept ImportError:\n    import cStringIO as StringIO',
+            'import StringIO':
+                'try:\n    import io as StringIO\nexcept ImportError:\n    import StringIO',
+            'import dircache':
+                'try:\n    import os as dircache\nexcept ImportError:\n    import dircache',
+            'import urlparse':
+                'try:\n    from urllib import parse as urlparse  # Python 3\n'
+                'except ImportError:\n    import urlparse  # Python 2.7',
+            'import urllib2':
+                'try:\n    from urllib import request as urllib2\n'
+                'except ImportError:\n    import urllib2',
+            'import cStringIO':
+                'try:\n    from io import StringIO as cStringIO\n'
+                'except ImportError:\n    import cStringIO as StringIO',
             'from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer\n':
-                'try:\n\tfrom http.server import BaseHTTPRequestHandler, HTTPServer\n'
-                'except ImportError:\n\tfrom BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer',
+                'try:\n    from http.server import BaseHTTPRequestHandler, HTTPServer\n'
+                'except ImportError:\n    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer',
+            'from urllib2 import HTTPError, URLError':
+                'try:\n    from urllib.error import HTTPError, URLError\n'
+                'except ImportError:\n    from urllib2 import HTTPError, URLError',
             'basestring': 'str',
             'raw_input(': 'input(',
             'str(': 'str('
@@ -97,10 +102,11 @@ class AdhereToPEP8:
 
     def alternative_imports(self, line):
         if line in self.alternative_import_strings.keys():
+            print(f' we got match on {line}')
             self.replace_in_file(line, self.alternative_import_strings[line])
 
     def replace_in_file(self, wrong, correct):
-        self.file_data.replace(wrong, correct)
+        self.file_data = self.file_data.replace(wrong, correct)
 
     @staticmethod
     def replace_in_project(wrong, correct):
@@ -129,4 +135,5 @@ if __name__ == '__main__':
     fix_names = AdhereToPEP8()
     fix_names.find_py_files()
     for filename in fix_names.py_files_list:
+        print(filename)
         fix_names.bring_code_to_future(filename)

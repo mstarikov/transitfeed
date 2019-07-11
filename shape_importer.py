@@ -76,7 +76,7 @@ def add_shapefile(shapefile, graph, key_cols):
         poly = shapelib.Poly(name=shape_id)
         for j in range(0, geometry.GetPointCount()):
             (lat, lng) = (round(geometry.GetY(j), 15), round(geometry.GetX(j), 15))
-            poly.AddPoint(shapelib.Point.FromLatLng(lat, lng))
+            poly.add_point(shapelib.Point.FromLatLng(lat, lng))
         graph.AddPoly(poly)
 
     return graph
@@ -122,7 +122,7 @@ def add_extra_shapes(extra_shapes_txt, graph):
         shutil.copy(extra_shapes_txt, os.path.join(tmpdir, 'shapes.txt'))
         loader = transitfeed.ShapeLoader(tmpdir)
         schedule = loader.Load()
-        for shape in schedule.GetShapeList():
+        for shape in schedule.get_shape_list():
             print("Adding extra shape: %s" % shape.shape_id)
             graph.AddPoly(shape_to_poly(shape))
     finally:
@@ -136,7 +136,7 @@ def shape_to_poly(shape):
     poly = shapelib.Poly(name=shape.shape_id)
     for lat, lng, distance in shape.points:
         point = shapelib.Point.FromLatLng(round(lat, 15), round(lng, 15))
-        poly.AddPoint(point)
+        poly.add_point(point)
     return poly
 
 
@@ -258,12 +258,12 @@ def main(key_cols):
                         shape = transitfeed.Shape(shape_match.GetName())
                         for point in shape_match.GetPoints():
                             (lat, lng) = point.ToLatLng()
-                            shape.AddPoint(lat, lng)
+                            shape.add_point(lat, lng)
                         schedule.add_shape_object(shape)
                     trip.shape_id = shape.shape_id
 
     print("Matched %d shapes out of %d patterns" % (shape_count, pattern_count))
-    schedule.WriteGoogleTransitFeed(options.dest_gtfs)
+    schedule.write_google_transit_feed(options.dest_gtfs)
 
 
 if __name__ == '__main__':

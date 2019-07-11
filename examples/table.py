@@ -124,7 +124,7 @@ def process_options(schedule, table):
 
 def add_stops(schedule, table):
     for name, lat_str, lng_str in table[1:]:
-        stop = schedule.AddStop(lat=float(lat_str), lng=float(lng_str), name=name)
+        stop = schedule.add_stop(lat=float(lat_str), lng=float(lng_str), name=name)
         stops[name.lower()] = stop
 
 
@@ -173,7 +173,7 @@ def main():
 
     process_table(schedule, table)
 
-    schedule.WriteGoogleTransitFeed(options.output)
+    schedule.write_google_transit_feed(options.output)
 
 
 if __name__ == '__main__':

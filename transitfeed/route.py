@@ -87,7 +87,7 @@ class Route(GtfsObjectBase):
             assert self._schedule is not None
             schedule = self._schedule
         if trip_id is None:
-            trip_id = util.FindUniqueId(schedule.trips)
+            trip_id = util.find_unique_id(schedule.trips)
         if service_period is None:
             service_period = schedule.GetDefaultServicePeriod()
         trip_class = self.get_gtfs_factory().Trip

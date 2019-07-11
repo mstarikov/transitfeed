@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import transitfeed
+from .gtfsobjectbase import GtfsObjectBase
+from .util import validate_url, validate_date, validate_language_code, validate_required_fields_are_not_empty
 
 
-class FeedInfo(transitfeed.GtfsObjectBase):
+class FeedInfo(GtfsObjectBase):
     """Model and validation for feed_info.txt."""
 
     _REQUIRED_FIELD_NAMES = ["feed_publisher_name", "feed_publisher_url",
@@ -35,20 +36,20 @@ class FeedInfo(transitfeed.GtfsObjectBase):
             self.__dict__.update(field_dict)
 
     def validate_feed_info_lang(self, problems):
-        return not transitfeed.ValidateLanguageCode(self.feed_lang, 'feed_lang',
+        return not validate_language_code(self.feed_lang, 'feed_lang',
                                                     problems)
 
     def validate_feed_info_publisher_url(self, problems):
-        return not transitfeed.ValidateURL(self.feed_publisher_url,
+        return not validate_url(self.feed_publisher_url,
                                            'feed_publisher_url', problems)
 
     def validate_dates(self, problems):
         # Both validity dates are currently set to optional, thus they don't have
         # to be provided and it's currently OK to provide one but not the other.
-        start_date_valid = transitfeed.ValidateDate(self.feed_start_date,
+        start_date_valid = validate_date(self.feed_start_date,
                                                     'feed_start_date', problems)
 
-        end_date_valid = transitfeed.ValidateDate(self.feed_end_date,
+        end_date_valid = validate_date(self.feed_end_date,
                                                   'feed_end_date', problems)
 
         if (start_date_valid and end_date_valid and
@@ -59,7 +60,7 @@ class FeedInfo(transitfeed.GtfsObjectBase):
                                   (self.feed_end_date, self.feed_start_date))
 
     def validate_before_add(self, problems):
-        transitfeed.ValidateRequiredFieldsAreNotEmpty(self,
+        validate_required_fields_are_not_empty(self,
                                                       self._REQUIRED_FIELD_NAMES,
                                                       problems)
         self.validate_feed_info_lang(problems)
@@ -73,4 +74,4 @@ class FeedInfo(transitfeed.GtfsObjectBase):
         pass
 
     def add_to_schedule(self, schedule, problems):
-        schedule.AddFeedInfoObject(self, problems)
+        schedule.add_feed_info_object(self, problems)

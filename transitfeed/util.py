@@ -30,7 +30,6 @@ try:
     from urllib import request as urllib2
 except ImportError:
     import urllib2
-
 from distutils.version import LooseVersion
 from . import errors
 from .version import __version__
@@ -115,9 +114,9 @@ or an email to the public group transitfeed@googlegroups.com. Sorry!
         print(apology)
 
         try:
-            raw_input('Press enter to continue...')
-        except EOFError:
             input('Press enter to continue...')
+        except EOFError:
+            raw_input('Press enter to continue...')
             # Ignore stdin being closed. This happens during some tests.
             pass
         sys.exit(127)
@@ -243,7 +242,7 @@ def _max_version(versions):
     print(versions)
     try:
         ver_list = filter(None, versions)
-        ver_list.sort(lambda x, y: -cmp([int(item) for item in x.split('.')],
+        ver_list.sort(lambda x, y: cmp([int(item) for item in x.split('.')],
                                         [int(item) for item in y.split('.')]))
     except AttributeError:
         versions.sort(key=lambda x: LooseVersion(x), reverse=True)
@@ -274,7 +273,7 @@ def is_valid_u_r_l(url):
     return url.startswith(u'http://') or url.startswith(u'https://')
 
 
-def validate_u_r_l(url, column_name=None, problems=None):
+def validate_url(url, column_name=None, problems=None):
     """
     Validates a non-required URL value using is_valid_u_r_l():
       - if invalid adds invalid_value error (if problems accumulator is provided)

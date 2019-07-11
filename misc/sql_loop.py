@@ -46,7 +46,7 @@ TURAL JOIN stops WHERE trip_headsign LIKE '%intern%' ORDER BY trip_id,time"""
     def do_help(self, topic):
         print(self.doc)
 
-    def do__e_o_f(self, line):
+    def do_eof(self, line):
         print()
         return True
 

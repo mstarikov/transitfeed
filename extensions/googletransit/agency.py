@@ -29,5 +29,5 @@ class Agency(transitfeed.Agency):
   def validate_agency_lang(self, problems):
     if not self.agency_lang:
       return False
-    return not extension_util.ValidateLanguageCode(
+    return not extension_util.validate_language_code(
         self.agency_lang, 'agency_lang', problems)

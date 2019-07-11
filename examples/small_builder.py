@@ -20,8 +20,8 @@ service_period = schedule.GetDefaultServicePeriod()
 service_period.SetWeekdayService(True)
 service_period.set_date_has_service('20070704')
 
-stop1 = schedule.AddStop(lng=-122, lat=37.2, name="Suburbia")
-stop2 = schedule.AddStop(lng=-122.001, lat=37.201, name="Civic Center")
+stop1 = schedule.add_stop(lng=-122, lat=37.2, name="Suburbia")
+stop2 = schedule.add_stop(lng=-122.001, lat=37.201, name="Civic Center")
 
 route = schedule.AddRoute(short_name="22", long_name="Civic Center Express",
                           route_type="Bus")
@@ -35,4 +35,4 @@ trip.AddStopTime(stop1, stop_time='17:30:00')
 trip.AddStopTime(stop2, stop_time='17:45:00')
 
 schedule.Validate()
-schedule.WriteGoogleTransitFeed(options.output)
+schedule.write_google_transit_feed(options.output)

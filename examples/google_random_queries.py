@@ -82,7 +82,7 @@ def add_noise_to_lat_lng(lat, lng):
 def get_random_locations_near_stops(schedule):
     """Return a list of (lat, lng) tuples."""
     locations = []
-    for s in schedule.GetStopList():
+    for s in schedule.get_stop_list():
         locations.append(add_noise_to_lat_lng(s.stop_lat, s.stop_lon))
     return locations
 
@@ -197,7 +197,7 @@ def main():
         
         Create an HTML page of random URLs for the Google Maps transit trip
         planner. The queries go between places near stops listed in a <input GTFS.zip>.
-        By default 50 random URLs are saved to google_random_queries.html.
+        By default 50 random URLs are saved to GoogleRandomQueries.html.
         
         For more information see
         https://github.com/google/transitfeed/wiki/GoogleRandomQueries
@@ -210,7 +210,7 @@ def main():
                       help="Maximum number of URLs to generate")
     parser.add_option("-o", "--output", dest="output", metavar="HTML_OUTPUT_PATH",
                       help="write HTML output to HTML_OUTPUT_PATH")
-    parser.set_defaults(output="google_random_queries.html", limit=50)
+    parser.set_defaults(output="GoogleRandomQueries.html", limit=50)
     (options, args) = parser.parse_args()
     if len(args) != 1:
         print(parser.format_help(), file=sys.stderr)

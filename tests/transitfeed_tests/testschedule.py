@@ -91,12 +91,12 @@ class OverlappingBlockTripsTestCase(util.TestCase):
         sp3.SetEndDate("20080605")
         schedule.add_service_period_object(sp3)
 
-        self.stop1 = schedule.AddStop(lng=-116.75167,
+        self.stop1 = schedule.add_stop(lng=-116.75167,
                                       lat=36.915682,
                                       name="Stagecoach Hotel & Casino",
                                       stop_id="S1")
 
-        self.stop2 = schedule.AddStop(lng=-116.76218,
+        self.stop2 = schedule.add_stop(lng=-116.76218,
                                       lat=36.905697,
                                       name="E Main St / S Irving St",
                                       stop_id="S2")
@@ -466,9 +466,9 @@ class StopBelongsToBothSubwayAndBusTestCase(util.ValidationTestCase):
         trip1 = route1.AddTrip(schedule, "trip1", service, "t1")
         trip2 = route2.AddTrip(schedule, "trip2", service, "t2")
 
-        stop1 = schedule.AddStop(36.425288, -117.133162, "stop1")
-        stop2 = schedule.AddStop(36.424288, -117.133142, "stop2")
-        stop3 = schedule.AddStop(36.423288, -117.134142, "stop3")
+        stop1 = schedule.add_stop(36.425288, -117.133162, "stop1")
+        stop2 = schedule.add_stop(36.424288, -117.133142, "stop2")
+        stop3 = schedule.add_stop(36.423288, -117.134142, "stop3")
 
         trip1.AddStopTime(stop1, arrival_time="5:11:00", departure_time="5:12:00")
         trip1.AddStopTime(stop2, arrival_time="5:21:00", departure_time="5:22:00")

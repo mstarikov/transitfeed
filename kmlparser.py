@@ -48,7 +48,7 @@ class Placemark(object):
         return len(self.coordinates) > 1
 
 
-class Kmlparser(object):
+class KMLParser(object):
     def __init__(self, stopNameRe='(.*)'):
         """
         Args:
@@ -83,7 +83,7 @@ class Kmlparser(object):
             if p.is_point():
                 (lon, lat) = p.coordinates[0]
                 m = self.stopNameRe.search(p.name)
-                feed.AddStop(lat, lon, m.group(1))
+                feed.add_stop(lat, lon, m.group(1))
             elif p.is_line():
                 self.convert_placemark_to_shape(p, feed)
 
@@ -96,7 +96,8 @@ class Kmlparser(object):
                 ret.coordinates = self.extract_coordinates(child)
         return ret
 
-    def extract_text(self, node):
+    @staticmethod
+    def extract_text(node):
         for child in node.childNodes:
             if child.nodeType == child.TEXT_NODE:
                 return child.wholeText  # is a unicode string
@@ -114,10 +115,11 @@ class Kmlparser(object):
             ret.append((float(coords[0]), float(coords[1])))
         return ret
 
-    def convert_placemark_to_shape(self, p, feed):
+    @staticmethod
+    def convert_placemark_to_shape(p, feed):
         shape = transitfeed.Shape(p.name)
         for (lon, lat) in p.coordinates:
-            shape.AddPoint(lat, lon)
+            shape.add_point(lat, lon)
 
         try:
             existing_shape = feed.GetShape(p.name)
@@ -129,7 +131,7 @@ class Kmlparser(object):
 
             # If the shape has different points, we need to modify our shape id so as
             # to avoid duplication.
-            shape.shape_id += '_%d' % len(feed.GetShapeList())
+            shape.shape_id += '_%d' % len(feed.get_shape_list())
 
         except KeyError:
             # No existing shape with that id, so no worries.
@@ -159,7 +161,7 @@ def main():
     feed = transitfeed.Schedule()
     feed.save_all_stops = True
     parser.parse(args[0], feed)
-    feed.WriteGoogleTransitFeed(args[1])
+    feed.write_google_transit_feed(args[1])
 
     print("Done.")
 

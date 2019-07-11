@@ -24,15 +24,12 @@ try:
     from io import StringIO
 except ImportError:
     import cStringIO as StringIO
-
 try:
     import sqlite3 as sqlite
-
     native_sqlite = True
 except ImportError:
     try:
         from pysqlite2 import dbapi2 as sqlite
-
         native_sqlite = True
     except ImportError:
         from com.ziclix.python.sql import zxJDBC as sqlite
@@ -207,7 +204,7 @@ class Schedule(object):
         """Create a new Agency object and make it the default agency for this Schedule"""
         agency = self._gtfs_factory.Agency(**kwargs)
         if not agency.agency_id:
-            agency.agency_id = util.FindUniqueId(self._agencies)
+            agency.agency_id = util.find_unique_id(self._agencies)
         self._default_agency = agency
         self.set_default_agency(agency, validate=False)  # Blank agency won't validate
         return agency
@@ -245,7 +242,7 @@ class Schedule(object):
         return it. The default service period is used when you create a trip without
         providing an explict service period. """
         service_period = self._gtfs_factory.ServicePeriod()
-        service_period.service_id = util.FindUniqueId(self.service_periods)
+        service_period.service_id = util.find_unique_id(self.service_periods)
         # blank service won't validate in add_service_period_object
         self.set_default_service_period(service_period, validate=False)
         return service_period
@@ -358,7 +355,7 @@ class Schedule(object):
           A new Stop object
         """
         if stop_id is None:
-            stop_id = util.FindUniqueId(self.stops)
+            stop_id = util.find_unique_id(self.stops)
         stop = self._gtfs_factory.Stop(stop_id=stop_id, lat=lat, lng=lng, name=name)
         self.add_stop_object(stop)
         return stop
@@ -397,7 +394,7 @@ class Schedule(object):
           A new Route object
         """
         if route_id is None:
-            route_id = util.FindUniqueId(self.routes)
+            route_id = util.find_unique_id(self.routes)
         route = self._gtfs_factory.Route(short_name=short_name, long_name=long_name,
                                          route_type=route_type, route_id=route_id)
         route.agency_id = self.get_default_agency().agency_id

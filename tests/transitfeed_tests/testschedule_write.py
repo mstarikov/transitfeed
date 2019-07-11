@@ -68,7 +68,7 @@ class MinimalWriteTestCase(util.TempFileTestCaseBase):
         trip.AddStopTime(stop2, arrival_time="12:05:00", departure_time="12:05:00")
 
         schedule.Validate()
-        schedule.WriteGoogleTransitFeed(self.tempfilepath)
+        schedule.write_google_transit_feed(self.tempfilepath)
 
 
 class ScheduleBuilderTestCase(util.TempFileTestCaseBase):
@@ -82,9 +82,9 @@ class ScheduleBuilderTestCase(util.TempFileTestCaseBase):
         service_period = schedule.GetDefaultServicePeriod()
         service_period.set_date_has_service('20070101')
         # "u020b i with inverted accent breve" encoded in utf-8
-        stop1 = schedule.AddStop(lng=140, lat=48.2, name="\xc8\x8b hub")
+        stop1 = schedule.add_stop(lng=140, lat=48.2, name="\xc8\x8b hub")
         # "u020b i with inverted accent breve" as unicode string
-        stop2 = schedule.AddStop(lng=140.001, lat=48.201,
+        stop2 = schedule.add_stop(lng=140.001, lat=48.201,
                                  name=u"remote \u020b station")
         route = schedule.AddRoute(u"\u03b2", "Beta", "Bus")
         trip = route.AddTrip(schedule, u"to remote \u020b station")
@@ -96,7 +96,7 @@ class ScheduleBuilderTestCase(util.TempFileTestCaseBase):
         trip.AddStopTime(stop2, stop_time='10:10:00')
 
         schedule.Validate(problems)
-        schedule.WriteGoogleTransitFeed(self.tempfilepath)
+        schedule.write_google_transit_feed(self.tempfilepath)
         read_schedule = \
             transitfeed.Loader(self.tempfilepath, problems=problems,
                                extra_validation=True).Load()
@@ -122,11 +122,11 @@ class ScheduleBuilderTestCase(util.TempFileTestCaseBase):
         service_period.SetStartDate("20070320")
         service_period.SetEndDate("20071231")
 
-        stop1 = schedule.AddStop(lng=-140.12, lat=48.921,
+        stop1 = schedule.add_stop(lng=-140.12, lat=48.921,
                                  name="one forty at forty eight")
-        stop2 = schedule.AddStop(lng=-140.22, lat=48.421, name="west and south")
-        stop3 = schedule.AddStop(lng=-140.32, lat=48.121, name="more away")
-        stop4 = schedule.AddStop(lng=-140.42, lat=48.021, name="more more away")
+        stop2 = schedule.add_stop(lng=-140.22, lat=48.421, name="west and south")
+        stop3 = schedule.add_stop(lng=-140.32, lat=48.121, name="more away")
+        stop4 = schedule.add_stop(lng=-140.42, lat=48.021, name="more more away")
 
         route = schedule.AddRoute(short_name="R", long_name="My Route",
                                   route_type="Bus")
@@ -151,24 +151,24 @@ class ScheduleBuilderTestCase(util.TempFileTestCaseBase):
                          pickup_type=1, drop_off_type=3)
 
         schedule.Validate()
-        schedule.WriteGoogleTransitFeed(self.tempfilepath)
+        schedule.write_google_transit_feed(self.tempfilepath)
         read_schedule = \
             transitfeed.Loader(self.tempfilepath, problems=problems,
                                extra_validation=True).Load()
         self.assertEqual(4, len(read_schedule.GetTrip(trip_id).GetTimeStops()))
         self.assertEqual(1, len(read_schedule.GetRouteList()))
-        self.assertEqual(4, len(read_schedule.GetStopList()))
+        self.assertEqual(4, len(read_schedule.get_stop_list()))
 
     def test_stop_id_conflict(self):
         problems = util.GetTestFailureProblemReporter(self)
         schedule = transitfeed.Schedule(problem_reporter=problems)
-        schedule.AddStop(lat=3, lng=4.1, name="stop1", stop_id="1")
-        schedule.AddStop(lat=3, lng=4.0, name="stop0", stop_id="0")
-        schedule.AddStop(lat=3, lng=4.2, name="stop2")
-        schedule.AddStop(lat=3, lng=4.2, name="stop4", stop_id="4")
+        schedule.add_stop(lat=3, lng=4.1, name="stop1", stop_id="1")
+        schedule.add_stop(lat=3, lng=4.0, name="stop0", stop_id="0")
+        schedule.add_stop(lat=3, lng=4.2, name="stop2")
+        schedule.add_stop(lat=3, lng=4.2, name="stop4", stop_id="4")
         # AddStop will try to use stop_id=4 first but it is taken
-        schedule.AddStop(lat=3, lng=4.2, name="stop5")
-        stop_list = sorted(schedule.GetStopList(), key=lambda s: s.stop_name)
+        schedule.add_stop(lat=3, lng=4.2, name="stop5")
+        stop_list = sorted(schedule.get_stop_list(), key=lambda s: s.stop_name)
         self.assertEqual("stop0 stop1 stop2 stop4 stop5",
                          " ".join([s.stop_name for s in stop_list]))
         self.assertMatchesRegex(r"0 1 2 4 \d{7,9}",
@@ -276,7 +276,7 @@ class WriteSampleFeedTestCase(util.TempFileTestCaseBase):
 
         shape = transitfeed.Shape("BFC1S")
         for (lat, lon) in shape_data:
-            shape.AddPoint(lat, lon)
+            shape.add_point(lat, lon)
         schedule.add_shape_object(shape)
 
         week_period = transitfeed.ServicePeriod()
@@ -445,11 +445,11 @@ class WriteSampleFeedTestCase(util.TempFileTestCaseBase):
         feed_info.feed_publisher_name = "Some Agency"
         feed_info.feed_publisher_url = "http://www.aurl.com"
         feed_info.feed_lang = "en"
-        schedule.AddFeedInfoObject(feed_info)
+        schedule.add_feed_info_object(feed_info)
 
         schedule.Validate(problems)
         accumulator.AssertNoMoreExceptions()
-        schedule.WriteGoogleTransitFeed(self.tempfilepath)
+        schedule.write_google_transit_feed(self.tempfilepath)
 
         read_schedule = \
             transitfeed.Loader(self.tempfilepath, problems=problems,
@@ -475,7 +475,7 @@ class WriteSampleFeedTestCase(util.TempFileTestCaseBase):
         self.assertEqual(weekend_period,
                          read_schedule.GetServicePeriod(weekend_period.service_id))
 
-        self.assertEqual(len(stops), len(read_schedule.GetStopList()))
+        self.assertEqual(len(stops), len(read_schedule.get_stop_list()))
         for stop in stops:
             self.assertEqual(stop, read_schedule.GetStop(stop.stop_id))
         self.assertEqual("croak!", read_schedule.GetStop("BULLFROG").stop_sound)
@@ -522,7 +522,7 @@ class WriteSampleFeedTestCase(util.TempFileTestCaseBase):
         for rf, f in zip(read_fare_rules_data, fare_rule_data):
             self.assertEqual(rf, f)
 
-        self.assertEqual(1, len(read_schedule.GetShapeList()))
+        self.assertEqual(1, len(read_schedule.get_shape_list()))
         self.assertEqual(shape, read_schedule.GetShape(shape.shape_id))
 
         self.assertEqual(feed_info, read_schedule.feed_info)

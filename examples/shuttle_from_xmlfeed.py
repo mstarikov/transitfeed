@@ -32,7 +32,7 @@ except ImportError as e:
     import elementtree.ElementTree as ET  # older pythons
 
 
-class Nounused_stopExceptionProblemReporter(transitfeed.ProblemReporter):
+class NounusedStopExceptionProblemReporter(transitfeed.ProblemReporter):
     """The company shuttle database has a few unused stops for reasons unrelated
     to this script. Ignore them.
     """
@@ -69,7 +69,7 @@ def save_feed(input, output):
                                        timezone='America/Los_Angeles')
 
     for xml_stop in tree.getiterator('stop'):
-        stop = schedule.AddStop(lat=float(xml_stop.attrib['lat']),
+        stop = schedule.add_stop(lat=float(xml_stop.attrib['lat']),
                                 lng=float(xml_stop.attrib['lng']),
                                 name=xml_stop.attrib['name'])
         stops[xml_stop.attrib['id']] = stop
@@ -90,8 +90,8 @@ def save_feed(input, output):
             for (time, stop) in trip_stops:
                 t.AddStopTime(stop=stop, arrival_secs=time, departure_secs=time)
 
-    schedule.Validate(problems=Nounused_stopExceptionProblemReporter())
-    schedule.WriteGoogleTransitFeed(output)
+    schedule.Validate(problems=NounusedStopExceptionProblemReporter())
+    schedule.write_google_transit_feed(output)
 
 
 def main():

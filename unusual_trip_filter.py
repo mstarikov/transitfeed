@@ -149,9 +149,9 @@ def main():
 
     # Write the result
     if options.output is None:
-        data.WriteGoogleTransitFeed(feed_name)
+        data.write_google_transit_feed(feed_name)
     else:
-        data.WriteGoogleTransitFeed(options.output)
+        data.write_google_transit_feed(options.output)
 
 
 if __name__ == '__main__':

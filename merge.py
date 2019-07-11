@@ -921,7 +921,7 @@ class StopMerger(DataSetMerger):
         self.largest_stop_distance = distance
 
     def _get_iter(self, schedule):
-        return schedule.GetStopList()
+        return schedule.get_stop_list()
 
     def _get_by_id(self, schedule, stop_id):
         return schedule.GetStop(stop_id)
@@ -1004,8 +1004,8 @@ class StopMerger(DataSetMerger):
 
         print('Stops merged: %d of %d, %d' % (
             num_merged,
-            len(fm.a_schedule.GetStopList()),
-            len(fm.b_schedule.GetStopList())))
+            len(fm.a_schedule.get_stop_list()),
+            len(fm.b_schedule.get_stop_list())))
         return True
 
     def _update_andmigrate_unmerged(self, not_merged_stops, zone_map, merge_map,
@@ -1350,7 +1350,7 @@ class ShapeMerger(DataSetMerger):
         self.largest_shape_distance = distance
 
     def _get_iter(self, schedule):
-        return schedule.GetShapeList()
+        return schedule.get_shape_list()
 
     def _get_by_id(self, schedule, shape_id):
         return schedule.GetShape(shape_id)
@@ -1623,12 +1623,12 @@ class FeedMerger(object):
                 return 0
 
         id_data_sets = {'agency_id': schedule.GetAgencyList(),
-                        'stop_id': schedule.GetStopList(),
+                        'stop_id': schedule.get_stop_list(),
                         'route_id': schedule.GetRouteList(),
                         'trip_id': schedule.GetTripList(),
                         'service_id': schedule.GetServicePeriodList(),
                         'fare_id': schedule.GetFareAttributeList(),
-                        'shape_id': schedule.GetShapeList()}
+                        'shape_id': schedule.get_shape_list()}
 
         max_postfix_number = 0
         for id_name, entity_list in id_data_sets.items():
@@ -1851,7 +1851,7 @@ def main():
         service_period_merger.disjoin_calendars(options.cutoff_date)
 
     if feed_merger.merge_schedules():
-        feed_merger.get_merged_schedule().WriteGoogleTransitFeed(merged_feed_path)
+        feed_merger.get_merged_schedule().write_google_transit_feed(merged_feed_path)
     else:
         merged_feed_path = None
 

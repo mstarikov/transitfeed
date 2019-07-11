@@ -23,7 +23,7 @@ class ShapeValidationTestCase(util.ValidationTestCase):
     def expect_failed_add(self, shape, lat, lon, dist, column_name, value):
         self.Expectinvalid_valueInClosure(
             column_name, value,
-            lambda: shape.AddPoint(lat, lon, dist, self.problems))
+            lambda: shape.add_point(lat, lon, dist, self.problems))
 
     def run_test(self):
         shape = transitfeed.Shape('TEST')
@@ -33,8 +33,8 @@ class ShapeValidationTestCase(util.ValidationTestCase):
         self.expect_failed_add(shape, 36.905019, -116.763207, -1,
                                'shape_dist_traveled', -1)
 
-        shape.AddPoint(36.915760, -116.751709, 0, self.problems)
-        shape.AddPoint(36.905018, -116.763206, 5, self.problems)
+        shape.add_point(36.915760, -116.751709, 0, self.problems)
+        shape.add_point(36.905018, -116.763206, 5, self.problems)
         shape.Validate(self.problems)
 
         shape.shape_id = None
@@ -51,13 +51,13 @@ class ShapeValidationTestCase(util.ValidationTestCase):
         self.expect_failed_add(shape, 0, 0, 6, 'shape_pt_lat', 0)
 
         # distance decreasing is bad, but staying the same is OK
-        shape.AddPoint(36.905019, -116.763206, 4, self.problems)
+        shape.add_point(36.905019, -116.763206, 4, self.problems)
         e = self.accumulator.PopException('invalid_value')
         self.assertMatchesRegex('Each subsequent point', e.FormatProblem())
         self.assertMatchesRegex('distance was 5.000000.', e.FormatProblem())
         self.accumulator.AssertNoMoreExceptions()
 
-        shape.AddPoint(36.925019, -116.764206, 6, self.problems)
+        shape.add_point(36.925019, -116.764206, 6, self.problems)
         self.accumulator.AssertNoMoreExceptions()
 
         shapepoint = transitfeed.ShapePoint('TEST', 36.915760, -116.7156, 6, 8)

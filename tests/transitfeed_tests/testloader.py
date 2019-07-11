@@ -194,7 +194,7 @@ class LoadAndRewriteFromZipTestCase(util.TestCase):
         schedule.Load(util.DataPath('good_feed.zip'), extra_validation=True)
 
         # Finally see if write crashes
-        schedule.WriteGoogleTransitFeed(tempfile.TemporaryFile())
+        schedule.write_google_transit_feed(tempfile.TemporaryFile())
 
 
 class BasicMemoryZipTestCase(util.MemoryZipTestCase):
@@ -208,14 +208,14 @@ class ZipCompressionTestCase(util.MemoryZipTestCase):
         schedule = self.make_loader_and_load()
         self.zip.close()
         write_output = StringIO()
-        schedule.WriteGoogleTransitFeed(write_output)
+        schedule.write_google_transit_feed(write_output)
         recompressedzip = zlib.compress(write_output.getvalue())
         write_size = len(write_output.getvalue())
         recompressedzip_size = len(recompressedzip)
         # If zlib can compress write_output it probably wasn't compressed
         self.assertFalse(
             recompressedzip_size < write_size * 0.60,
-            "Are you sure WriteGoogleTransitFeed wrote a compressed zip? "
+            "Are you sure write_google_transit_feed wrote a compressed zip? "
             "Orginial size: %d  recompressed: %d" %
             (write_size, recompressedzip_size))
 
@@ -285,7 +285,7 @@ class LoadUnknownFormatTestCase(util.TestCase):
             self.assertEqual(feed_name, e.feed_name)
 
 
-class Loadunrecognized_columnsTestCase(util.TestCase):
+class LoadunrecognizedColumnsTestCase(util.TestCase):
     def run_test(self):
         problems = unrecognized_columnRecorder(self)
         loader = transitfeed.Loader(util.DataPath('unrecognized_columns'),

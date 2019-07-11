@@ -267,12 +267,12 @@ class KMLwriter(object):
         Returns:
           The Folder ElementTree.Element instance or None if there are no stops.
         """
-        if not schedule.GetStopList():
+        if not schedule.get_stop_list():
             return None
         stop_folder = self._create_folder(doc, 'Stops')
         stop_folder_selection = self._stopfolder_selection_method(stop_folder)
         stop_style_selection = self._stopstyle_selection_method(doc)
-        stops = list(schedule.GetStopList())
+        stops = list(schedule.get_stop_list())
         stops.sort(key=lambda x: x.stop_name)
         for stop in stops:
             (folder, pathway_folder) = stop_folder_selection(stop)
@@ -659,10 +659,10 @@ class KMLwriter(object):
         Returns:
           The Folder ElementTree.Element instance or None.
         """
-        if not schedule.GetShapeList():
+        if not schedule.get_shape_list():
             return None
         shapes_folder = self._create_folder(doc, 'Shapes')
-        shapes = list(schedule.GetShapeList())
+        shapes = list(schedule.get_shape_list())
         shapes.sort(key=lambda x: x.shape_id)
         for shape in shapes:
             placemark = self._create_placemark(shapes_folder, shape.shape_id)

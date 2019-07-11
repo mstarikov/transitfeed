@@ -33,9 +33,10 @@ import subprocess
 import sys
 import tempfile
 import traceback
-import transitfeed
 import unittest
 import zipfile
+import transitfeed
+from transitfeed import problems
 
 
 def check_call(cmd, expected_retcode=0, stdin_str="", **kwargs):
@@ -115,20 +116,23 @@ class RedirectStdOutTestCaseBase(TestCase):
 
 class GetPathTestCase(TestCase):
     """TestCase with method to get paths to files in the distribution."""
-
     def set_up(self):
-        super(GetPathTestCase, self).set_up()
         self._origcwd = os.getcwd()
+        super(GetPathTestCase, self).set_up()
 
     def get_example_path(self, name):
         """Return the full path of a file in the examples directory"""
         return self.get_path('examples', name)
 
-    def get_testdata_path(self, *path):
+    def get_test_data_path(self, *path):
         """Return the full path of a file in the tests/data directory"""
         return self.get_path('tests', 'data', *path)
 
     def get_path(self, *path):
+        try:
+            self.set_up()
+        except AttributeError:
+            self._origcwd = os.getcwd()
         """Return absolute path of path. path is relative main source directory."""
         here = os.path.dirname(__file__)  # Relative to _origcwd
         return os.path.join(self._origcwd, here, '..', *path)
@@ -469,9 +473,9 @@ class ValidationTestCase(TestCase):
         service_period.SetEndDate("20111203")
         service_period.set_date_has_service("20091203")
         schedule.add_service_period_object(service_period)
-        stop1 = schedule.AddStop(lng=1.00, lat=48.2, name="Stop 1", stop_id="stop1")
-        stop2 = schedule.AddStop(lng=1.01, lat=48.2, name="Stop 2", stop_id="stop2")
-        stop3 = schedule.AddStop(lng=1.03, lat=48.2, name="Stop 3", stop_id="stop3")
+        stop1 = schedule.add_stop(lng=1.00, lat=48.2, name="Stop 1", stop_id="stop1")
+        stop2 = schedule.add_stop(lng=1.01, lat=48.2, name="Stop 2", stop_id="stop2")
+        stop3 = schedule.add_stop(lng=1.03, lat=48.2, name="Stop 3", stop_id="stop3")
         route = schedule.AddRoute("54C", "", "Bus", route_id="054C")
         trip = route.AddTrip(schedule, "bus trip", trip_id="CITY1")
         trip.AddStopTime(stop1, stop_time="12:00:00")
@@ -481,7 +485,7 @@ class ValidationTestCase(TestCase):
 
 
 # TODO(anog): Revisit this after we implement proper per-exception level change
-class RecordingProblemAccumulator(transitfeed.ProblemAccumulatorInterface):
+class RecordingProblemAccumulator(problems.ProblemAccumulatorInterface):
     """Save all problems for later inspection.
 
     Args:
@@ -624,7 +628,7 @@ class RecordingProblemAccumulator(transitfeed.ProblemAccumulatorInterface):
         self.exceptions = sorted_exceptions
 
 
-class TestFailureProblemAccumulator(transitfeed.ProblemAccumulatorInterface):
+class TestFailureProblemAccumulator(problems.ProblemAccumulatorInterface):
     """Causes a test failure immediately on any problem."""
 
     def __init__(self, test_case, ignore_types=("expiration_date",)):
@@ -649,7 +653,7 @@ def get_test_failure_problem_reporter(test_case,
     return problems
 
 
-class ExceptionProblemReporterNoExpiration(transitfeed.ProblemReporter):
+class ExceptionProblemReporterNoExpiration(problems.ProblemReporter):
     """Ignores feed expiration problems.
 
     Use TestFailureProblemReporter in new code because it fails more cleanly, is

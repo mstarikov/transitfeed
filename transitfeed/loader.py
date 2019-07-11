@@ -34,11 +34,11 @@ class Loader:
     def __init__(self,
                  feed_path=None,
                  schedule=None,
-                 problems=problems.default_problem_reporter,
+                 error_reporter=problems.default_problem_reporter,
                  extra_validation=False,
                  load_stop_times=True,
                  memory_db=True,
-                 zip=None,
+                 zip_object=None,
                  check_duplicate_trips=False,
                  gtfs_factory=None):
         """Initialize a new loader object.
@@ -53,7 +53,7 @@ class Loader:
             times are not needed. The default is True.
           memory_db: if creating a new Schedule object use an in-memory sqlite
             database instead of creating one in a temporary file
-          zip: a zipfile.ZipFile object, optionally used instead of path
+          zip_object: a zipfile.ZipFile object, optionally used instead of path
         """
         if gtfs_factory is None:
             gtfs_factory = gtfsfactoryuser.GtfsFactoryUser().get_gtfs_factory()
@@ -64,9 +64,9 @@ class Loader:
 
         self._extra_validation = extra_validation
         self._schedule = schedule
-        self._problems = problems
+        self._problems = error_reporter
         self._path = feed_path
-        self._zip = zip
+        self._zip = zip_object
         self._load_stop_times_flag = load_stop_times
         self._gtfs_factory = gtfs_factory
 

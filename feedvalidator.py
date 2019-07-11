@@ -61,7 +61,7 @@ def problem_count_text(error_count, warning_count):
     return ' and '.join(results)
 
 
-def Calendar_summary(schedule):
+def calendar_summary(schedule):
     today = datetime.date.today()
     summary_end_date = today + datetime.timedelta(days=60)
     start_date, end_date = schedule.GetDateRange()
@@ -168,7 +168,7 @@ class CountingConsoleProblemAccumulator(transitfeed.SimpleProblemAccumulator):
         return self.notice_count()
 
 
-class Boundedproblem_list(object):
+class BoundedproblemList(object):
     """A list of one type of ExceptionWithContext objects with bounded size."""
 
     def __init__(self, size_bound):
@@ -196,7 +196,7 @@ class Boundedproblem_list(object):
         return self._count - len(self._exceptions)
 
     def __repr__(self):
-        return "<Boundedproblem_list %s>" % repr(self._exceptions)
+        return "<BoundedproblemList %s>" % repr(self._exceptions)
 
     count = property(lambda s: s._count)
     dropped_count = property(_get_dropped_count)
@@ -213,11 +213,11 @@ class LimitPerTypeProblemAccumulator(transitfeed.ProblemAccumulatorInterface):
     """
 
     def __init__(self, limit_per_type, ignore_types=None):
-        # {TYPE_WARNING: {"ClassName": Boundedproblem_list()}}
+        # {TYPE_WARNING: {"ClassName": BoundedproblemList()}}
         self._type_to_name_to_problist = {
-            TYPE_WARNING: defaultdict(lambda: Boundedproblem_list(limit_per_type)),
-            TYPE_ERROR: defaultdict(lambda: Boundedproblem_list(limit_per_type)),
-            TYPE_NOTICE: defaultdict(lambda: Boundedproblem_list(limit_per_type))
+            TYPE_WARNING: defaultdict(lambda: BoundedproblemList(limit_per_type)),
+            TYPE_ERROR: defaultdict(lambda: BoundedproblemList(limit_per_type)),
+            TYPE_NOTICE: defaultdict(lambda: BoundedproblemList(limit_per_type))
         }
         self._ignore_types = ignore_types or set()
 
@@ -242,11 +242,11 @@ class LimitPerTypeProblemAccumulator(transitfeed.ProblemAccumulatorInterface):
         return sum(map(lambda v: v.count, warning_sets))
 
     def problem_list(self, problem_type, class_name):
-        """Return the Boundedproblem_list object for given type and class."""
+        """Return the BoundedproblemList object for given type and class."""
         return self._type_to_name_to_problist[problem_type][class_name]
 
     def problem_list_map(self, problem_type):
-        """Return the map from class name to Boundedproblem_list object."""
+        """Return the map from class name to BoundedproblemList object."""
         return self._type_to_name_to_problist[problem_type]
 
 
@@ -257,7 +257,7 @@ class HTMLCountingProblemAccumulator(LimitPerTypeProblemAccumulator):
         Args:
           level_name: string such as "Error" or "Warning"
           class_problist: sequence of tuples (class name,
-              Boundedproblem_list object)
+              BoundedproblemList object)
 
         Returns:
           HTML in a string
@@ -280,7 +280,7 @@ class HTMLCountingProblemAccumulator(LimitPerTypeProblemAccumulator):
 
         Args:
           level_name: string such as "Error" or "Warning"
-          name_to_problist: dict mapping class name to an Boundedproblem_list object
+          name_to_problist: dict mapping class name to an BoundedproblemList object
 
         Returns:
           HTML in a string
@@ -464,9 +464,9 @@ FeedValidator extension used: %(extension)s
        "feed_dir": feed_path[0],
        "agencies": agencies,
        "routes": len(schedule.GetRouteList()),
-       "stops": len(schedule.GetStopList()),
+       "stops": len(schedule.get_stop_list()),
        "trips": len(schedule.GetTripList()),
-       "shapes": len(schedule.GetShapeList()),
+       "shapes": len(schedule.get_shape_list()),
        "dates": dates,
        "problem_summary": summary,
        "calendar_summary": calendar_summary_html,

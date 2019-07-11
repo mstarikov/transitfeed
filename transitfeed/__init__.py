@@ -64,26 +64,47 @@ from __future__ import absolute_import
 # because problems.py isn't fully loaded yet). Loading util first solves this as
 # problems.py gets fully loaded right away.
 # TODO: Solve this problem cleanly
-from .util import *
-from .agency import *
-from .fareattribute import *
-from .farerule import *
-from .frequency import *
-from .gtfsfactory import *
-from .gtfsfactoryuser import *
-from .gtfsobjectbase import *
-from .loader import *
-from .problems import *
-from .route import *
-from .schedule import *
-from .serviceperiod import *
-from .shape import *
-from .shapelib import *
-from .shapeloader import *
-from .shapepoint import *
-from .stop import *
-from .stoptime import *
-from .transfer import *
-from .trip import *
+# from .agency import *
+# from .fareattribute import *
+# from .farerule import *
+# from .frequency import *
+# from .gtfsfactory import *
+# from .gtfsfactoryuser import *
+# from .gtfsobjectbase import *
+# from .loader import *
+# from .problems import *
+# from .route import *
+# from .schedule import *
+# from .serviceperiod import *
+# from .shape import *
+# from .shapelib import *
+# from .shapeloader import *
+# from .shapepoint import *
+# from .stop import *
+# from .stoptime import *
+# from .transfer import *
+# from .trip import *
+
+# TODO: don't do import * this just lazy and lame.
+# gtfsfactory.py imports all below
+from .agency import Agency
+from .fareattribute import FareAttribute
+from .farerule import FareRule
+from .frequency import Frequency
+from .gtfsfactory import GtfsFactory
+from .gtfsfactoryuser import GtfsFactoryUser
+from .gtfsobjectbase import GtfsObjectBase
+from .loader import Loader
+from .route import Route
+from .schedule import Schedule
+from .serviceperiod import ServicePeriod
+from .shape import Shape
+from .shapelib import ShapeError
+from .shapeloader import ShapeLoader
+from .shapepoint import ShapePoint
+from .stop import Stop
+from .stoptime import StopTime
+from .transfer import Transfer
+from .trip import Trip
 
 from transitfeed.version import __version__

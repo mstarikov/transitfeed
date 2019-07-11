@@ -78,12 +78,12 @@ class TestKMLStopsRoundtrip(util.TestCase):
         feed1 = transitfeed.Loader(gtfs_input).Load()
         kmlwriter.KMLWriter().Write(feed1, self.kml_output)
         feed2 = transitfeed.Schedule()
-        kmlparser.KmlParser().Parse(self.kml_output, feed2)
+        kmlparser.KmlParser().parse(self.kml_output, feed2)
 
         stop_name_mapper = lambda x: x.stop_name
 
-        stops1 = set(map(stop_name_mapper, feed1.GetStopList()))
-        stops2 = set(map(stop_name_mapper, feed2.GetStopList()))
+        stops1 = set(map(stop_name_mapper, feed1.get_stop_list()))
+        stops2 = set(map(stop_name_mapper, feed2.get_stop_list()))
 
         self.assertEqual(stops1, stops2)
 
@@ -160,9 +160,9 @@ class TestKMLGeneratorMethods(util.TestCase):
 
     def test_create_line_stringForShape(self):
         shape = transitfeed.Shape('shape')
-        shape.AddPoint(1.0, 1.0)
-        shape.AddPoint(2.0, 4.0)
-        shape.AddPoint(3.0, 9.0)
+        shape.add_point(1.0, 1.0)
+        shape.add_point(2.0, 4.0)
+        shape.add_point(3.0, 9.0)
         element = self.kmlwriter._CreateLineStringForShape(self.parent, shape)
         self.assertEqual(_element_to_string(element),
                          '<LineString><tessellate>1</tessellate>'
@@ -346,7 +346,7 @@ class TestStopsKML(util.TestCase):
     def test_create_stops_folder(self):
         folder = self.kmlwriter._CreateStopsFolder(self.feed, self.parent)
         placemarks = folder.findall('Placemark')
-        self.assertEquals(len(placemarks), len(self.feed.GetStopList()))
+        self.assertEquals(len(placemarks), len(self.feed.get_stop_list()))
 
 
 class TestShapePointsKML(util.TestCase):
@@ -371,22 +371,22 @@ class TestShapePointsKML(util.TestCase):
 
 class FullTests(util.TempDirTestCaseBase):
     def test_normal_run(self):
-        (out, err) = self.CheckCallWithPath(
-            [self.GetPath('kmlwriter.py'), self.GetTestdata_path('good_feed.zip'),
+        (out, err) = self.check_call_with_path(
+            [self.get_path('kmlwriter.py'), self.GetTestdata_path('good_feed.zip'),
              'good_feed.kml'])
         self.assertFalse(os.path.exists('transitfeedcrash.txt'))
         self.assertTrue(os.path.exists('good_feed.kml'))
 
     def test_command_line_error(self):
-        (out, err) = self.CheckCallWithPath(
-            [self.GetPath('kmlwriter.py'), '--bad_flag'], expected_retcode=2)
+        (out, err) = self.check_call_with_path(
+            [self.get_path('kmlwriter.py'), '--bad_flag'], expected_retcode=2)
         self.assertMatchesRegex(r'no such option.*--bad_flag', err)
         self.assertMatchesRegex(r'--showtrips', err)
         self.assertFalse(os.path.exists('transitfeedcrash.txt'))
 
     def test_crash_handler(self):
-        (out, err) = self.CheckCallWithPath(
-            [self.GetPath('kmlwriter.py'), 'IWantMyCrash', 'output.zip'],
+        (out, err) = self.check_call_with_path(
+            [self.get_path('kmlwriter.py'), 'IWantMyCrash', 'output.zip'],
             stdin_str="\n", expected_retcode=127)
         self.assertMatchesRegex(r'Yikes', out)
         crashout = open('transitfeedcrash.txt').read()

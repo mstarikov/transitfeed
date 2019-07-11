@@ -633,8 +633,8 @@ class TestStopmerger(util.TestCase):
         self.fm.MergeSchedules()
 
         merged_schedule = self.fm.GetMergedSchedule()
-        self.assertEquals(len(merged_schedule.GetStopList()), 1)
-        self.assertEquals(merged_schedule.GetStopList()[0],
+        self.assertEquals(len(merged_schedule.get_stop_list()), 1)
+        self.assertEquals(merged_schedule.get_stop_list()[0],
                           self.fm.a_merge_map[self.s1])
         self.assertEquals(self.fm.a_merge_map[self.s1],
                           self.fm.b_merge_map[self.s2])
@@ -658,9 +658,9 @@ class TestStopmerger(util.TestCase):
         self.fm.MergeSchedules()
 
         merged_schedule = self.fm.GetMergedSchedule()
-        self.assertEquals(len(merged_schedule.GetStopList()), 2)
-        self.assert_(self.fm.a_merge_map[self.s1] in merged_schedule.GetStopList())
-        self.assert_(self.fm.b_merge_map[self.s2] in merged_schedule.GetStopList())
+        self.assertEquals(len(merged_schedule.get_stop_list()), 2)
+        self.assert_(self.fm.a_merge_map[self.s1] in merged_schedule.get_stop_list())
+        self.assert_(self.fm.b_merge_map[self.s2] in merged_schedule.get_stop_list())
         self.assertEquals(self.sm.GetMergeStats(), (0, 1, 1))
 
     def test_no_merge__different_name(self):
@@ -671,9 +671,9 @@ class TestStopmerger(util.TestCase):
         self.fm.MergeSchedules()
 
         merged_schedule = self.fm.GetMergedSchedule()
-        self.assertEquals(len(merged_schedule.GetStopList()), 2)
-        self.assert_(self.fm.a_merge_map[self.s1] in merged_schedule.GetStopList())
-        self.assert_(self.fm.b_merge_map[self.s2] in merged_schedule.GetStopList())
+        self.assertEquals(len(merged_schedule.get_stop_list()), 2)
+        self.assert_(self.fm.a_merge_map[self.s1] in merged_schedule.get_stop_list())
+        self.assert_(self.fm.b_merge_map[self.s2] in merged_schedule.get_stop_list())
         self.assertEquals(self.sm.GetMergeStats(), (0, 1, 1))
 
     def test_no_merge__far_apart(self):
@@ -688,9 +688,9 @@ class TestStopmerger(util.TestCase):
         self.fm.MergeSchedules()
 
         merged_schedule = self.fm.GetMergedSchedule()
-        self.assertEquals(len(merged_schedule.GetStopList()), 2)
-        self.assert_(self.fm.a_merge_map[self.s1] in merged_schedule.GetStopList())
-        self.assert_(self.fm.b_merge_map[self.s2] in merged_schedule.GetStopList())
+        self.assertEquals(len(merged_schedule.get_stop_list()), 2)
+        self.assert_(self.fm.a_merge_map[self.s1] in merged_schedule.get_stop_list())
+        self.assert_(self.fm.b_merge_map[self.s2] in merged_schedule.get_stop_list())
         self.assertEquals(self.sm.GetMergeStats(), (0, 1, 1))
 
         # check that the merged ids are different
@@ -706,7 +706,7 @@ class TestStopmerger(util.TestCase):
         self.fm.b_schedule.AddStopObject(self.s2)
         self.fm.MergeSchedules()
         merged_schedule = self.fm.GetMergedSchedule()
-        self.assertEquals(len(merged_schedule.GetStopList()), 1)
+        self.assertEquals(len(merged_schedule.get_stop_list()), 1)
         self.assertEquals(self.sm.GetMergeStats(), (1, 0, 0))
 
     def test_no_merge__zone_id(self):
@@ -716,7 +716,7 @@ class TestStopmerger(util.TestCase):
         self.fm.MergeSchedules()
 
         merged_schedule = self.fm.GetMergedSchedule()
-        self.assertEquals(len(merged_schedule.GetStopList()), 2)
+        self.assertEquals(len(merged_schedule.get_stop_list()), 2)
 
         self.assert_(self.s1.zone_id in self.fm.a_zone_map)
         self.assert_(self.s2.zone_id in self.fm.b_zone_map)
@@ -770,7 +770,7 @@ class TestStopmerger(util.TestCase):
         self.fm.a_schedule.AddStopObject(self.s1)
         self.fm.b_schedule.AddStopObject(self.s2)
         self.fm.MergeSchedules()
-        merged_stops = self.fm.GetMergedSchedule().GetStopList()
+        merged_stops = self.fm.GetMergedSchedule().get_stop_list()
         self.assertEquals(len(merged_stops), 1)
         self.assertEquals(merged_stops[0].location_type, 1)
 
@@ -851,7 +851,7 @@ class TestStopmerger(util.TestCase):
         self.assertEquals(self.sm.largest_stop_distance, largest_stop_distance)
         self.accumulator.expect_problem_class(merge.SameIdButNotMerged)
         self.fm.MergeSchedules()
-        self.assertEquals(len(self.fm.GetMergedSchedule().GetStopList()), 2)
+        self.assertEquals(len(self.fm.GetMergedSchedule().get_stop_list()), 2)
         self.accumulator.assert_expected_problemsreported(self)
 
     def test_set_largest_stop_distance_large(self):
@@ -859,7 +859,7 @@ class TestStopmerger(util.TestCase):
         self.sm.SetLargestStopDistance(largest_stop_distance)
         self.assertEquals(self.sm.largest_stop_distance, largest_stop_distance)
         self.fm.MergeSchedules()
-        self.assertEquals(len(self.fm.GetMergedSchedule().GetStopList()), 1)
+        self.assertEquals(len(self.fm.GetMergedSchedule().get_stop_list()), 1)
 
 
 class TestRoutemerger(util.TestCase):
@@ -998,7 +998,7 @@ class TestTripmerger(util.TestCase):
         self.s1.SetWeekdayService()
 
         self.shape = transitfeed.Shape('shape1')
-        self.shape.AddPoint(30.0, 30.0)
+        self.shape.add_point(30.0, 30.0)
 
         self.t1 = transitfeed.Trip(service_period=self.s1,
                                    route=self.r1, trip_id='t1')
@@ -1054,7 +1054,7 @@ class TestTripmerger(util.TestCase):
         t1_in_b = transitfeed.Trip(field_dict=self.t1)
         t1_in_b.trip_short_name = 't1-b'
         shape_in_b = transitfeed.Shape('shape1')
-        shape_in_b.AddPoint(30.0, 30.0)
+        shape_in_b.add_point(30.0, 30.0)
         s_in_b = transitfeed.ServicePeriod('s1')
         s_in_b.start_date = '20080101'
         s_in_b.end_date = '20080131'
@@ -1149,27 +1149,27 @@ class TestShapemerger(util.TestCase):
         # s3 has different endpoints to s1 and s2
 
         self.s1 = transitfeed.Shape('s1')
-        self.s1.AddPoint(30.0, 30.0)
-        self.s1.AddPoint(40.0, 30.0)
-        self.s1.AddPoint(50.0, 50.0)
+        self.s1.add_point(30.0, 30.0)
+        self.s1.add_point(40.0, 30.0)
+        self.s1.add_point(50.0, 50.0)
 
         self.s2 = transitfeed.Shape('s2')
-        self.s2.AddPoint(30.0, 30.0)
-        self.s2.AddPoint(40.0, 35.0)
-        self.s2.AddPoint(50.0, 50.0)
+        self.s2.add_point(30.0, 30.0)
+        self.s2.add_point(40.0, 35.0)
+        self.s2.add_point(50.0, 50.0)
 
         self.s3 = transitfeed.Shape('s3')
-        self.s3.AddPoint(31.0, 31.0)
-        self.s3.AddPoint(45.0, 35.0)
-        self.s3.AddPoint(51.0, 51.0)
+        self.s3.add_point(31.0, 31.0)
+        self.s3.add_point(45.0, 35.0)
+        self.s3.add_point(51.0, 51.0)
 
     def test_merge(self):
         self.s2.shape_id = self.s1.shape_id
         self.fm.a_schedule.add_shape_object(self.s1)
         self.fm.b_schedule.add_shape_object(self.s2)
         self.fm.MergeSchedules()
-        self.assertEquals(len(self.fm.merged_schedule.GetShapeList()), 1)
-        self.assertEquals(self.fm.merged_schedule.GetShapeList()[0], self.s2)
+        self.assertEquals(len(self.fm.merged_schedule.get_shape_list()), 1)
+        self.assertEquals(self.fm.merged_schedule.get_shape_list()[0], self.s2)
         self.assertEquals(self.sm.GetMergeStats(), (1, 0, 0))
 
         # check that the id is preserved
@@ -1179,7 +1179,7 @@ class TestShapemerger(util.TestCase):
         self.fm.a_schedule.add_shape_object(self.s1)
         self.fm.b_schedule.add_shape_object(self.s2)
         self.fm.MergeSchedules()
-        self.assertEquals(len(self.fm.merged_schedule.GetShapeList()), 2)
+        self.assertEquals(len(self.fm.merged_schedule.get_shape_list()), 2)
         self.assertEquals(self.s1, self.fm.a_merge_map[self.s1])
         self.assertEquals(self.s2, self.fm.b_merge_map[self.s2])
         self.assertEquals(self.sm.GetMergeStats(), (0, 1, 1))
@@ -1194,7 +1194,7 @@ class TestShapemerger(util.TestCase):
         self.fm.b_schedule.add_shape_object(self.s3)
         self.accumulator.expect_problem_class(merge.SameIdButNotMerged)
         self.fm.MergeSchedules()
-        self.assertEquals(len(self.fm.merged_schedule.GetShapeList()), 2)
+        self.assertEquals(len(self.fm.merged_schedule.get_shape_list()), 2)
         self.assertEquals(self.s1, self.fm.a_merge_map[self.s1])
         self.assertEquals(self.s3, self.fm.b_merge_map[self.s3])
         self.assertEquals(self.sm.GetMergeStats(), (0, 1, 1))
@@ -1228,7 +1228,7 @@ class TestShapemerger(util.TestCase):
         self.assertEquals(self.sm.largest_shape_distance, largest_shape_distance)
         self.accumulator.expect_problem_class(merge.SameIdButNotMerged)
         self.fm.MergeSchedules()
-        self.assertEquals(len(self.fm.GetMergedSchedule().GetShapeList()), 2)
+        self.assertEquals(len(self.fm.GetMergedSchedule().get_shape_list()), 2)
         self.accumulator.assert_expected_problemsreported(self)
 
     def test_set_largest_shape_distance_large(self):
@@ -1236,7 +1236,7 @@ class TestShapemerger(util.TestCase):
         self.sm.SetLargestShapeDistance(largest_shape_distance)
         self.assertEquals(self.sm.largest_shape_distance, largest_shape_distance)
         self.fm.MergeSchedules()
-        self.assertEquals(len(self.fm.GetMergedSchedule().GetShapeList()), 1)
+        self.assertEquals(len(self.fm.GetMergedSchedule().get_shape_list()), 1)
 
 
 class TestFareRulemerger(util.TestCase):
@@ -1497,8 +1497,8 @@ class MergeInSubprocessTestCase(util.TempDirTestCaseBase):
         return new_zip_path
 
     def test_crash_handler(self):
-        (out, err) = self.CheckCallWithPath(
-            [self.GetPath('merge.py'), '--no_browser',
+        (out, err) = self.check_call_with_path(
+            [self.get_path('merge.py'), '--no_browser',
              'IWantMyCrash', 'file2', 'fileout.zip'],
             expected_retcode=127)
         self.assertMatchesRegex(r'Yikes', out)
@@ -1506,8 +1506,8 @@ class MergeInSubprocessTestCase(util.TempDirTestCaseBase):
         self.assertMatchesRegex(r'For testing the merge crash handler', crashout)
 
     def test_mergeBadCommandLine(self):
-        (out, err) = self.CheckCallWithPath(
-            [self.GetPath('merge.py'), '--no_browser'],
+        (out, err) = self.check_call_with_path(
+            [self.get_path('merge.py'), '--no_browser'],
             expected_retcode=2)
         self.assertFalse(out)
         self.assertMatchesRegex(r'command line arguments', err)
@@ -1518,11 +1518,11 @@ class MergeInSubprocessTestCase(util.TempDirTestCaseBase):
         # avoids adding another tests/data file. good_feed.zip needs to remain error
         # free so it can't start in the future.
         future_good_feed = self.copy_and_modify_test_data(
-            self.GetPath('tests/data/good_feed.zip'), 'calendar.txt',
+            self.get_path('tests/data/good_feed.zip'), 'calendar.txt',
             '20070101', '20110101')
-        (out, err) = self.CheckCallWithPath(
-            [self.GetPath('merge.py'), '--no_browser',
-             self.GetPath('tests/data/unused_stop'),
+        (out, err) = self.check_call_with_path(
+            [self.get_path('merge.py'), '--no_browser',
+             self.get_path('tests/data/unused_stop'),
              future_good_feed,
              os.path.join(self.tempdirpath, 'merged-warnings.zip')],
             expected_retcode=0)
@@ -1532,22 +1532,22 @@ class MergeInSubprocessTestCase(util.TempDirTestCaseBase):
         # avoids adding another tests/data file. good_feed.zip needs to remain error
         # free so it can't start in the future.
         future_good_feed = self.copy_and_modify_test_data(
-            self.GetPath('tests/data/good_feed.zip'), 'calendar.txt',
+            self.get_path('tests/data/good_feed.zip'), 'calendar.txt',
             '20070101', '20110101')
-        (out, err) = self.CheckCallWithPath(
-            [self.GetPath('merge.py'), '--no_browser',
-             self.GetPath('tests/data/unused_stop'),
+        (out, err) = self.check_call_with_path(
+            [self.get_path('merge.py'), '--no_browser',
+             self.get_path('tests/data/unused_stop'),
              future_good_feed],
             expected_retcode=2)
 
     def test_check_version_is_run(self):
         future_good_feed = self.copy_and_modify_test_data(
-            self.GetPath('tests/data/good_feed.zip'), 'calendar.txt',
+            self.get_path('tests/data/good_feed.zip'), 'calendar.txt',
             '20070101', '20110101')
-        (out, err) = self.CheckCallWithPath(
-            [self.GetPath('merge.py'), '--no_browser',
+        (out, err) = self.check_call_with_path(
+            [self.get_path('merge.py'), '--no_browser',
              '--latest_version', '100.100.100',
-             self.GetPath('tests/data/unused_stop'),
+             self.get_path('tests/data/unused_stop'),
              future_good_feed,
              os.path.join(self.tempdirpath, 'merged.zip')],
             expected_retcode=0)

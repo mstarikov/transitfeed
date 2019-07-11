@@ -177,8 +177,8 @@ class TransferObjectTestCase(util.ValidationTestCase):
         # from_stop_id and to_stop_id are present in schedule
         schedule = transitfeed.Schedule()
         # 597m appart
-        stop1 = schedule.AddStop(57.5, 30.2, "stop 1")
-        stop2 = schedule.AddStop(57.5, 30.21, "stop 2")
+        stop1 = schedule.add_stop(57.5, 30.2, "stop 1")
+        stop2 = schedule.add_stop(57.5, 30.21, "stop 2")
         transfer = transitfeed.Transfer(schedule=schedule)
         transfer.from_stop_id = stop1.stop_id
         transfer.to_stop_id = stop2.stop_id
@@ -190,7 +190,7 @@ class TransferObjectTestCase(util.ValidationTestCase):
 
         # only from_stop_id is present in schedule
         schedule = transitfeed.Schedule()
-        stop1 = schedule.AddStop(57.5, 30.2, "stop 1")
+        stop1 = schedule.add_stop(57.5, 30.2, "stop 1")
         transfer = transitfeed.Transfer(schedule=schedule)
         transfer.from_stop_id = stop1.stop_id
         transfer.to_stop_id = "unexist"
@@ -212,8 +212,8 @@ class TransferObjectTestCase(util.ValidationTestCase):
     def test_validationSpeedDistanceAllTransferTypes(self):
         schedule = transitfeed.Schedule()
         transfer = transitfeed.Transfer(schedule=schedule)
-        stop1 = schedule.AddStop(1, 0, "stop 1")
-        stop2 = schedule.AddStop(0, 1, "stop 2")
+        stop1 = schedule.add_stop(1, 0, "stop 1")
+        stop2 = schedule.add_stop(0, 1, "stop 2")
         transfer = transitfeed.Transfer(schedule=schedule)
         transfer.from_stop_id = stop1.stop_id
         transfer.to_stop_id = stop2.stop_id
@@ -269,8 +269,8 @@ class TransferObjectTestCase(util.ValidationTestCase):
         # and transfer time is too small
         schedule = transitfeed.Schedule()
         # 298m appart
-        stop1 = schedule.AddStop(57.5, 30.2, "stop 1")
-        stop2 = schedule.AddStop(57.5, 30.205, "stop 2")
+        stop1 = schedule.add_stop(57.5, 30.2, "stop 1")
+        stop2 = schedule.add_stop(57.5, 30.205, "stop 2")
         transfer = transitfeed.Transfer(schedule=schedule)
         transfer.from_stop_id = stop1.stop_id
         transfer.to_stop_id = stop2.stop_id
@@ -290,8 +290,8 @@ class TransferObjectTestCase(util.ValidationTestCase):
         # are very close together.
         schedule = transitfeed.Schedule()
         # 239m appart
-        stop1 = schedule.AddStop(57.5, 30.2, "stop 1")
-        stop2 = schedule.AddStop(57.5, 30.204, "stop 2")
+        stop1 = schedule.add_stop(57.5, 30.2, "stop 1")
+        stop2 = schedule.add_stop(57.5, 30.204, "stop 2")
         transfer = transitfeed.Transfer(schedule=schedule)
         transfer.from_stop_id = stop1.stop_id
         transfer.to_stop_id = stop2.stop_id
@@ -312,7 +312,7 @@ class TransferObjectTestCase(util.ValidationTestCase):
         transfer.attr2 = "foo2"
 
         saved_schedule_file = StringIO()
-        schedule.WriteGoogleTransitFeed(saved_schedule_file)
+        schedule.write_google_transit_feed(saved_schedule_file)
         self.accumulator.AssertNoMoreExceptions()
 
         # Ignore NoServiceExceptions error to keep the test simple
@@ -418,7 +418,7 @@ class TransferValidationTestCase(util.MemoryZipTestCase):
         self.accumulator.AssertNoMoreExceptions()
 
         saved_schedule_file = StringIO()
-        schedule.WriteGoogleTransitFeed(saved_schedule_file)
+        schedule.write_google_transit_feed(saved_schedule_file)
         self.accumulator.AssertNoMoreExceptions()
         load_problems = util.GetTestFailureProblemReporter(
             self, ("ExpirationDate", "duplicate_id"))

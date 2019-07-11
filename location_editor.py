@@ -28,13 +28,13 @@ import schedule_viewer
 
 
 class LocationEditorRequestHandler(schedule_viewer.ScheduleRequestHandler):
-    def handle_json__g_e_t_setstoplocation(self, params):
+    def handle_json_get_set_stop_location(self, params):
         schedule = self.server.schedule
         stop_id = params.get('id', None)
         lat = params.get('lat', -1)
         lon = params.get('lng', -1)
         stop = schedule.GetStop(stop_id)
-        if (stop is None):
+        if stop is None:
             msg = 'Stop with id=' + stop_id + 'not found.'
         else:
             stop.stop_lat = float(lat)
@@ -44,12 +44,12 @@ class LocationEditorRequestHandler(schedule_viewer.ScheduleRequestHandler):
         print(msg)
         return msg
 
-    def handle_json__g_e_t_savedata(self, params):
+    def handle_json_get_save_data(self, params):
         schedule = self.server.schedule
         if not self.server.feed_path:
             msg = 'Feed path not defined'
         else:
-            schedule.WriteGoogleTransitFeed(self.server.feed_path)
+            schedule.write_google_transit_feed(self.server.feed_path)
             msg = 'Data saved to ' + self.server.feed_path
         print(msg)
         return msg

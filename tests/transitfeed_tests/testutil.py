@@ -55,22 +55,22 @@ class ColorLuminanceTestCase(test_util.TestCase):
                                decimal_places_tested, RGBmsg)
 
 
-class FindUniqueIdTestCase(test_util.TestCase):
+class find_unique_idTestCase(test_util.TestCase):
     def test_simple(self):
         d = {}
         for i in range(0, 5):
-            d[util.FindUniqueId(d)] = 1
+            d[util.find_unique_id(d)] = 1
         k = d.keys()
         k.sort()
         self.assertEqual(('0', '1', '2', '3', '4'), tuple(k))
 
     def test__avoid_collision(self):
         d = {'1': 1}
-        d[util.FindUniqueId(d)] = 1
+        d[util.find_unique_id(d)] = 1
         self.assertEqual(2, len(d))
         self.assertFalse('3' in d, "Ops, next statement should add something to d")
         d['3'] = None
-        d[util.FindUniqueId(d)] = 1
+        d[util.find_unique_id(d)] = 1
         self.assertEqual(4, len(d))
 
 
@@ -119,15 +119,15 @@ class ValidationUtilsTestCase(test_util.TestCase):
         self.assertFalse(util.IsValidURL("ftp://www.example.com"))
         self.assertFalse(util.IsValidURL(""))
 
-    def test_validate_u_r_l(self):
+    def test_validate_url(self):
         accumulator = test_util.RecordingProblemAccumulator(self)
         problems = ProblemReporter(accumulator)
-        self.assertTrue(util.ValidateURL("", "col", problems))
+        self.assertTrue(util.validate_url("", "col", problems))
         accumulator.AssertNoMoreExceptions()
-        self.assertTrue(util.ValidateURL("http://www.example.com", "col",
+        self.assertTrue(util.validate_url("http://www.example.com", "col",
                                          problems))
         accumulator.AssertNoMoreExceptions()
-        self.assertFalse(util.ValidateURL("ftp://www.example.com", "col",
+        self.assertFalse(util.validate_url("ftp://www.example.com", "col",
                                           problems))
         e = accumulator.Popinvalid_value("col")
         accumulator.AssertNoMoreExceptions()
@@ -145,11 +145,11 @@ class ValidationUtilsTestCase(test_util.TestCase):
     def test_validate_language_code(self):
         accumulator = test_util.RecordingProblemAccumulator(self)
         problems = ProblemReporter(accumulator)
-        self.assertTrue(util.ValidateLanguageCode("", "col", problems))
+        self.assertTrue(util.validate_language_code("", "col", problems))
         accumulator.AssertNoMoreExceptions()
-        self.assertTrue(util.ValidateLanguageCode("de", "col", problems))
+        self.assertTrue(util.validate_language_code("de", "col", problems))
         accumulator.AssertNoMoreExceptions()
-        self.assertFalse(util.ValidateLanguageCode("Swiss German", "col",
+        self.assertFalse(util.validate_language_code("Swiss German", "col",
                                                    problems))
         e = accumulator.Popinvalid_value("col")
         accumulator.AssertNoMoreExceptions()
@@ -180,11 +180,11 @@ class ValidationUtilsTestCase(test_util.TestCase):
     def test_validate_date(self):
         accumulator = test_util.RecordingProblemAccumulator(self)
         problems = ProblemReporter(accumulator)
-        self.assertTrue(util.ValidateDate("", "col", problems))
+        self.assertTrue(util.validate_date("", "col", problems))
         accumulator.AssertNoMoreExceptions()
-        self.assertTrue(util.ValidateDate("20100801", "col", problems))
+        self.assertTrue(util.validate_date("20100801", "col", problems))
         accumulator.AssertNoMoreExceptions()
-        self.assertFalse(util.ValidateDate("20100732", "col", problems))
+        self.assertFalse(util.validate_date("20100732", "col", problems))
         e = accumulator.Popinvalid_value("col")
         accumulator.AssertNoMoreExceptions()
 

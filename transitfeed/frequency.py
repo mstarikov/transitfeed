@@ -29,6 +29,16 @@ class Frequency(GtfsObjectBase):
     _TABLE_NAME = "frequencies"
 
     def __init__(self, field_dict=None):
+        if util.is_empty(self.exact_times):
+            self.exact_times = 0
+        try:
+            self.exact_times = int(self.exact_times)
+        except (ValueError, TypeError):
+            problems.invalid_value('exact_times', self.exact_times,
+                                  'Should be 0 (no fixed schedule) or 1 (fixed and ' \
+                                  'regular schedule, shortcut for a repetitive ' \
+                                  'stop_times file).')
+            del self.exact_times
         self._schedule = None
         if field_dict:
             if isinstance(field_dict, self.__class__):
@@ -52,19 +62,7 @@ class Frequency(GtfsObjectBase):
     def exact_times(self):
         return self.exact_times
 
-    def validateexact_times(self, problems):
-        if util.is_empty(self.exact_times):
-            self.exact_times = 0
-            return
-        try:
-            self.exact_times = int(self.exact_times)
-        except (ValueError, TypeError):
-            problems.invalid_value('exact_times', self.exact_times,
-                                  'Should be 0 (no fixed schedule) or 1 (fixed and ' \
-                                  'regular schedule, shortcut for a repetitive ' \
-                                  'stop_times file).')
-            del self.exact_times
-            return
+    def validate_exact_times(self, problems):
         if self.exact_times not in (0, 1):
             problems.invalid_value('exact_times', self.exact_times,
                                   'Should be 0 (no fixed schedule) or 1 (fixed and ' \

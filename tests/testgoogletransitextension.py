@@ -37,10 +37,10 @@ class ExtensionFullTests(FullTests):
                             'DeprecatedColumn']
 
     def test_google_transit_good_feed(self):
-        (out, err) = self.CheckCallWithPath(
-            [self.GetPath(self.feedvalidator_executable), '-n', '--latest_version',
+        (out, err) = self.check_call_with_path(
+            [self.get_path(self.feedvalidator_executable), '-n', '--latest_version',
              transitfeed.__version__] + self.additional_arguments +
-            [self.GetPath('tests', 'data', 'googletransit', 'good_feed')])
+            [self.get_path('tests', 'data', 'googletransit', 'good_feed')])
         self.assertTrue(re.search(r'feed validated successfully', out))
         self.assertFalse(re.search(r'ERROR', out))
         htmlout = open('validation-results.html').read()

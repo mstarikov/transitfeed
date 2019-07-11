@@ -142,11 +142,11 @@ class TooFastTravelTestCase(util.ValidationTestCase):
     def add_stop_distance_time(self, dist_time_list):
         # latitude where each 0.01 degrees longitude is 1km
         magic_lat = 26.062468289
-        stop = self.schedule.AddStop(magic_lat, 0, "Demo Stop 0")
+        stop = self.schedule.add_stop(magic_lat, 0, "Demo Stop 0")
         time = 0
         self.trip.AddStopTime(stop, arrival_secs=time, departure_secs=time)
         for i, (dist_delta, time_delta) in enumerate(dist_time_list):
-            stop = self.schedule.AddStop(
+            stop = self.schedule.add_stop(
                 magic_lat, stop.stop_lon + dist_delta * 0.00001,
                            "Demo Stop %d" % (i + 1))
             time += time_delta
@@ -264,12 +264,12 @@ class TooManyConsecutiveStopTimesWithSameTime(util.TestCase):
         self.schedule.AddAgency("Demo Transit Authority", "http://dta.org",
                                 "America/Los_Angeles")
 
-        self.stop1 = self.schedule.AddStop(lng=-116.75167,
+        self.stop1 = self.schedule.add_stop(lng=-116.75167,
                                            lat=36.915682,
                                            name="Stagecoach Hotel & Casino",
                                            stop_id="S1")
 
-        self.stop2 = self.schedule.AddStop(lng=-116.76218,
+        self.stop2 = self.schedule.add_stop(lng=-116.76218,
                                            lat=36.905697,
                                            name="E Main St / S Irving St",
                                            stop_id="S2")

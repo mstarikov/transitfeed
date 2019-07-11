@@ -17,10 +17,12 @@
 
 """Filter the unused stops out of a transit feed file."""
 from __future__ import print_function
-
+import os
 import optparse
 import sys
 import transitfeed
+from transitfeed.loader import Loader
+
 
 
 def main():
@@ -32,14 +34,18 @@ def main():
                       action="store_true",
                       help="Print removed stops to stdout")
     (options, args) = parser.parse_args()
-    if len(args) != 2:
+    if len(args) == 0:
+        input_path = os.path.join('tests', 'data', 'good_feed.zip')
+        output_path = 'output_good_feed.zip'
+    elif len(args) != 2:
         print(parser.format_help(), file=sys.stderr)
         print("\n\nYou must provide input_feed and output_feed\n\n", file=sys.stderr)
         sys.exit(2)
-    input_path = args[0]
-    output_path = args[1]
+    else:
+        input_path = args[0]
+        output_path = args[1]
 
-    loader = transitfeed.Loader(input_path)
+    loader = Loader(input_path)
     schedule = loader.Load()
 
     print("Removing unused stops...")
@@ -57,7 +63,7 @@ def main():
     else:
         print("Removed %d stops" % removed)
 
-    schedule.WriteGoogleTransitFeed(output_path)
+    schedule.write_google_transit_feed(output_path)
 
 
 if __name__ == "__main__":

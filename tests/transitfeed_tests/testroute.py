@@ -62,7 +62,7 @@ class RouteMemoryZipTestCase(util.MemoryZipTestCase):
         route_n.n_foo = "bar"
         schedule.AddRouteObject(route_n)
         saved_schedule_file = StringIO()
-        schedule.WriteGoogleTransitFeed(saved_schedule_file)
+        schedule.write_google_transit_feed(saved_schedule_file)
         self.accumulator.AssertNoMoreExceptions()
 
         self.assert_load_and_check_extra_values(saved_schedule_file)
@@ -82,7 +82,7 @@ class RouteMemoryZipTestCase(util.MemoryZipTestCase):
             self, ("ExpirationDate", "UnrecognizedColumn"))
         schedule = self.make_loader_and_load(problems=load1_problems)
         saved_schedule_file = StringIO()
-        schedule.WriteGoogleTransitFeed(saved_schedule_file)
+        schedule.write_google_transit_feed(saved_schedule_file)
 
         self.assert_load_and_check_extra_values(saved_schedule_file)
 

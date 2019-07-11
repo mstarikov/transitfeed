@@ -148,7 +148,7 @@ class TestPoly(ShapeLibTestBase):
     def test_get_closest_pointShape(self):
         poly = Poly()
 
-        poly.AddPoint(Point(1, 1, 0).Normalize())
+        poly.add_point(Point(1, 1, 0).Normalize())
         self.assert_point_approx_eq(Point(
             0.707106781187, 0.707106781187, 0), poly.GetPoint(0))
 
@@ -156,7 +156,7 @@ class TestPoly(ShapeLibTestBase):
         self.assert_point_approx_eq(Point(1, 1, 0).Normalize(),
                                     poly.GetClosestPoint(point)[0])
 
-        poly.AddPoint(Point(0, 1, 1).Normalize())
+        poly.add_point(Point(0, 1, 1).Normalize())
 
         self.assert_point_approx_eq(
             Point(0, 1, 1).Normalize(),
@@ -164,9 +164,9 @@ class TestPoly(ShapeLibTestBase):
 
     def test_cut_at_closest_point(self):
         poly = Poly()
-        poly.AddPoint(Point(0, 1, 0).Normalize())
-        poly.AddPoint(Point(0, 0.5, 0.5).Normalize())
-        poly.AddPoint(Point(0, 0, 1).Normalize())
+        poly.add_point(Point(0, 1, 0).Normalize())
+        poly.add_point(Point(0, 0.5, 0.5).Normalize())
+        poly.add_point(Point(0, 0, 1).Normalize())
 
         (before, after) = \
             poly.CutAtClosestPoint(Point(0, 0.3, 0.7).Normalize())
@@ -180,27 +180,27 @@ class TestPoly(ShapeLibTestBase):
             Point(0, 0.393919298579, 0.919145030018), after.GetPoint(0))
 
         poly = Poly()
-        poly.AddPoint(Point.FromLatLng(40.527035999999995, -74.191265999999999))
-        poly.AddPoint(Point.FromLatLng(40.526859999999999, -74.191140000000004))
-        poly.AddPoint(Point.FromLatLng(40.524681000000001, -74.189579999999992))
-        poly.AddPoint(Point.FromLatLng(40.523128999999997, -74.188467000000003))
-        poly.AddPoint(Point.FromLatLng(40.523054999999999, -74.188676000000001))
+        poly.add_point(Point.FromLatLng(40.527035999999995, -74.191265999999999))
+        poly.add_point(Point.FromLatLng(40.526859999999999, -74.191140000000004))
+        poly.add_point(Point.FromLatLng(40.524681000000001, -74.189579999999992))
+        poly.add_point(Point.FromLatLng(40.523128999999997, -74.188467000000003))
+        poly.add_point(Point.FromLatLng(40.523054999999999, -74.188676000000001))
         pattern = Poly()
-        pattern.AddPoint(Point.FromLatLng(40.52713,
+        pattern.add_point(Point.FromLatLng(40.52713,
                                           -74.191146000000003))
         self.assert_approx_eq(14.564268281551, pattern.GreedyPolyMatchDist(poly))
 
     def test_merge_polys(self):
         poly1 = Poly(name="Foo")
-        poly1.AddPoint(Point(0, 1, 0).Normalize())
-        poly1.AddPoint(Point(0, 0.5, 0.5).Normalize())
-        poly1.AddPoint(Point(0, 0, 1).Normalize())
-        poly1.AddPoint(Point(1, 1, 1).Normalize())
+        poly1.add_point(Point(0, 1, 0).Normalize())
+        poly1.add_point(Point(0, 0.5, 0.5).Normalize())
+        poly1.add_point(Point(0, 0, 1).Normalize())
+        poly1.add_point(Point(1, 1, 1).Normalize())
 
         poly2 = Poly()
         poly3 = Poly(name="Bar")
-        poly3.AddPoint(Point(1, 1, 1).Normalize())
-        poly3.AddPoint(Point(2, 0.5, 0.5).Normalize())
+        poly3.add_point(Point(1, 1, 1).Normalize())
+        poly3.add_point(Point(2, 0.5, 0.5).Normalize())
 
         merged1 = Poly.MergePolys([poly1, poly2])
         self.assert_points_approx_eq(poly1.GetPoints(), merged1.GetPoints())
@@ -222,7 +222,7 @@ class TestPoly(ShapeLibTestBase):
 
         # test merging two nearby points
         newPoint = poly1.GetPoint(-1).Plus(Point(0.000001, 0, 0)).Normalize()
-        poly1.AddPoint(newPoint)
+        poly1.add_point(newPoint)
         distance = poly1.GetPoint(-1).GetDistanceMeters(poly3.GetPoint(0))
         self.assertTrue(distance <= 10)
         self.assertTrue(distance > 5)
@@ -269,9 +269,9 @@ class TestPoly(ShapeLibTestBase):
 class TestCollection(ShapeLibTestBase):
     def test_poly_match(self):
         poly = Poly()
-        poly.AddPoint(Point(0, 1, 0).Normalize())
-        poly.AddPoint(Point(0, 0.5, 0.5).Normalize())
-        poly.AddPoint(Point(0, 0, 1).Normalize())
+        poly.add_point(Point(0, 1, 0).Normalize())
+        poly.add_point(Point(0, 0.5, 0.5).Normalize())
+        poly.add_point(Point(0, 0, 1).Normalize())
 
         collection = PolyCollection()
         collection.AddPoly(poly)
@@ -284,8 +284,8 @@ class TestCollection(ShapeLibTestBase):
         self.assert_(len(match) == 0)
 
         poly = Poly()
-        poly.AddPoint(Point.FromLatLng(45.585212, -122.586136))
-        poly.AddPoint(Point.FromLatLng(45.586654, -122.587595))
+        poly.add_point(Point.FromLatLng(45.585212, -122.586136))
+        poly.add_point(Point.FromLatLng(45.586654, -122.587595))
         collection = PolyCollection()
         collection.AddPoly(poly)
 
